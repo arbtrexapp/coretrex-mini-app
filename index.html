@@ -412,7 +412,6 @@
 
       <p id="withdrawMessage" class="muted"></p>
 
-      <!-- SECURITY CODE -->
       <div id="securityCodeBox" class="code-box hidden">
 
         <div class="code-label">SECURITY CODE</div>
@@ -460,9 +459,80 @@
       <p>Active</p>
     </div>
 
+    <!-- ADMIN BUTTON ADDED -->
+    <button
+      class="btn secondary hidden"
+      id="adminBtn"
+      style="margin-bottom:9px"
+    >
+      Admin
+    </button>
+
     <button class="btn danger" id="logoutBtn">
       Logout
     </button>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="adminScreen" class="screen">
+
+    <button class="back" data-screen="accountScreen">← Back</button>
+
+    <h2>Admin</h2>
+    <p class="muted">
+      Review Coretrex deposit and withdrawal requests.
+    </p>
+
+    <!-- PENDING DEPOSITS -->
+    <div class="card">
+
+      <div class="row" style="align-items:center">
+        <div>
+          <h3 style="margin:0 0 4px">Pending Deposits</h3>
+          <div class="muted">Deposit requests awaiting review.</div>
+        </div>
+
+        <button
+          id="refreshDepositsBtn"
+          class="btn secondary"
+          style="width:auto;padding:10px 13px"
+        >
+          Refresh
+        </button>
+      </div>
+
+      <div id="adminDepositList" style="margin-top:10px">
+        <div class="empty">Loading deposits...</div>
+      </div>
+
+    </div>
+
+    <!-- PENDING WITHDRAWALS -->
+    <div class="card">
+
+      <div class="row" style="align-items:center">
+        <div>
+          <h3 style="margin:0 0 4px">Pending Withdrawals</h3>
+          <div class="muted">Security-code-verified withdrawals.</div>
+        </div>
+
+        <button
+          id="refreshWithdrawalsBtn"
+          class="btn secondary"
+          style="width:auto;padding:10px 13px"
+        >
+          Refresh
+        </button>
+      </div>
+
+      <div id="adminWithdrawalList" style="margin-top:10px">
+        <div class="empty">Loading withdrawals...</div>
+      </div>
+
+    </div>
+
+    <p id="adminMessage" class="muted"></p>
+
   </section>
 
   <nav class="bottom">
@@ -512,6 +582,7 @@ const DEPOSIT_ASSETS = {
 let currentUser = null;
 let currentWithdrawalId = null;
 let countdownTimer = null;
+let isAdmin = false;
 
 const $ = id => document.getElementById(id);
 
@@ -548,6 +619,10 @@ function showScreen(id) {
 
   if (id === "homeScreen") {
     loadAccount();
+  }
+
+  if (id === "adminScreen" && isAdmin) {
+    loadAdminData();
   }
 }
 
@@ -637,6 +712,30 @@ $("loginBtn").onclick = async () => {
   await openApp();
 };
 
+async function checkAdmin() {
+  if (!currentUser) {
+    isAdmin = false;
+    $("adminBtn").classList.add("hidden");
+    return false;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("admin_users")
+    .select("user_id")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  isAdmin = !error && !!data;
+
+  if (isAdmin) {
+    $("adminBtn").classList.remove("hidden");
+  } else {
+    $("adminBtn").classList.add("hidden");
+  }
+
+  return isAdmin;
+}
+
 async function openApp() {
   $("authScreen").classList.add("hidden");
   $("app").classList.remove("hidden");
@@ -649,6 +748,7 @@ async function openApp() {
 
   updateDepositAsset();
 
+  await checkAdmin();
   await loadAccount();
   await loadActivity();
 }
@@ -820,8 +920,11 @@ function resetSecurityCode() {
     "Expires in 10 seconds";
 
   $("securityCodeInput").value = "";
+  $("securityCodeInput").disabled = false;
 
   $("securityMessage").textContent = "";
+  $("verifySecurityCodeBtn").disabled = false;
+  $("verifySecurityCodeBtn").textContent = "Verify Code";
 }
 
 function startCountdown() {
@@ -1237,6 +1340,440 @@ function escapeHtml(value) {
 $("refreshActivity").onclick =
   loadActivity;
 
+/* =========================
+   ADMIN
+========================= */
+
+$("adminBtn").onclick = async () => {
+
+  if (!isAdmin) {
+    return;
+  }
+
+  showScreen("adminScreen");
+
+  await loadAdminData();
+};
+
+async function loadAdminData() {
+  if (!isAdmin) {
+    return;
+  }
+
+  $("adminMessage").textContent =
+    "Loading admin data...";
+
+  await Promise.all([
+    loadPendingDeposits(),
+    loadPendingWithdrawals()
+  ]);
+
+  $("adminMessage").textContent = "";
+}
+
+async function loadPendingDeposits() {
+
+  $("adminDepositList").innerHTML =
+    '<div class="empty">Loading deposits...</div>';
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "admin_get_pending_deposits"
+  );
+
+  if (error) {
+    $("adminDepositList").innerHTML =
+      `<div class="empty error">${escapeHtml(error.message)}</div>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    $("adminDepositList").innerHTML =
+      '<div class="empty">No pending deposits.</div>';
+    return;
+  }
+
+  $("adminDepositList").innerHTML =
+    data.map(deposit => {
+
+      const date =
+        new Date(deposit.created_at)
+          .toLocaleString("en-NG", {
+            dateStyle: "medium",
+            timeStyle: "short"
+          });
+
+      return `
+        <div class="history-item">
+
+          <div class="row">
+            <div>
+              <b>${money(deposit.amount)}</b>
+              <div class="muted">
+                ${escapeHtml(
+                  deposit.full_name ||
+                  deposit.user_email ||
+                  "User"
+                )}
+              </div>
+            </div>
+
+            <span class="status pending">
+              Pending
+            </span>
+          </div>
+
+          ${
+            deposit.user_email
+              ? `
+                <div
+                  class="muted"
+                  style="margin-top:9px"
+                >
+                  ${escapeHtml(deposit.user_email)}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            deposit.reference
+              ? `
+                <div style="margin-top:9px">
+                  <span class="muted">
+                    TXID / Reference
+                  </span>
+
+                  <div
+                    class="address"
+                    style="margin-top:5px"
+                  >
+                    ${escapeHtml(deposit.reference)}
+                  </div>
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            deposit.description
+              ? `
+                <div
+                  class="muted"
+                  style="margin-top:9px"
+                >
+                  ${escapeHtml(deposit.description)}
+                </div>
+              `
+              : ""
+          }
+
+          <div
+            class="muted"
+            style="margin-top:9px"
+          >
+            ${date}
+          </div>
+
+          <div
+            style="
+              display:grid;
+              grid-template-columns:1fr 1fr;
+              gap:9px;
+              margin-top:12px
+            "
+          >
+
+            <button
+              class="btn"
+              data-deposit-action="approve"
+              data-deposit-id="${escapeHtml(deposit.transaction_id)}"
+            >
+              Approve
+            </button>
+
+            <button
+              class="btn danger"
+              data-deposit-action="reject"
+              data-deposit-id="${escapeHtml(deposit.transaction_id)}"
+            >
+              Reject
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+
+  document
+    .querySelectorAll("[data-deposit-action]")
+    .forEach(button => {
+
+      button.onclick = () =>
+        reviewDeposit(
+          button.dataset.depositId,
+          button.dataset.depositAction,
+          button
+        );
+
+    });
+}
+
+async function reviewDeposit(
+  transactionId,
+  decision,
+  button
+) {
+
+  if (!isAdmin) return;
+
+  const originalText =
+    button.textContent;
+
+  button.disabled = true;
+  button.textContent =
+    decision === "approve"
+      ? "Approving..."
+      : "Rejecting...";
+
+  const { error } =
+    await supabaseClient.rpc(
+      "admin_review_deposit",
+      {
+        p_transaction_id: transactionId,
+        p_decision: decision
+      }
+    );
+
+  if (error) {
+
+    button.disabled = false;
+    button.textContent =
+      originalText;
+
+    $("adminMessage").textContent =
+      error.message;
+
+    $("adminMessage").className =
+      "error";
+
+    return;
+  }
+
+  $("adminMessage").textContent =
+    `Deposit ${decision}d successfully.`;
+
+  $("adminMessage").className =
+    "success";
+
+  await loadPendingDeposits();
+  await loadAccount();
+}
+
+async function loadPendingWithdrawals() {
+
+  $("adminWithdrawalList").innerHTML =
+    '<div class="empty">Loading withdrawals...</div>';
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "admin_get_pending_withdrawals"
+  );
+
+  if (error) {
+    $("adminWithdrawalList").innerHTML =
+      `<div class="empty error">${escapeHtml(error.message)}</div>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    $("adminWithdrawalList").innerHTML =
+      '<div class="empty">No pending withdrawals.</div>';
+    return;
+  }
+
+  $("adminWithdrawalList").innerHTML =
+    data.map(withdrawal => {
+
+      const date =
+        new Date(withdrawal.created_at)
+          .toLocaleString("en-NG", {
+            dateStyle: "medium",
+            timeStyle: "short"
+          });
+
+      return `
+        <div class="history-item">
+
+          <div class="row">
+
+            <div>
+              <b>${money(withdrawal.amount)}</b>
+
+              <div class="muted">
+                ${escapeHtml(
+                  withdrawal.full_name ||
+                  withdrawal.user_email ||
+                  "User"
+                )}
+              </div>
+            </div>
+
+            <span class="status code_verified">
+              Verified
+            </span>
+
+          </div>
+
+          ${
+            withdrawal.user_email
+              ? `
+                <div
+                  class="muted"
+                  style="margin-top:9px"
+                >
+                  ${escapeHtml(withdrawal.user_email)}
+                </div>
+              `
+              : ""
+          }
+
+          <div style="margin-top:9px">
+            <span class="muted">
+              ${escapeHtml(withdrawal.network || "TRC20")} Wallet
+            </span>
+
+            <div
+              class="address"
+              style="margin-top:5px"
+            >
+              ${escapeHtml(withdrawal.wallet_address)}
+            </div>
+          </div>
+
+          <div
+            class="muted"
+            style="margin-top:9px"
+          >
+            ${date}
+          </div>
+
+          <div
+            style="
+              display:grid;
+              grid-template-columns:1fr 1fr;
+              gap:9px;
+              margin-top:12px
+            "
+          >
+
+            <button
+              class="btn"
+              data-withdraw-action="approve"
+              data-withdraw-id="${escapeHtml(withdrawal.withdrawal_id)}"
+            >
+              Approve
+            </button>
+
+            <button
+              class="btn danger"
+              data-withdraw-action="reject"
+              data-withdraw-id="${escapeHtml(withdrawal.withdrawal_id)}"
+            >
+              Reject
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+
+  document
+    .querySelectorAll("[data-withdraw-action]")
+    .forEach(button => {
+
+      button.onclick = () =>
+        reviewWithdrawal(
+          button.dataset.withdrawId,
+          button.dataset.withdrawAction,
+          button
+        );
+
+    });
+}
+
+async function reviewWithdrawal(
+  withdrawalId,
+  decision,
+  button
+) {
+
+  if (!isAdmin) return;
+
+  const originalText =
+    button.textContent;
+
+  button.disabled = true;
+
+  button.textContent =
+    decision === "approve"
+      ? "Approving..."
+      : "Rejecting...";
+
+  const { error } =
+    await supabaseClient.rpc(
+      "admin_review_withdrawal",
+      {
+        p_withdrawal_id: withdrawalId,
+        p_decision: decision
+      }
+    );
+
+  if (error) {
+
+    button.disabled = false;
+
+    button.textContent =
+      originalText;
+
+    $("adminMessage").textContent =
+      error.message;
+
+    $("adminMessage").className =
+      "error";
+
+    return;
+  }
+
+  $("adminMessage").textContent =
+    `Withdrawal ${decision}d successfully.`;
+
+  $("adminMessage").className =
+    "success";
+
+  await loadPendingWithdrawals();
+  await loadAccount();
+  await loadActivity();
+}
+
+$("refreshDepositsBtn").onclick =
+  loadPendingDeposits;
+
+$("refreshWithdrawalsBtn").onclick =
+  loadPendingWithdrawals;
+
+/* =========================
+   LOGOUT
+========================= */
+
 $("logoutBtn").onclick = async () => {
 
   clearInterval(countdownTimer);
@@ -1245,6 +1782,9 @@ $("logoutBtn").onclick = async () => {
 
   currentUser = null;
   currentWithdrawalId = null;
+  isAdmin = false;
+
+  $("adminBtn").classList.add("hidden");
 
   $("app").classList.add("hidden");
 
@@ -1275,6 +1815,9 @@ supabaseClient.auth.onAuthStateChange(
       event === "SIGNED_OUT"
     ) {
       currentUser = null;
+      isAdmin = false;
+
+      $("adminBtn").classList.add("hidden");
 
       $("app").classList.add("hidden");
 
