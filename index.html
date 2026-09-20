@@ -6,6 +6,7 @@
   <title>Coretrex</title>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
@@ -117,6 +118,11 @@
       cursor: pointer;
     }
 
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
     .primary {
       background: #0b6b45;
       color: white;
@@ -149,6 +155,29 @@
       background: transparent;
       color: #0b6b45;
       font-size: 13px;
+    }
+
+    .message {
+      display: none;
+      padding: 13px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .success {
+      background: #e9f7ef;
+      color: #17633f;
+    }
+
+    .error {
+      background: #fdecec;
+      color: #9b2c2c;
     }
 
     .demo-note {
@@ -293,6 +322,9 @@
         <p>Access your trading dashboard</p>
       </div>
 
+      <div id="authMessage" class="message"></div>
+
+
       <!-- LOGIN -->
 
       <div id="loginBox" class="auth-card">
@@ -307,17 +339,20 @@
           type="email"
           id="loginEmail"
           placeholder="Email address"
+          autocomplete="email"
         >
 
         <input
           type="password"
           id="loginPassword"
           placeholder="Password"
+          autocomplete="current-password"
         >
 
         <button
+          id="loginButton"
           class="primary full"
-          onclick="demoLogin()"
+          onclick="loginUser()"
         >
           Login
         </button>
@@ -357,23 +392,27 @@
           type="text"
           id="registerName"
           placeholder="Full name"
+          autocomplete="name"
         >
 
         <input
           type="email"
           id="registerEmail"
           placeholder="Email address"
+          autocomplete="email"
         >
 
         <input
           type="password"
           id="registerPassword"
           placeholder="Create password"
+          autocomplete="new-password"
         >
 
         <button
+          id="registerButton"
           class="primary full"
-          onclick="demoRegister()"
+          onclick="registerUser()"
         >
           Register
         </button>
@@ -396,9 +435,8 @@
 
 
       <div class="demo-note">
-        🔐 Demo mode: account registration and login are currently
-        frontend-only. Secure account storage and authentication will
-        require a backend before real user accounts are enabled.
+        🔐 Your email must be verified before you can sign in.
+        Never share your password or verification code with anyone.
       </div>
 
     </div>
@@ -520,6 +558,10 @@
         🎧 Support
       </button>
 
+      <button onclick="logoutUser()">
+        🚪 Logout
+      </button>
+
     </div>
 
   </div>
@@ -529,10 +571,7 @@
 
   <div id="plans" class="page">
 
-    <button
-      class="back"
-      onclick="showPage('dashboard')"
-    >
+    <button class="back" onclick="showPage('dashboard')">
       ← Back
     </button>
 
@@ -612,10 +651,7 @@
 
   <div id="deposit" class="page">
 
-    <button
-      class="back"
-      onclick="showPage('dashboard')"
-    >
+    <button class="back" onclick="showPage('dashboard')">
       ← Back
     </button>
 
@@ -668,10 +704,7 @@
 
   <div id="withdraw" class="page">
 
-    <button
-      class="back"
-      onclick="showPage('dashboard')"
-    >
+    <button class="back" onclick="showPage('dashboard')">
       ← Back
     </button>
 
@@ -686,8 +719,8 @@
     </div>
 
     <div class="notice">
-      🔐 Email verification and secure server-side processing
-      will be added when the backend is connected.
+      🔐 Secure server-side withdrawal processing will be
+      required before real withdrawals are enabled.
     </div>
 
   </div>
@@ -697,10 +730,7 @@
 
   <div id="investments" class="page">
 
-    <button
-      class="back"
-      onclick="showPage('dashboard')"
-    >
+    <button class="back" onclick="showPage('dashboard')">
       ← Back
     </button>
 
@@ -719,10 +749,7 @@
 
   <div id="transactions" class="page">
 
-    <button
-      class="back"
-      onclick="showPage('dashboard')"
-    >
+    <button class="back" onclick="showPage('dashboard')">
       ← Back
     </button>
 
@@ -741,10 +768,7 @@
 
   <div id="referral" class="page">
 
-    <button
-      class="back"
-      onclick="showPage('dashboard')"
-    >
+    <button class="back" onclick="showPage('dashboard')">
       ← Back
     </button>
 
@@ -765,10 +789,7 @@
 
   <div id="account" class="page">
 
-    <button
-      class="back"
-      onclick="showPage('dashboard')"
-    >
+    <button class="back" onclick="showPage('dashboard')">
       ← Back
     </button>
 
@@ -776,7 +797,7 @@
       👤 My Account
     </div>
 
-    <div class="info">
+    <div class="info" id="accountInfo">
       Account status: Active<br>
       Available balance: $0.00<br>
       Invested capital: $0.00<br>
@@ -790,10 +811,7 @@
 
   <div id="support" class="page">
 
-    <button
-      class="back"
-      onclick="showPage('dashboard')"
-    >
+    <button class="back" onclick="showPage('dashboard')">
       ← Back
     </button>
 
@@ -817,14 +835,31 @@
 
 <script>
 
+  /* =========================
+     SUPABASE CONFIGURATION
+     ========================= */
+
+  const SUPABASE_URL =
+    "https://gttfjmoyggyunhaojcxg.supabase.co";
+
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_UPsL7MaeNjsbh8InoyfmxQ_LPi8LLkm";
+
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+
+
+  /* =========================
+     TELEGRAM MINI APP
+     ========================= */
+
   const tg =
     window.Telegram &&
     window.Telegram.WebApp;
 
-
-  /*
-    TELEGRAM MINI APP
-  */
 
   if (tg) {
 
@@ -850,11 +885,42 @@
   }
 
 
-  /*
-    LOGIN / REGISTER DEMO
-  */
+  /* =========================
+     MESSAGE SYSTEM
+     ========================= */
+
+  function showMessage(message, type) {
+
+    const box =
+      document.getElementById("authMessage");
+
+    box.textContent = message;
+
+    box.className =
+      "message show " + type;
+
+  }
+
+
+  function clearMessage() {
+
+    const box =
+      document.getElementById("authMessage");
+
+    box.textContent = "";
+
+    box.className = "message";
+
+  }
+
+
+  /* =========================
+     LOGIN / REGISTER SCREENS
+     ========================= */
 
   function showRegister() {
+
+    clearMessage();
 
     document.getElementById("loginBox").style.display =
       "none";
@@ -867,6 +933,8 @@
 
   function showLogin() {
 
+    clearMessage();
+
     document.getElementById("registerBox").style.display =
       "none";
 
@@ -876,7 +944,11 @@
   }
 
 
-  function demoRegister() {
+  /* =========================
+     REAL SUPABASE REGISTRATION
+     ========================= */
+
+  async function registerUser() {
 
     const name =
       document.getElementById("registerName").value.trim();
@@ -887,24 +959,108 @@
     const password =
       document.getElementById("registerPassword").value;
 
+    const button =
+      document.getElementById("registerButton");
+
+
     if (!name || !email || !password) {
 
-      alert("Please complete all registration fields.");
+      showMessage(
+        "Please complete all registration fields.",
+        "error"
+      );
 
       return;
 
     }
 
-    alert(
-      "Demo registration successful. Secure account creation will be enabled when the backend is connected."
-    );
 
-    showPage("dashboard");
+    if (password.length < 6) {
+
+      showMessage(
+        "Password must contain at least 6 characters.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    button.disabled = true;
+    button.textContent = "Creating account...";
+
+
+    try {
+
+      const { data, error } =
+        await supabaseClient.auth.signUp({
+
+          email: email,
+
+          password: password,
+
+          options: {
+
+            data: {
+              full_name: name
+            },
+
+            emailRedirectTo:
+              window.location.origin
+
+          }
+
+        });
+
+
+      if (error) {
+
+        showMessage(
+          error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      showMessage(
+        "Registration successful. Please check your email and click the verification link before logging in.",
+        "success"
+      );
+
+
+      document.getElementById("registerPassword").value =
+        "";
+
+    }
+
+    catch (error) {
+
+      showMessage(
+        "Unable to create the account. Please try again.",
+        "error"
+      );
+
+    }
+
+    finally {
+
+      button.disabled = false;
+      button.textContent = "Register";
+
+    }
 
   }
 
 
-  function demoLogin() {
+  /* =========================
+     REAL SUPABASE LOGIN
+     ========================= */
+
+  async function loginUser() {
 
     const email =
       document.getElementById("loginEmail").value.trim();
@@ -912,65 +1068,225 @@
     const password =
       document.getElementById("loginPassword").value;
 
+    const button =
+      document.getElementById("loginButton");
+
+
     if (!email || !password) {
 
-      alert(
-        "Please enter your email and password."
+      showMessage(
+        "Please enter your email and password.",
+        "error"
       );
 
       return;
 
     }
 
-    alert(
-      "Demo login successful. Secure authentication will be enabled when the backend is connected."
-    );
 
-    showPage("dashboard");
-
-  }
+    button.disabled = true;
+    button.textContent = "Signing in...";
 
 
-  /*
-    TELEGRAM LOGIN DEMO
-  */
+    try {
 
-  function continueWithTelegram() {
+      const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
 
-    if (tg) {
+          email: email,
+          password: password
 
-      const user =
-        tg.initDataUnsafe &&
-        tg.initDataUnsafe.user;
+        });
 
-      if (user) {
 
-        const name =
-          user.first_name ||
-          user.username ||
-          "Telegram User";
+      if (error) {
 
-        document.getElementById("welcomeText").textContent =
-          "Welcome, " + name;
-
-        showPage("dashboard");
+        showMessage(
+          error.message,
+          "error"
+        );
 
         return;
 
       }
 
+
+      if (!data.user) {
+
+        showMessage(
+          "Login could not be completed.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      updateWelcome(data.user);
+
+      showPage("dashboard");
+
     }
 
-    alert(
-      "Please open Coretrex from Telegram to continue with Telegram."
-    );
+    catch (error) {
+
+      showMessage(
+        "Unable to sign in. Please try again.",
+        "error"
+      );
+
+    }
+
+    finally {
+
+      button.disabled = false;
+      button.textContent = "Login";
+
+    }
 
   }
 
 
-  /*
-    PAGE NAVIGATION
-  */
+  /* =========================
+     USER WELCOME
+     ========================= */
+
+  function updateWelcome(user) {
+
+    if (!user) return;
+
+
+    const telegramUser =
+      tg &&
+      tg.initDataUnsafe &&
+      tg.initDataUnsafe.user;
+
+
+    const name =
+      user.user_metadata &&
+      user.user_metadata.full_name
+        ? user.user_metadata.full_name
+        : telegramUser &&
+          (telegramUser.first_name || telegramUser.username)
+          ? (telegramUser.first_name || telegramUser.username)
+          : user.email
+            ? user.email.split("@")[0]
+            : "User";
+
+
+    document.getElementById("welcomeText").textContent =
+      "Welcome, " + name;
+
+
+    const accountInfo =
+      document.getElementById("accountInfo");
+
+
+    accountInfo.innerHTML =
+      "Account status: Active<br>" +
+      "Email: " +
+      user.email +
+      "<br>" +
+      "Available balance: $0.00<br>" +
+      "Invested capital: $0.00<br>" +
+      "Realized P/L: $0.00";
+
+  }
+
+
+  /* =========================
+     CHECK EXISTING SESSION
+     ========================= */
+
+  async function checkSession() {
+
+    const { data } =
+      await supabaseClient.auth.getSession();
+
+
+    if (data.session && data.session.user) {
+
+      updateWelcome(data.session.user);
+
+      showPage("dashboard");
+
+    }
+
+  }
+
+
+  /* =========================
+     LOGOUT
+     ========================= */
+
+  async function logoutUser() {
+
+    await supabaseClient.auth.signOut();
+
+    document.getElementById("loginEmail").value =
+      "";
+
+    document.getElementById("loginPassword").value =
+      "";
+
+    showLogin();
+
+    showPage("auth");
+
+    document.getElementById("welcomeText").textContent =
+      "Trading & investment dashboard";
+
+  }
+
+
+  /* =========================
+     TELEGRAM BUTTON
+     ========================= */
+
+  function continueWithTelegram() {
+
+    if (!tg) {
+
+      showMessage(
+        "Please open Coretrex from Telegram.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    const user =
+      tg.initDataUnsafe &&
+      tg.initDataUnsafe.user;
+
+
+    if (user) {
+
+      showMessage(
+        "Telegram account detected. Secure Telegram verification will be connected to the backend before this login method is enabled for real accounts.",
+        "success"
+      );
+
+    }
+
+    else {
+
+      showMessage(
+        "Telegram account information was not detected.",
+        "error"
+      );
+
+    }
+
+  }
+
+
+  /* =========================
+     PAGE NAVIGATION
+     ========================= */
 
   function showPage(pageId) {
 
@@ -996,6 +1312,13 @@
     }
 
   }
+
+
+  /* =========================
+     START APPLICATION
+     ========================= */
+
+  checkSession();
 
 </script>
 
