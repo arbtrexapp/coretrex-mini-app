@@ -38,7 +38,8 @@
     }
 
     button,
-    input {
+    input,
+    select {
       font: inherit;
     }
 
@@ -131,7 +132,8 @@
       font-weight: 700;
     }
 
-    .field input {
+    .field input,
+    .field select {
       width: 100%;
       height: 52px;
       padding: 0 15px;
@@ -147,7 +149,8 @@
       color: #596679;
     }
 
-    .field input:focus {
+    .field input:focus,
+    .field select:focus {
       border-color: var(--blue);
       box-shadow: 0 0 0 3px rgba(79,140,255,.10);
     }
@@ -292,17 +295,6 @@
         radial-gradient(circle at 90% 10%, rgba(79,140,255,.24), transparent 35%),
         linear-gradient(145deg, #17263a, #0e1725);
       box-shadow: 0 15px 35px rgba(0,0,0,.20);
-    }
-
-    .balance-card::after {
-      content: "";
-      position: absolute;
-      width: 130px;
-      height: 130px;
-      right: -65px;
-      bottom: -65px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,.07);
     }
 
     .balance-label {
@@ -544,6 +536,119 @@
       line-height: 1.5;
     }
 
+    /* DEPOSIT */
+
+    .deposit-card {
+      padding: 17px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      background: linear-gradient(145deg, #111a28, #0c141f);
+    }
+
+    .asset-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .asset-button {
+      min-height: 48px;
+      border: 1px solid #2a384b;
+      border-radius: 11px;
+      background: #0d1521;
+      color: #aeb9c8;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .asset-button.active {
+      border-color: var(--blue);
+      background: #14233a;
+      color: #78a3ff;
+    }
+
+    .address-box {
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid #2a384b;
+      border-radius: 13px;
+      background: #09111c;
+    }
+
+    .address-label {
+      color: #748297;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .7px;
+    }
+
+    .network-name {
+      margin-top: 5px;
+      color: #b9c5d4;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .address-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+      margin-top: 11px;
+    }
+
+    .address-text {
+      flex: 1;
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid #222f41;
+      border-radius: 10px;
+      background: #0f1825;
+      color: #cbd5e1;
+      font-size: 10px;
+      line-height: 1.45;
+      word-break: break-all;
+    }
+
+    .copy-btn {
+      min-width: 70px;
+      border: 1px solid #30415a;
+      border-radius: 10px;
+      background: #17263b;
+      color: #78a3ff;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .warning {
+      margin-top: 12px;
+      padding: 11px;
+      border-radius: 10px;
+      background: rgba(255,102,120,.06);
+      border: 1px solid rgba(255,102,120,.16);
+      color: #d997a0;
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .deposit-form {
+      margin-top: 18px;
+    }
+
+    .submit-deposit {
+      margin-top: 18px;
+    }
+
+    .deposit-note {
+      margin-top: 12px;
+      color: #68778c;
+      font-size: 10px;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    /* ACCOUNT */
+
     .account-row {
       padding: 15px 0;
       border-bottom: 1px solid #1d2838;
@@ -652,77 +757,36 @@
 
     </div>
 
-
     <div class="login-content">
 
       <div id="nameField" class="field hidden">
-
         <label for="name">FULL NAME</label>
-
-        <input
-          id="name"
-          type="text"
-          placeholder="Enter your full name">
-
+        <input id="name" type="text" placeholder="Enter your full name">
       </div>
 
-
       <div class="field">
-
         <label for="email">EMAIL ADDRESS</label>
-
-        <input
-          id="email"
-          type="email"
-          placeholder="Enter your email">
-
+        <input id="email" type="email" placeholder="Enter your email">
       </div>
-
 
       <div class="field">
-
         <label for="password">PASSWORD</label>
-
-        <input
-          id="password"
-          type="password"
-          placeholder="Enter your password">
-
+        <input id="password" type="password" placeholder="Enter your password">
       </div>
 
-
-      <button
-        id="loginBtn"
-        class="primary-btn"
-        type="button">
-
+      <button id="loginBtn" class="primary-btn" type="button">
         Login
-
       </button>
 
-
-      <button
-        id="telegramBtn"
-        class="telegram-btn"
-        type="button">
-
+      <button id="telegramBtn" class="telegram-btn" type="button">
         Continue with Telegram
-
       </button>
 
-
-      <button
-        id="modeBtn"
-        class="switch-btn"
-        type="button">
-
+      <button id="modeBtn" class="switch-btn" type="button">
         Create a new account
-
       </button>
-
 
       <div id="message" class="message"></div>
-
 
       <div class="login-footer">
         Coretrex © 2026
@@ -743,13 +807,8 @@
 
         <div class="small-logo">C</div>
 
-        <button
-          class="profile-button"
-          id="profileButton"
-          type="button">
-
+        <button class="profile-button" id="profileButton" type="button">
           ●
-
         </button>
 
       </div>
@@ -770,9 +829,7 @@
 
       <!-- HOME -->
 
-      <section
-        id="homeScreen"
-        class="screen active">
+      <section id="homeScreen" class="screen active">
 
         <div class="balance-card">
 
@@ -785,11 +842,8 @@
           </div>
 
           <div class="balance-status">
-
             <span class="status-dot"></span>
-
             Account active
-
           </div>
 
         </div>
@@ -798,19 +852,13 @@
         <div class="stats">
 
           <div class="stat">
-
             <span>INVESTED CAPITAL</span>
-
             <strong>$0.00</strong>
-
           </div>
 
           <div class="stat">
-
             <span>REALIZED P/L</span>
-
             <strong>$0.00</strong>
-
           </div>
 
         </div>
@@ -819,9 +867,7 @@
         <div class="section">
 
           <div class="section-header">
-
             <h2>Quick Access</h2>
-
           </div>
 
 
@@ -833,9 +879,7 @@
               type="button">
 
               <div class="quick-icon">↓</div>
-
               <strong>Deposit</strong>
-
               <small>Add funds</small>
 
             </button>
@@ -847,9 +891,7 @@
               type="button">
 
               <div class="quick-icon">↑</div>
-
               <strong>Withdraw</strong>
-
               <small>Request funds</small>
 
             </button>
@@ -861,9 +903,7 @@
               type="button">
 
               <div class="quick-icon">↗</div>
-
               <strong>Investments</strong>
-
               <small>View portfolio</small>
 
             </button>
@@ -875,9 +915,7 @@
               type="button">
 
               <div class="quick-icon">≡</div>
-
               <strong>Activity</strong>
-
               <small>Transaction history</small>
 
             </button>
@@ -890,11 +928,8 @@
         <div class="section">
 
           <div class="section-header">
-
             <h2>Investment Plans</h2>
-
             <span>AVAILABLE</span>
-
           </div>
 
 
@@ -1009,9 +1044,7 @@
 
       <!-- INVESTMENTS -->
 
-      <section
-        id="investmentsScreen"
-        class="screen">
+      <section id="investmentsScreen" class="screen">
 
         <div class="screen-heading">
 
@@ -1040,9 +1073,7 @@
 
       <!-- ACTIVITY -->
 
-      <section
-        id="transactionsScreen"
-        class="screen">
+      <section id="transactionsScreen" class="screen">
 
         <div class="screen-heading">
 
@@ -1071,9 +1102,7 @@
 
       <!-- ACCOUNT -->
 
-      <section
-        id="accountScreen"
-        class="screen">
+      <section id="accountScreen" class="screen">
 
         <div class="screen-heading">
 
@@ -1108,13 +1137,8 @@
         </div>
 
 
-        <button
-          id="logoutBtn"
-          class="logout"
-          type="button">
-
+        <button id="logoutBtn" class="logout" type="button">
           Log Out
-
         </button>
 
       </section>
@@ -1122,30 +1146,167 @@
 
       <!-- DEPOSIT -->
 
-      <section
-        id="depositScreen"
-        class="screen">
+      <section id="depositScreen" class="screen">
 
         <div class="screen-heading">
 
           <h1>Deposit</h1>
 
           <p>
-            Deposit options will be connected in the next step.
+            Select an asset and send your deposit to the corresponding
+            Coretrex address.
           </p>
 
         </div>
 
-        <div class="empty">
 
-          <div class="empty-icon">↓</div>
+        <div class="deposit-card">
 
-          <strong>Deposit centre</strong>
 
-          <p>
-            The deposit form and transaction confirmation system
-            will be added next.
-          </p>
+          <div class="field" style="margin-top:0;">
+
+            <label>SELECT ASSET</label>
+
+            <div class="asset-buttons">
+
+              <button
+                class="asset-button active"
+                data-asset="USDT"
+                type="button">
+
+                USDT
+
+              </button>
+
+              <button
+                class="asset-button"
+                data-asset="BTC"
+                type="button">
+
+                BTC
+
+              </button>
+
+              <button
+                class="asset-button"
+                data-asset="ETH"
+                type="button">
+
+                ETH
+
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="address-box">
+
+            <div class="address-label">
+              DEPOSIT ADDRESS
+            </div>
+
+            <div
+              id="networkName"
+              class="network-name">
+
+              USDT — TRC20
+
+            </div>
+
+
+            <div class="address-row">
+
+              <div
+                id="depositAddress"
+                class="address-text">
+
+                TLFM28HbiGBgMVdqug2M7pJRW4pDLfzUMH
+
+              </div>
+
+              <button
+                id="copyAddressBtn"
+                class="copy-btn"
+                type="button">
+
+                Copy
+
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="warning">
+
+            ⚠️ Send only the selected asset through the displayed
+            network. Sending through another network may result in
+            loss of funds.
+
+          </div>
+
+
+          <div class="deposit-form">
+
+
+            <div class="field" style="margin-top:0;">
+
+              <label for="depositAmount">
+                DEPOSIT AMOUNT
+              </label>
+
+              <input
+                id="depositAmount"
+                type="number"
+                min="0"
+                step="any"
+                placeholder="Enter amount">
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="depositTxid">
+                TRANSACTION ID / TX HASH
+              </label>
+
+              <input
+                id="depositTxid"
+                type="text"
+                placeholder="Paste your transaction ID or hash">
+
+            </div>
+
+
+            <button
+              id="submitDepositBtn"
+              class="primary-btn submit-deposit"
+              type="button">
+
+              Submit Deposit
+
+            </button>
+
+
+            <div
+              id="depositMessage"
+              class="message">
+            </div>
+
+
+            <div class="deposit-note">
+
+              Your deposit will remain pending until it has been
+              reviewed and approved. Your balance is not credited
+              automatically.
+
+            </div>
+
+          </div>
 
         </div>
 
@@ -1154,9 +1315,7 @@
 
       <!-- WITHDRAW -->
 
-      <section
-        id="withdrawScreen"
-        class="screen">
+      <section id="withdrawScreen" class="screen">
 
         <div class="screen-heading">
 
@@ -1248,13 +1407,39 @@
     "sb_publishable_UPsL7MaeNjsbh8InoyfmxQ_LPi8LLkm";
 
 
+  const DEPOSIT_ASSETS = {
+
+    USDT: {
+      network: "USDT — TRC20",
+      address: "TLFM28HbiGBgMVdqug2M7pJRW4pDLfzUMH"
+    },
+
+    BTC: {
+      network: "BTC — Bitcoin Network",
+      address: "bc1q6ejj3fr5r98haam0g7gck6cr37sset96gqzhkt"
+    },
+
+    ETH: {
+      network: "ETH — Ethereum Network",
+      address: "0xCBC6AD0B86cfdf5E59905bD9680403ED91bF1Ddc"
+    }
+
+  };
+
+
   let supabaseClient = null;
 
   let registerMode = false;
 
+  let selectedAsset = "USDT";
+
 
   const message =
     document.getElementById("message");
+
+
+  const depositMessage =
+    document.getElementById("depositMessage");
 
 
   function showMessage(text, type) {
@@ -1262,6 +1447,16 @@
     message.textContent = text;
 
     message.className =
+      "message " + type;
+
+  }
+
+
+  function showDepositMessage(text, type) {
+
+    depositMessage.textContent = text;
+
+    depositMessage.className =
       "message " + type;
 
   }
@@ -1653,6 +1848,252 @@
   }
 
 
+  function updateDepositAsset(asset) {
+
+    if (!DEPOSIT_ASSETS[asset]) {
+      return;
+    }
+
+
+    selectedAsset = asset;
+
+
+    const details =
+      DEPOSIT_ASSETS[asset];
+
+
+    document
+      .getElementById("networkName")
+      .textContent =
+        details.network;
+
+
+    document
+      .getElementById("depositAddress")
+      .textContent =
+        details.address;
+
+
+    document
+      .querySelectorAll(".asset-button")
+      .forEach(
+        button => {
+
+          button.classList.toggle(
+            "active",
+            button.dataset.asset === asset
+          );
+
+        }
+      );
+
+
+    showDepositMessage(
+      "",
+      ""
+    );
+
+    depositMessage.className =
+      "message";
+
+  }
+
+
+  async function copyDepositAddress() {
+
+    const address =
+      DEPOSIT_ASSETS[selectedAsset].address;
+
+
+    try {
+
+      if (
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+      ) {
+
+        await navigator.clipboard.writeText(
+          address
+        );
+
+      } else {
+
+        const temp =
+          document.createElement("textarea");
+
+        temp.value = address;
+
+        document.body.appendChild(temp);
+
+        temp.select();
+
+        document.execCommand("copy");
+
+        temp.remove();
+
+      }
+
+
+      const button =
+        document.getElementById("copyAddressBtn");
+
+
+      button.textContent =
+        "Copied";
+
+
+      setTimeout(
+        () => {
+
+          button.textContent =
+            "Copy";
+
+        },
+        1500
+      );
+
+    } catch (error) {
+
+      showDepositMessage(
+        "Unable to copy the address. Please copy it manually.",
+        "error"
+      );
+
+    }
+
+  }
+
+
+  async function submitDeposit() {
+
+    if (!supabaseClient) {
+
+      showDepositMessage(
+        "Coretrex is still loading. Please refresh.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    const amountInput =
+      document.getElementById(
+        "depositAmount"
+      );
+
+
+    const txidInput =
+      document.getElementById(
+        "depositTxid"
+      );
+
+
+    const amount =
+      Number(amountInput.value);
+
+
+    const txid =
+      txidInput.value.trim();
+
+
+    if (
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ) {
+
+      showDepositMessage(
+        "Please enter a valid deposit amount.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    if (!txid) {
+
+      showDepositMessage(
+        "Please enter the transaction ID or transaction hash.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    const button =
+      document.getElementById(
+        "submitDepositBtn"
+      );
+
+
+    button.disabled = true;
+
+    button.textContent =
+      "Submitting...";
+
+
+    try {
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient.rpc(
+          "create_deposit_request",
+          {
+            p_amount: amount,
+            p_reference: txid,
+            p_description:
+              `Deposit via ${selectedAsset}`
+          }
+        );
+
+
+      if (error) {
+
+        throw error;
+
+      }
+
+
+      showDepositMessage(
+        "Deposit request submitted successfully. Your request is now pending review.",
+        "success"
+      );
+
+
+      amountInput.value = "";
+
+      txidInput.value = "";
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      showDepositMessage(
+        error.message ||
+        "Unable to submit the deposit request.",
+        "error"
+      );
+
+    } finally {
+
+      button.disabled = false;
+
+      button.textContent =
+        "Submit Deposit";
+
+    }
+
+  }
+
+
   document
     .getElementById("loginBtn")
     .addEventListener(
@@ -1712,6 +2153,48 @@
         );
 
       }
+    );
+
+
+  document
+    .querySelectorAll(
+      ".asset-button"
+    )
+    .forEach(
+      button => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            updateDepositAsset(
+              button.dataset.asset
+            );
+
+          }
+        );
+
+      }
+    );
+
+
+  document
+    .getElementById(
+      "copyAddressBtn"
+    )
+    .addEventListener(
+      "click",
+      copyDepositAddress
+    );
+
+
+  document
+    .getElementById(
+      "submitDepositBtn"
+    )
+    .addEventListener(
+      "click",
+      submitDeposit
     );
 
 
