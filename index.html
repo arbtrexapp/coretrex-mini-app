@@ -1,17 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Coretrex</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+  <title>Coretrex</title>  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  <style>
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -20,14 +12,9 @@
       color: #17211d;
     }
 
-    button,
-    input {
-      font: inherit;
-    }
+    button, input, select { font: inherit; }
 
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
     .app {
       max-width: 720px;
@@ -112,9 +99,7 @@
       color: white;
     }
 
-    .form-group {
-      margin-bottom: 15px;
-    }
+    .form-group { margin-bottom: 15px; }
 
     label {
       display: block;
@@ -123,7 +108,7 @@
       margin-bottom: 7px;
     }
 
-    input {
+    input, select {
       width: 100%;
       padding: 13px;
       border: 1px solid #d6ded9;
@@ -132,7 +117,7 @@
       background: white;
     }
 
-    input:focus {
+    input:focus, select:focus {
       border-color: #0c8f62;
     }
 
@@ -161,11 +146,6 @@
       color: white;
     }
 
-    .btn.warning {
-      background: #9a6700;
-      color: white;
-    }
-
     .btn:disabled {
       opacity: .55;
       cursor: not-allowed;
@@ -186,9 +166,7 @@
       display: none;
     }
 
-    .message.show {
-      display: block;
-    }
+    .message.show { display: block; }
 
     .message.error {
       background: #fdecec;
@@ -200,21 +178,12 @@
       color: #12663f;
     }
 
-    .page {
-      display: none;
-    }
+    .page { display: none; }
 
-    .page.active {
-      display: block;
-    }
+    .page.active { display: block; }
 
-    h2 {
-      margin-top: 0;
-    }
-
-    h3 {
-      margin-top: 0;
-    }
+    h2 { margin-top: 0; }
+    h3 { margin-top: 0; }
 
     .muted {
       color: #69756f;
@@ -322,9 +291,7 @@
       margin-bottom: 10px;
     }
 
-    .record:last-child {
-      margin-bottom: 0;
-    }
+    .record:last-child { margin-bottom: 0; }
 
     .status {
       display: inline-block;
@@ -355,6 +322,27 @@
       text-align: center;
       padding: 20px;
       color: #7b8580;
+    }
+
+    .wallet-box {
+      background: #f3f7f5;
+      border: 1px solid #dbe5e0;
+      border-radius: 10px;
+      padding: 13px;
+      margin-top: 12px;
+      word-break: break-all;
+    }
+
+    .wallet-label {
+      font-size: 12px;
+      color: #69756f;
+      margin-bottom: 6px;
+    }
+
+    .wallet-address {
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.5;
     }
 
     .admin-header {
@@ -388,9 +376,7 @@
       margin-top: 10px;
     }
 
-    .admin-actions .btn {
-      margin: 0;
-    }
+    .admin-actions .btn { margin: 0; }
 
     .bottom-nav {
       position: fixed;
@@ -427,765 +413,638 @@
     }
 
     @media(max-width:480px) {
-      main {
-        padding: 14px;
-      }
-
-      .auth-card {
-        padding: 20px;
-      }
-
-      .balance {
-        font-size: 29px;
-      }
+      main { padding: 14px; }
+      .auth-card { padding: 20px; }
+      .balance { font-size: 29px; }
     }
-  </style>
-</head>
+  </style></head><body><div id="authScreen" class="auth">
+  <div class="auth-card"><div class="auth-logo">CORETREX</div>
 
-<body>
+<div class="auth-subtitle">
+  Account access and trading information
+</div>
 
-<!-- AUTH -->
-<div id="authScreen" class="auth">
+<div id="authMessage" class="message"></div>
 
-  <div class="auth-card">
+<div class="auth-tabs">
+  <button id="loginTab" class="tab active" type="button">Sign In</button>
+  <button id="registerTab" class="tab" type="button">Register</button>
+</div>
 
-    <div class="auth-logo">CORETREX</div>
+<form id="loginForm">
 
-    <div class="auth-subtitle">
-      Account access and trading information
+  <div class="form-group">
+    <label>Email</label>
+    <input id="loginEmail" type="email" required autocomplete="email">
+  </div>
+
+  <div class="form-group">
+    <label>Password</label>
+    <input id="loginPassword" type="password" required autocomplete="current-password">
+  </div>
+
+  <button class="btn primary" type="submit">Sign In</button>
+
+  <div class="divider">OR</div>
+
+  <button id="telegramLoginBtn" class="btn secondary" type="button">
+    Continue with Telegram
+  </button>
+
+</form>
+
+<form id="registerForm" class="hidden">
+
+  <div class="form-group">
+    <label>Full Name</label>
+    <input id="registerName" type="text" required autocomplete="name">
+  </div>
+
+  <div class="form-group">
+    <label>Email</label>
+    <input id="registerEmail" type="email" required autocomplete="email">
+  </div>
+
+  <div class="form-group">
+    <label>Password</label>
+    <input id="registerPassword" type="password" minlength="6" required autocomplete="new-password">
+  </div>
+
+  <button class="btn primary" type="submit">Create Account</button>
+
+  <div class="divider">OR</div>
+
+  <button id="telegramRegisterBtn" class="btn secondary" type="button">
+    Continue with Telegram
+  </button>
+
+</form>
+
+  </div>
+</div><div id="appScreen" class="app hidden">  <header>
+    <div class="brand">CORETREX</div>
+    <div id="headerUser" class="header-user">Account</div>
+  </header>  <main><!-- DASHBOARD -->
+<section id="dashboardPage" class="page active">
+
+  <div class="notice">
+    <strong>Demo / information interface:</strong>
+    displayed trading-plan figures are proposed plan information and
+    are not a guarantee of returns.
+  </div>
+
+  <div class="card balance-card">
+
+    <div class="balance-label">Available Balance</div>
+
+    <div id="availableBalance" class="balance">$0.00</div>
+
+    <div class="stats">
+
+      <div class="stat">
+        <small>Invested Capital</small>
+        <strong id="investedCapital">$0.00</strong>
+      </div>
+
+      <div class="stat">
+        <small>Realized P/L</small>
+        <strong id="realizedPL">$0.00</strong>
+      </div>
+
     </div>
+  </div>
 
-    <div id="authMessage" class="message"></div>
+  <div class="card">
+    <h3>Welcome to Coretrex</h3>
+    <p class="muted">
+      Manage your account information and view available trading
+      plans from one place.
+    </p>
+  </div>
 
-    <div class="auth-tabs">
-      <button id="loginTab" class="tab active" type="button">
-        Sign In
-      </button>
+  <div class="card">
 
-      <button id="registerTab" class="tab" type="button">
-        Register
-      </button>
-    </div>
+    <h3>Quick Actions</h3>
 
-    <form id="loginForm">
+    <button class="btn primary" type="button" data-page="plansPage">
+      View Trading Plans
+    </button>
 
-      <div class="form-group">
-        <label>Email</label>
-        <input
-          id="loginEmail"
-          type="email"
-          required
-          autocomplete="email"
-        >
-      </div>
+    <button class="btn secondary" type="button" data-page="depositPage">
+      Deposit
+    </button>
 
-      <div class="form-group">
-        <label>Password</label>
-        <input
-          id="loginPassword"
-          type="password"
-          required
-          autocomplete="current-password"
-        >
-      </div>
-
-      <button class="btn primary" type="submit">
-        Sign In
-      </button>
-
-      <div class="divider">OR</div>
-
-      <button
-        id="telegramLoginBtn"
-        class="btn secondary"
-        type="button"
-      >
-        Continue with Telegram
-      </button>
-
-    </form>
-
-    <form id="registerForm" class="hidden">
-
-      <div class="form-group">
-        <label>Full Name</label>
-        <input
-          id="registerName"
-          type="text"
-          required
-          autocomplete="name"
-        >
-      </div>
-
-      <div class="form-group">
-        <label>Email</label>
-        <input
-          id="registerEmail"
-          type="email"
-          required
-          autocomplete="email"
-        >
-      </div>
-
-      <div class="form-group">
-        <label>Password</label>
-        <input
-          id="registerPassword"
-          type="password"
-          minlength="6"
-          required
-          autocomplete="new-password"
-        >
-      </div>
-
-      <button class="btn primary" type="submit">
-        Create Account
-      </button>
-
-      <div class="divider">OR</div>
-
-      <button
-        id="telegramRegisterBtn"
-        class="btn secondary"
-        type="button"
-      >
-        Continue with Telegram
-      </button>
-
-    </form>
+    <button class="btn secondary" type="button" data-page="withdrawPage">
+      Withdrawal Information
+    </button>
 
   </div>
 
-</div>
+</section>
 
 
-<!-- APP -->
-<div id="appScreen" class="app hidden">
+<!-- PLANS -->
+<section id="plansPage" class="page">
 
-  <header>
+  <h2>Trading Plans</h2>
 
-    <div class="brand">
-      CORETREX
+  <div class="notice">
+    Plan figures shown below are proposed terms for the Coretrex
+    interface. They should not be treated as guaranteed investment
+    returns.
+  </div>
+
+  <div class="plans">
+
+    <div class="plan">
+      <div class="plan-title">24 Hours Plan</div>
+
+      <div class="plan-row">
+        <span>Minimum</span>
+        <strong>$100</strong>
+      </div>
+
+      <div class="plan-row">
+        <span>Duration</span>
+        <strong>24 hours</strong>
+      </div>
+
+      <div class="plan-row">
+        <span>Proposed return</span>
+        <strong>10%</strong>
+      </div>
+
+      <div class="plan-note">
+        Proposed terms: one investment activation. Profit withdrawal
+        only according to the stated plan terms.
+      </div>
+
+      <button class="btn primary planBtn" type="button" data-plan="24 Hours Plan">
+        View Plan
+      </button>
     </div>
 
-    <div id="headerUser" class="header-user">
-      Account
+
+    <div class="plan">
+      <div class="plan-title">72 Hours Plan</div>
+
+      <div class="plan-row">
+        <span>Minimum</span>
+        <strong>$250</strong>
+      </div>
+
+      <div class="plan-row">
+        <span>Duration</span>
+        <strong>72 hours</strong>
+      </div>
+
+      <div class="plan-row">
+        <span>Proposed return</span>
+        <strong>50%</strong>
+      </div>
+
+      <div class="plan-note">
+        Proposed terms: up to two investment activations.
+        Profit withdrawal according to stated plan terms.
+      </div>
+
+      <button class="btn primary planBtn" type="button" data-plan="72 Hours Plan">
+        View Plan
+      </button>
     </div>
 
-  </header>
 
+    <div class="plan">
+      <div class="plan-title">2 Weeks Plan</div>
 
-  <main>
-
-    <!-- DASHBOARD -->
-    <section id="dashboardPage" class="page active">
-
-      <div class="notice">
-        <strong>Demo / information interface:</strong>
-        displayed trading-plan figures are proposed plan information and
-        are not a guarantee of returns.
+      <div class="plan-row">
+        <span>Minimum</span>
+        <strong>$500</strong>
       </div>
 
-      <div class="card balance-card">
-
-        <div class="balance-label">
-          Available Balance
-        </div>
-
-        <div id="availableBalance" class="balance">
-          $0.00
-        </div>
-
-        <div class="stats">
-
-          <div class="stat">
-            <small>Invested Capital</small>
-            <strong id="investedCapital">$0.00</strong>
-          </div>
-
-          <div class="stat">
-            <small>Realized P/L</small>
-            <strong id="realizedPL">$0.00</strong>
-          </div>
-
-        </div>
-
+      <div class="plan-row">
+        <span>Duration</span>
+        <strong>2 weeks</strong>
       </div>
 
-      <div class="card">
-
-        <h3>Welcome to Coretrex</h3>
-
-        <p class="muted">
-          Manage your account information and view available trading
-          plans from one place.
-        </p>
-
+      <div class="plan-row">
+        <span>Proposed return</span>
+        <strong>75%</strong>
       </div>
 
-      <div class="card">
-
-        <h3>Quick Actions</h3>
-
-        <button
-          class="btn primary"
-          type="button"
-          data-page="plansPage"
-        >
-          View Trading Plans
-        </button>
-
-        <button
-          class="btn secondary"
-          type="button"
-          data-page="depositPage"
-        >
-          Deposit Information
-        </button>
-
-        <button
-          class="btn secondary"
-          type="button"
-          data-page="withdrawPage"
-        >
-          Withdrawal Information
-        </button>
-
+      <div class="plan-note">
+        Proposed terms: up to three investment activations.
       </div>
 
-    </section>
-
-
-    <!-- PLANS -->
-    <section id="plansPage" class="page">
-
-      <h2>Trading Plans</h2>
-
-      <div class="notice">
-        Plan figures shown below are proposed terms for the Coretrex
-        interface. They should not be treated as guaranteed investment
-        returns.
-      </div>
-
-      <div class="plans">
-
-        <div class="plan">
-
-          <div class="plan-title">
-            24 Hours Plan
-          </div>
-
-          <div class="plan-row">
-            <span>Minimum</span>
-            <strong>$100</strong>
-          </div>
-
-          <div class="plan-row">
-            <span>Duration</span>
-            <strong>24 hours</strong>
-          </div>
-
-          <div class="plan-row">
-            <span>Proposed return</span>
-            <strong>10%</strong>
-          </div>
-
-          <div class="plan-note">
-            Proposed terms: one investment activation. Profit withdrawal
-            only according to the stated plan terms.
-          </div>
-
-          <button
-            class="btn primary planBtn"
-            type="button"
-            data-plan="24 Hours Plan"
-          >
-            View Plan
-          </button>
-
-        </div>
-
-
-        <div class="plan">
-
-          <div class="plan-title">
-            72 Hours Plan
-          </div>
-
-          <div class="plan-row">
-            <span>Minimum</span>
-            <strong>$250</strong>
-          </div>
-
-          <div class="plan-row">
-            <span>Duration</span>
-            <strong>72 hours</strong>
-          </div>
-
-          <div class="plan-row">
-            <span>Proposed return</span>
-            <strong>50%</strong>
-          </div>
-
-          <div class="plan-note">
-            Proposed terms: up to two investment activations.
-            Profit withdrawal according to stated plan terms.
-          </div>
-
-          <button
-            class="btn primary planBtn"
-            type="button"
-            data-plan="72 Hours Plan"
-          >
-            View Plan
-          </button>
-
-        </div>
-
-
-        <div class="plan">
-
-          <div class="plan-title">
-            2 Weeks Plan
-          </div>
-
-          <div class="plan-row">
-            <span>Minimum</span>
-            <strong>$500</strong>
-          </div>
-
-          <div class="plan-row">
-            <span>Duration</span>
-            <strong>2 weeks</strong>
-          </div>
-
-          <div class="plan-row">
-            <span>Proposed return</span>
-            <strong>75%</strong>
-          </div>
-
-          <div class="plan-note">
-            Proposed terms: up to three investment activations.
-          </div>
-
-          <button
-            class="btn primary planBtn"
-            type="button"
-            data-plan="2 Weeks Plan"
-          >
-            View Plan
-          </button>
-
-        </div>
-
-
-        <div class="plan">
-
-          <div class="plan-title">
-            1 Month Plan
-          </div>
-
-          <div class="plan-row">
-            <span>Minimum</span>
-            <strong>$1,200</strong>
-          </div>
-
-          <div class="plan-row">
-            <span>Duration</span>
-            <strong>1 month</strong>
-          </div>
-
-          <div class="plan-row">
-            <span>Proposed return</span>
-            <strong>100%</strong>
-          </div>
-
-          <div class="plan-note">
-            Proposed terms: up to five investment activations.
-            Capital and profit withdrawal subject to the stated terms.
-          </div>
-
-          <button
-            class="btn primary planBtn"
-            type="button"
-            data-plan="1 Month Plan"
-          >
-            View Plan
-          </button>
-
-        </div>
-
-
-        <div class="plan">
-
-          <div class="plan-title">
-            3 Months Plan
-          </div>
-
-          <div class="plan-row">
-            <span>Stated plan amount</span>
-            <strong>$7,500</strong>
-          </div>
-
-          <div class="plan-row">
-            <span>Activation minimum</span>
-            <strong>$2,000</strong>
-          </div>
-
-          <div class="plan-row">
-            <span>Stated profit figure</span>
-            <strong>$20,000</strong>
-          </div>
-
-          <div class="plan-note">
-            Proposed terms require completion of the stated investment
-            amount within the specified period. These figures are not
-            guarantees.
-          </div>
-
-          <button
-            class="btn primary planBtn"
-            type="button"
-            data-plan="3 Months Plan"
-          >
-            View Plan
-          </button>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- DEPOSIT -->
-    <section id="depositPage" class="page">
-
-      <h2>Deposit</h2>
-
-      <div class="card">
-
-        <h3>Deposit Information</h3>
-
-        <p class="muted">
-          Deposit functionality is currently presented as an interface
-          placeholder. No real payment is processed by this page.
-        </p>
-
-        <button
-          class="btn primary"
-          type="button"
-          id="depositInfoBtn"
-        >
-          Continue
-        </button>
-
-        <div id="depositMessage" class="message"></div>
-
-      </div>
-
-    </section>
-
-
-    <!-- WITHDRAW -->
-    <section id="withdrawPage" class="page">
-
-      <h2>Withdraw</h2>
-
-      <div class="notice">
-        Minimum withdrawal: <strong>$150</strong>.
-        Real withdrawal processing requires a secure backend and
-        verified payment infrastructure.
-      </div>
-
-      <div class="card">
-
-        <div class="form-group">
-
-          <label>Amount</label>
-
-          <input
-            id="withdrawAmount"
-            type="number"
-            min="150"
-            step="0.01"
-            placeholder="Minimum $150"
-          >
-
-        </div>
-
-        <div class="form-group">
-
-          <label>USDT TRC20 Wallet</label>
-
-          <input
-            id="withdrawWallet"
-            type="text"
-            placeholder="Enter wallet address"
-          >
-
-        </div>
-
-        <button
-          class="btn primary"
-          type="button"
-          id="withdrawBtn"
-        >
-          Submit Withdrawal Request
-        </button>
-
-        <div id="withdrawMessage" class="message"></div>
-
-      </div>
-
-    </section>
-
-
-    <!-- INVESTMENTS -->
-    <section id="investmentsPage" class="page">
-
-      <h2>My Investments</h2>
-
-      <div class="card">
-
-        <div id="investmentsLoading" class="empty">
-          Loading your investment records...
-        </div>
-
-        <div id="investmentsList"></div>
-
-      </div>
-
-      <button
-        class="btn secondary"
-        type="button"
-        data-page="transactionsPage"
-      >
-        View Transactions
+      <button class="btn primary planBtn" type="button" data-plan="2 Weeks Plan">
+        View Plan
       </button>
+    </div>
 
-    </section>
 
+    <div class="plan">
+      <div class="plan-title">1 Month Plan</div>
 
-    <!-- TRANSACTIONS -->
-    <section id="transactionsPage" class="page">
-
-      <h2>Transactions</h2>
-
-      <div class="card">
-
-        <div id="transactionsLoading" class="empty">
-          Loading your transaction records...
-        </div>
-
-        <div id="transactionsList"></div>
-
+      <div class="plan-row">
+        <span>Minimum</span>
+        <strong>$1,200</strong>
       </div>
 
-    </section>
-
-
-    <!-- REFERRAL -->
-    <section id="referralPage" class="page">
-
-      <h2>Referral</h2>
-
-      <div class="card">
-
-        <h3>Your Referral Balance</h3>
-
-        <div
-          id="referralBalance"
-          class="balance"
-          style="color:#0c8f62;font-size:28px;"
-        >
-          $0.00
-        </div>
-
-        <p class="muted">
-          Referral earnings become available according to the Coretrex
-          referral terms.
-        </p>
-
+      <div class="plan-row">
+        <span>Duration</span>
+        <strong>1 month</strong>
       </div>
 
-      <div class="card">
-
-        <h3>Referral Information</h3>
-
-        <p class="muted">
-          Referral commissions and transfers will be processed through
-          the secure Coretrex backend.
-        </p>
-
+      <div class="plan-row">
+        <span>Proposed return</span>
+        <strong>100%</strong>
       </div>
 
-    </section>
-
-
-    <!-- ACCOUNT -->
-    <section id="accountPage" class="page">
-
-      <h2>My Account</h2>
-
-      <div class="card">
-
-        <div class="account-line">
-          <span>Name</span>
-          <strong id="accountName">—</strong>
-        </div>
-
-        <div class="account-line">
-          <span>Email</span>
-          <strong id="accountEmail">—</strong>
-        </div>
-
-        <div class="account-line">
-          <span>Account status</span>
-          <span class="status">Active</span>
-        </div>
-
-        <div class="account-line">
-          <span>Available balance</span>
-          <strong id="accountBalance">$0.00</strong>
-        </div>
-
+      <div class="plan-note">
+        Proposed terms: up to five investment activations.
+        Capital and profit withdrawal subject to the stated terms.
       </div>
 
-      <button
-        id="logoutBtn"
-        class="btn danger"
-        type="button"
-      >
-        Sign Out
+      <button class="btn primary planBtn" type="button" data-plan="1 Month Plan">
+        View Plan
       </button>
+    </div>
 
-    </section>
 
+    <div class="plan">
+      <div class="plan-title">3 Months Plan</div>
 
-    <!-- SUPPORT -->
-    <section id="supportPage" class="page">
-
-      <h2>Support</h2>
-
-      <div class="card">
-
-        <h3>Coretrex Support</h3>
-
-        <p class="muted">
-          For account-related questions, use the official Coretrex
-          support channel configured for your service.
-        </p>
-
-        <button
-          class="btn secondary"
-          type="button"
-          id="supportBtn"
-        >
-          Contact Support
-        </button>
-
-        <div id="supportMessage" class="message"></div>
-
+      <div class="plan-row">
+        <span>Stated plan amount</span>
+        <strong>$7,500</strong>
       </div>
 
-    </section>
-
-
-    <!-- ADMIN -->
-    <section id="adminPage" class="page">
-
-      <div class="admin-header">
-
-        <strong>CORETREX ADMIN</strong>
-
-        <div>
-          Administrative account
-        </div>
-
-        <span class="admin-badge">
-          ADMIN ACCESS
-        </span>
-
+      <div class="plan-row">
+        <span>Activation minimum</span>
+        <strong>$2,000</strong>
       </div>
 
-      <div class="notice">
-        Administrative actions that change financial records must be
-        performed through secure server-side functions. This interface
-        does not allow browser-side balance manipulation.
+      <div class="plan-row">
+        <span>Stated profit figure</span>
+        <strong>$20,000</strong>
       </div>
 
-      <div class="card">
-
-        <h3>Pending Requests</h3>
-
-        <div id="adminLoading" class="empty">
-          Loading pending records...
-        </div>
-
-        <div id="adminRequests"></div>
-
+      <div class="plan-note">
+        Proposed terms require completion of the stated investment
+        amount within the specified period. These figures are not
+        guarantees.
       </div>
 
-    </section>
+      <button class="btn primary planBtn" type="button" data-plan="3 Months Plan">
+        View Plan
+      </button>
+    </div>
 
-  </main>
+  </div>
+</section>
 
 
-  <!-- NAVIGATION -->
-  <nav class="bottom-nav">
+<!-- DEPOSIT -->
+<section id="depositPage" class="page">
+
+  <h2>Deposit</h2>
+
+  <div class="notice">
+    Send funds only to the wallet address displayed for the selected
+    network. After the blockchain transaction is confirmed, submit
+    the transaction ID/hash below. Your deposit remains pending until
+    it is reviewed.
+  </div>
+
+  <div class="card">
+
+    <h3>Make a Deposit</h3>
+
+    <div class="form-group">
+
+      <label for="depositNetwork">
+        Select Network
+      </label>
+
+      <select id="depositNetwork">
+        <option value="">Select network</option>
+        <option value="USDT TRC20">USDT TRC20</option>
+        <option value="BTC">BTC</option>
+        <option value="ETH">ETH</option>
+      </select>
+
+    </div>
+
+    <div id="walletBox" class="wallet-box hidden">
+
+      <div class="wallet-label">
+        Coretrex deposit wallet
+      </div>
+
+      <div id="depositWallet" class="wallet-address">
+        —
+      </div>
+
+    </div>
+
+    <div class="form-group" style="margin-top:15px;">
+
+      <label for="depositAmount">
+        Amount
+      </label>
+
+      <input
+        id="depositAmount"
+        type="number"
+        min="0.01"
+        step="0.01"
+        placeholder="Enter deposit amount in USD"
+      >
+
+    </div>
+
+    <div class="form-group">
+
+      <label for="depositTxid">
+        Transaction ID / Hash
+      </label>
+
+      <input
+        id="depositTxid"
+        type="text"
+        placeholder="Paste your blockchain TXID/hash"
+        autocomplete="off"
+      >
+
+    </div>
 
     <button
-      class="nav-btn active"
+      id="submitDepositBtn"
+      class="btn primary"
       type="button"
-      data-page="dashboardPage"
     >
-      <span class="nav-icon">⌂</span>
-      Home
+      Submit Deposit for Review
     </button>
 
-    <button
-      class="nav-btn"
-      type="button"
-      data-page="plansPage"
-    >
-      <span class="nav-icon">▣</span>
-      Plans
+    <div id="depositMessage" class="message"></div>
+
+  </div>
+
+  <div class="card">
+
+    <h3>Important</h3>
+
+    <p class="muted">
+      Submitting a TXID does not by itself confirm a deposit.
+      The transaction must be independently reviewed before any
+      balance adjustment is made.
+    </p>
+
+  </div>
+
+</section>
+
+
+<!-- WITHDRAW -->
+<section id="withdrawPage" class="page">
+
+  <h2>Withdraw</h2>
+
+  <div class="notice">
+    Minimum withdrawal: <strong>$150</strong>.
+    Real withdrawal processing requires secure backend validation
+    and verified payment infrastructure.
+  </div>
+
+  <div class="card">
+
+    <div class="form-group">
+      <label>Amount</label>
+
+      <input
+        id="withdrawAmount"
+        type="number"
+        min="150"
+        step="0.01"
+        placeholder="Minimum $150"
+      >
+    </div>
+
+    <div class="form-group">
+      <label>USDT TRC20 Wallet</label>
+
+      <input
+        id="withdrawWallet"
+        type="text"
+        placeholder="Enter wallet address"
+      >
+    </div>
+
+    <button id="withdrawBtn" class="btn primary" type="button">
+      Submit Withdrawal Request
     </button>
 
-    <button
-      class="nav-btn"
-      type="button"
-      data-page="investmentsPage"
-    >
-      <span class="nav-icon">◈</span>
-      Invest
+    <div id="withdrawMessage" class="message"></div>
+
+  </div>
+</section>
+
+
+<!-- INVESTMENTS -->
+<section id="investmentsPage" class="page">
+
+  <h2>My Investments</h2>
+
+  <div class="card">
+
+    <div id="investmentsLoading" class="empty">
+      Loading your investment records...
+    </div>
+
+    <div id="investmentsList"></div>
+
+  </div>
+
+  <button class="btn secondary" type="button" data-page="transactionsPage">
+    View Transactions
+  </button>
+
+</section>
+
+
+<!-- TRANSACTIONS -->
+<section id="transactionsPage" class="page">
+
+  <h2>Transactions</h2>
+
+  <div class="card">
+
+    <div id="transactionsLoading" class="empty">
+      Loading your transaction records...
+    </div>
+
+    <div id="transactionsList"></div>
+
+  </div>
+
+</section>
+
+
+<!-- REFERRAL -->
+<section id="referralPage" class="page">
+
+  <h2>Referral</h2>
+
+  <div class="card">
+
+    <h3>Your Referral Balance</h3>
+
+    <div id="referralBalance" class="balance" style="color:#0c8f62;font-size:28px;">
+      $0.00
+    </div>
+
+    <p class="muted">
+      Referral earnings become available according to the Coretrex
+      referral terms.
+    </p>
+
+  </div>
+
+  <div class="card">
+
+    <h3>Referral Information</h3>
+
+    <p class="muted">
+      Referral commissions and transfers will be processed through
+      the secure Coretrex backend.
+    </p>
+
+  </div>
+
+</section>
+
+
+<!-- ACCOUNT -->
+<section id="accountPage" class="page">
+
+  <h2>My Account</h2>
+
+  <div class="card">
+
+    <div class="account-line">
+      <span>Name</span>
+      <strong id="accountName">—</strong>
+    </div>
+
+    <div class="account-line">
+      <span>Email</span>
+      <strong id="accountEmail">—</strong>
+    </div>
+
+    <div class="account-line">
+      <span>Account status</span>
+      <span class="status">Active</span>
+    </div>
+
+    <div class="account-line">
+      <span>Available balance</span>
+      <strong id="accountBalance">$0.00</strong>
+    </div>
+
+  </div>
+
+  <button id="logoutBtn" class="btn danger" type="button">
+    Sign Out
+  </button>
+
+</section>
+
+
+<!-- SUPPORT -->
+<section id="supportPage" class="page">
+
+  <h2>Support</h2>
+
+  <div class="card">
+
+    <h3>Coretrex Support</h3>
+
+    <p class="muted">
+      For account-related questions, use the official Coretrex
+      support channel configured for your service.
+    </p>
+
+    <button id="supportBtn" class="btn secondary" type="button">
+      Contact Support
     </button>
 
-    <button
-      class="nav-btn"
-      type="button"
-      data-page="referralPage"
-    >
-      <span class="nav-icon">♧</span>
-      Referral
-    </button>
+    <div id="supportMessage" class="message"></div>
 
-    <button
-      class="nav-btn"
-      type="button"
-      data-page="accountPage"
-    >
-      <span class="nav-icon">●</span>
-      Account
-    </button>
+  </div>
 
-  </nav>
-
-</div>
+</section>
 
 
-<script>
+<!-- ADMIN -->
+<section id="adminPage" class="page">
+
+  <div class="admin-header">
+
+    <strong>CORETREX ADMIN</strong>
+
+    <div>Administrative account</div>
+
+    <span class="admin-badge">
+      ADMIN ACCESS
+    </span>
+
+  </div>
+
+  <div class="notice">
+    Review deposits independently before approving them. Approval
+    changes the user's available balance.
+  </div>
+
+  <div class="card">
+
+    <h3>Pending Requests</h3>
+
+    <div id="adminLoading" class="empty">
+      Loading pending records...
+    </div>
+
+    <div id="adminRequests"></div>
+
+  </div>
+
+</section>
+
+  </main>  <nav class="bottom-nav"><button class="nav-btn active" type="button" data-page="dashboardPage">
+  <span class="nav-icon">⌂</span>
+  Home
+</button>
+
+<button class="nav-btn" type="button" data-page="plansPage">
+  <span class="nav-icon">▣</span>
+  Plans
+</button>
+
+<button class="nav-btn" type="button" data-page="investmentsPage">
+  <span class="nav-icon">◈</span>
+  Invest
+</button>
+
+<button class="nav-btn" type="button" data-page="referralPage">
+  <span class="nav-icon">♧</span>
+  Referral
+</button>
+
+<button class="nav-btn" type="button" data-page="accountPage">
+  <span class="nav-icon">●</span>
+  Account
+</button>
+
+  </nav></div><script>
 
 const SUPABASE_URL =
   "https://gttfjmoyggyunhaojcxg.supabase.co";
@@ -1196,8 +1055,7 @@ const SUPABASE_KEY =
 const CORETREX_URL =
   "https://arbtrexapp.github.io/coretrex-mini-app/";
 
-const { createClient } =
-  window.supabase;
+const { createClient } = window.supabase;
 
 const supabase =
   createClient(
@@ -1205,11 +1063,11 @@ const supabase =
     SUPABASE_KEY
   );
 
-
 let currentUser = null;
 let currentAccount = null;
 let currentProfile = null;
 let currentIsAdmin = false;
+let platformWallets = null;
 
 
 /* -------------------------
@@ -1218,8 +1076,7 @@ let currentIsAdmin = false;
 
 function money(value) {
 
-  const number =
-    Number(value || 0);
+  const number = Number(value || 0);
 
   return new Intl.NumberFormat(
     "en-US",
@@ -1233,12 +1090,9 @@ function money(value) {
 
 function formatDate(value) {
 
-  if (!value) {
-    return "—";
-  }
+  if (!value) return "—";
 
-  const date =
-    new Date(value);
+  const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
     return "—";
@@ -1268,15 +1122,10 @@ function showMessage(
   const element =
     document.getElementById(elementId);
 
-  if (!element) {
-    return;
-  }
+  if (!element) return;
 
-  element.textContent =
-    message;
-
-  element.className =
-    "message show " + type;
+  element.textContent = message;
+  element.className = "message show " + type;
 }
 
 
@@ -1285,15 +1134,10 @@ function clearMessage(elementId) {
   const element =
     document.getElementById(elementId);
 
-  if (!element) {
-    return;
-  }
+  if (!element) return;
 
-  element.textContent =
-    "";
-
-  element.className =
-    "message";
+  element.textContent = "";
+  element.className = "message";
 }
 
 
@@ -1303,64 +1147,50 @@ function clearMessage(elementId) {
 
 document
   .getElementById("loginTab")
-  .addEventListener(
-    "click",
-    () => {
+  .addEventListener("click", () => {
 
-      document
-        .getElementById("loginTab")
-        .classList
-        .add("active");
+    document
+      .getElementById("loginTab")
+      .classList.add("active");
 
-      document
-        .getElementById("registerTab")
-        .classList
-        .remove("active");
+    document
+      .getElementById("registerTab")
+      .classList.remove("active");
 
-      document
-        .getElementById("loginForm")
-        .classList
-        .remove("hidden");
+    document
+      .getElementById("loginForm")
+      .classList.remove("hidden");
 
-      document
-        .getElementById("registerForm")
-        .classList
-        .add("hidden");
+    document
+      .getElementById("registerForm")
+      .classList.add("hidden");
 
-      clearMessage("authMessage");
-    }
-  );
+    clearMessage("authMessage");
+  });
 
 
 document
   .getElementById("registerTab")
-  .addEventListener(
-    "click",
-    () => {
+  .addEventListener("click", () => {
 
-      document
-        .getElementById("registerTab")
-        .classList
-        .add("active");
+    document
+      .getElementById("registerTab")
+      .classList.add("active");
 
-      document
-        .getElementById("loginTab")
-        .classList
-        .remove("active");
+    document
+      .getElementById("loginTab")
+      .classList.remove("active");
 
-      document
-        .getElementById("registerForm")
-        .classList
-        .remove("hidden");
+    document
+      .getElementById("registerForm")
+      .classList.remove("hidden");
 
-      document
-        .getElementById("loginForm")
-        .classList
-        .add("hidden");
+    document
+      .getElementById("loginForm")
+      .classList.add("hidden");
 
-      clearMessage("authMessage");
-    }
-  );
+    clearMessage("authMessage");
+  });
 
 
 /* -------------------------
@@ -1369,52 +1199,48 @@ document
 
 document
   .getElementById("loginForm")
-  .addEventListener(
-    "submit",
-    async event => {
+  .addEventListener("submit", async event => {
 
-      event.preventDefault();
+    event.preventDefault();
 
-      clearMessage("authMessage");
+    clearMessage("authMessage");
 
-      const email =
-        document
-          .getElementById("loginEmail")
-          .value
-          .trim();
+    const email =
+      document
+        .getElementById("loginEmail")
+        .value
+        .trim();
 
-      const password =
-        document
-          .getElementById("loginPassword")
-          .value;
+    const password =
+      document
+        .getElementById("loginPassword")
+        .value;
 
-      const {
-        data,
-        error
-      } =
-        await supabase.auth
-          .signInWithPassword({
-            email,
-            password
-          });
+    const {
+      data,
+      error
+    } =
+      await supabase.auth
+        .signInWithPassword({
+          email,
+          password
+        });
 
-      if (error) {
+    if (error) {
 
-        showMessage(
-          "authMessage",
-          error.message,
-          "error"
-        );
+      showMessage(
+        "authMessage",
+        error.message,
+        "error"
+      );
 
-        return;
-      }
-
-      currentUser =
-        data.user;
-
-      await startApp();
+      return;
     }
-  );
+
+    currentUser = data.user;
+
+    await startApp();
+  });
 
 
 /* -------------------------
@@ -1423,74 +1249,70 @@ document
 
 document
   .getElementById("registerForm")
-  .addEventListener(
-    "submit",
-    async event => {
+  .addEventListener("submit", async event => {
 
-      event.preventDefault();
+    event.preventDefault();
 
-      clearMessage("authMessage");
+    clearMessage("authMessage");
 
-      const name =
-        document
-          .getElementById("registerName")
-          .value
-          .trim();
+    const name =
+      document
+        .getElementById("registerName")
+        .value
+        .trim();
 
-      const email =
-        document
-          .getElementById("registerEmail")
-          .value
-          .trim();
+    const email =
+      document
+        .getElementById("registerEmail")
+        .value
+        .trim();
 
-      const password =
-        document
-          .getElementById("registerPassword")
-          .value;
+    const password =
+      document
+        .getElementById("registerPassword")
+        .value;
 
-      const {
-        data,
-        error
-      } =
-        await supabase.auth
-          .signUp({
-            email,
-            password,
-            options: {
-              data: {
-                full_name: name
-              }
+    const {
+      data,
+      error
+    } =
+      await supabase.auth
+        .signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: name
             }
-          });
+          }
+        });
 
-      if (error) {
+    if (error) {
 
-        showMessage(
-          "authMessage",
-          error.message,
-          "error"
-        );
+      showMessage(
+        "authMessage",
+        error.message,
+        "error"
+      );
 
-        return;
-      }
-
-      if (!data.user) {
-
-        showMessage(
-          "authMessage",
-          "Account created. Please sign in.",
-          "success"
-        );
-
-        return;
-      }
-
-      currentUser =
-        data.user;
-
-      await startApp();
+      return;
     }
-  );
+
+    if (!data.user) {
+
+      showMessage(
+        "authMessage",
+        "Account created. Please sign in.",
+        "success"
+      );
+
+      return;
+    }
+
+    currentUser = data.user;
+
+    await startApp();
+  });
 
 
 /* -------------------------
@@ -1529,22 +1351,19 @@ document
 
 supabase.auth
   .getSession()
-  .then(
-    async ({ data }) => {
+  .then(async ({ data }) => {
 
-      if (data.session) {
+    if (data.session) {
 
-        currentUser =
-          data.session.user;
+      currentUser = data.session.user;
 
-        await startApp();
+      await startApp();
 
-      } else {
+    } else {
 
-        showAuth();
-      }
+      showAuth();
     }
-  );
+  });
 
 
 supabase.auth
@@ -1553,13 +1372,11 @@ supabase.auth
 
       if (session?.user) {
 
-        currentUser =
-          session.user;
+        currentUser = session.user;
 
       } else {
 
-        currentUser =
-          null;
+        currentUser = null;
 
         showAuth();
       }
@@ -1568,20 +1385,18 @@ supabase.auth
 
 
 /* -------------------------
-   SHOW APP
+   SHOW AUTH / APP
 ------------------------- */
 
 function showAuth() {
 
   document
     .getElementById("authScreen")
-    .classList
-    .remove("hidden");
+    .classList.remove("hidden");
 
   document
     .getElementById("appScreen")
-    .classList
-    .add("hidden");
+    .classList.add("hidden");
 }
 
 
@@ -1589,13 +1404,11 @@ function showApp() {
 
   document
     .getElementById("authScreen")
-    .classList
-    .add("hidden");
+    .classList.add("hidden");
 
   document
     .getElementById("appScreen")
-    .classList
-    .remove("hidden");
+    .classList.remove("hidden");
 }
 
 
@@ -1606,7 +1419,9 @@ function showApp() {
 async function startApp() {
 
   if (!currentUser) {
+
     showAuth();
+
     return;
   }
 
@@ -1620,6 +1435,8 @@ async function startApp() {
   await loadProfile();
 
   await loadAccount();
+
+  await loadPlatformWallets();
 
   await checkAdmin();
 
@@ -1654,8 +1471,7 @@ async function loadProfile() {
 
   if (!error && data) {
 
-    currentProfile =
-      data;
+    currentProfile = data;
 
     document
       .getElementById("accountName")
@@ -1703,12 +1519,9 @@ async function loadAccount() {
     return;
   }
 
-  if (!data) {
-    return;
-  }
+  if (!data) return;
 
-  currentAccount =
-    data;
+  currentAccount = data;
 
   document
     .getElementById("availableBalance")
@@ -1738,17 +1551,250 @@ async function loadAccount() {
 
 
 /* -------------------------
+   PLATFORM WALLETS
+------------------------- */
+
+async function loadPlatformWallets() {
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+      .from("platform_wallets")
+      .select(
+        "btc_address,usdt_trc20_address,eth_address"
+      )
+      .limit(1)
+      .maybeSingle();
+
+  if (error) {
+
+    console.error(
+      "Platform wallet error:",
+      error
+    );
+
+    platformWallets = null;
+
+    return;
+  }
+
+  platformWallets = data || null;
+}
+
+
+/* -------------------------
+   DEPOSIT NETWORK
+------------------------- */
+
+document
+  .getElementById("depositNetwork")
+  .addEventListener("change", () => {
+
+    clearMessage("depositMessage");
+
+    const network =
+      document
+        .getElementById("depositNetwork")
+        .value;
+
+    const walletBox =
+      document.getElementById("walletBox");
+
+    const wallet =
+      document.getElementById("depositWallet");
+
+    if (!network || !platformWallets) {
+
+      walletBox.classList.add("hidden");
+
+      wallet.textContent = "—";
+
+      return;
+    }
+
+    let address = "";
+
+    if (network === "USDT TRC20") {
+      address =
+        platformWallets.usdt_trc20_address;
+    }
+
+    if (network === "BTC") {
+      address =
+        platformWallets.btc_address;
+    }
+
+    if (network === "ETH") {
+      address =
+        platformWallets.eth_address;
+    }
+
+    if (!address) {
+
+      walletBox.classList.add("hidden");
+
+      wallet.textContent = "Wallet address unavailable.";
+
+      showMessage(
+        "depositMessage",
+        "The selected deposit wallet is not currently configured.",
+        "error"
+      );
+
+      return;
+    }
+
+    wallet.textContent = address;
+
+    walletBox.classList.remove("hidden");
+  });
+
+
+/* -------------------------
+   DEPOSIT SUBMISSION
+------------------------- */
+
+document
+  .getElementById("submitDepositBtn")
+  .addEventListener("click", async () => {
+
+    clearMessage("depositMessage");
+
+    if (!currentUser) {
+
+      showMessage(
+        "depositMessage",
+        "Please sign in first.",
+        "error"
+      );
+
+      return;
+    }
+
+    const network =
+      document
+        .getElementById("depositNetwork")
+        .value;
+
+    const amount =
+      Number(
+        document
+          .getElementById("depositAmount")
+          .value
+      );
+
+    const txid =
+      document
+        .getElementById("depositTxid")
+        .value
+        .trim();
+
+    if (!network) {
+
+      showMessage(
+        "depositMessage",
+        "Please select a deposit network.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+
+      showMessage(
+        "depositMessage",
+        "Please enter a valid deposit amount.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (!txid) {
+
+      showMessage(
+        "depositMessage",
+        "Please enter the transaction ID/hash.",
+        "error"
+      );
+
+      return;
+    }
+
+    const button =
+      document.getElementById(
+        "submitDepositBtn"
+      );
+
+    button.disabled = true;
+    button.textContent = "Submitting...";
+
+    const {
+      data,
+      error
+    } =
+      await supabase.rpc(
+        "create_deposit_request",
+        {
+          p_amount: amount,
+          p_network: network,
+          p_txid: txid,
+          p_description:
+            "Deposit submitted for Coretrex review."
+        }
+      );
+
+    button.disabled = false;
+    button.textContent =
+      "Submit Deposit for Review";
+
+    if (error) {
+
+      console.error(
+        "Deposit submission error:",
+        error
+      );
+
+      showMessage(
+        "depositMessage",
+        error.message ||
+        "Unable to submit deposit request.",
+        "error"
+      );
+
+      return;
+    }
+
+    showMessage(
+      "depositMessage",
+      "Deposit submitted successfully. Your request is pending review.",
+      "success"
+    );
+
+    document
+      .getElementById("depositAmount")
+      .value = "";
+
+    document
+      .getElementById("depositTxid")
+      .value = "";
+
+    await loadTransactions();
+  });
+
+
+/* -------------------------
    ADMIN CHECK
 ------------------------- */
 
 async function checkAdmin() {
 
-  currentIsAdmin =
-    false;
+  currentIsAdmin = false;
 
-  if (!currentUser) {
-    return;
-  }
+  if (!currentUser) return;
 
   const {
     data,
@@ -1765,8 +1811,7 @@ async function checkAdmin() {
 
   if (!error && data) {
 
-    currentIsAdmin =
-      true;
+    currentIsAdmin = true;
 
     addAdminNavigation();
   }
@@ -1784,13 +1829,12 @@ function addAdminNavigation() {
       ".bottom-nav"
     );
 
-  if (!nav) {
-    return;
-  }
+  if (!nav) return;
 
   if (
-    document
-      .getElementById("adminNavBtn")
+    document.getElementById(
+      "adminNavBtn"
+    )
   ) {
     return;
   }
@@ -1798,14 +1842,9 @@ function addAdminNavigation() {
   const button =
     document.createElement("button");
 
-  button.id =
-    "adminNavBtn";
-
-  button.className =
-    "nav-btn";
-
-  button.type =
-    "button";
+  button.id = "adminNavBtn";
+  button.className = "nav-btn";
+  button.type = "button";
 
   button.innerHTML =
     '<span class="nav-icon">⚙</span>Admin';
@@ -1832,59 +1871,43 @@ function showPage(pageId) {
 
   document
     .querySelectorAll(".page")
-    .forEach(
-      page => {
+    .forEach(page => {
 
-        page.classList
-          .remove("active");
-      }
-    );
+      page.classList.remove("active");
+    });
 
   const page =
     document.getElementById(pageId);
 
   if (page) {
-
-    page.classList
-      .add("active");
+    page.classList.add("active");
   }
 
   document
     .querySelectorAll(".nav-btn")
-    .forEach(
-      button => {
+    .forEach(button => {
 
-        button.classList
-          .remove("active");
+      button.classList.remove("active");
 
-        if (
-          button.dataset.page ===
-          pageId
-        ) {
+      if (
+        button.dataset.page ===
+        pageId
+      ) {
 
-          button.classList
-            .add("active");
-        }
+        button.classList.add("active");
       }
-    );
+    });
 
-  if (
-    pageId ===
-    "investmentsPage"
-  ) {
+  if (pageId === "investmentsPage") {
     loadInvestments();
   }
 
-  if (
-    pageId ===
-    "transactionsPage"
-  ) {
+  if (pageId === "transactionsPage") {
     loadTransactions();
   }
 
   if (
-    pageId ===
-    "adminPage" &&
+    pageId === "adminPage" &&
     currentIsAdmin
   ) {
     loadAdminRequests();
@@ -1893,23 +1916,19 @@ function showPage(pageId) {
 
 
 document
-  .querySelectorAll(
-    "[data-page]"
-  )
-  .forEach(
-    button => {
+  .querySelectorAll("[data-page]")
+  .forEach(button => {
 
-      button.addEventListener(
-        "click",
-        () => {
+    button.addEventListener(
+      "click",
+      () => {
 
-          showPage(
-            button.dataset.page
-          );
-        }
-      );
-    }
-  );
+        showPage(
+          button.dataset.page
+        );
+      }
+    );
+  });
 
 
 /* -------------------------
@@ -1928,15 +1947,10 @@ async function loadInvestments() {
       "investmentsList"
     );
 
-  if (!loading || !list) {
-    return;
-  }
+  if (!loading || !list) return;
 
-  loading.style.display =
-    "block";
-
-  list.innerHTML =
-    "";
+  loading.style.display = "block";
+  list.innerHTML = "";
 
   const {
     data,
@@ -1958,8 +1972,7 @@ async function loadInvestments() {
         }
       );
 
-  loading.style.display =
-    "none";
+  loading.style.display = "none";
 
   if (error) {
 
@@ -1979,42 +1992,37 @@ async function loadInvestments() {
     return;
   }
 
-  data.forEach(
-    investment => {
+  data.forEach(investment => {
 
-      const record =
-        document.createElement(
-          "div"
-        );
+    const record =
+      document.createElement("div");
 
-      record.className =
-        "record";
+    record.className = "record";
 
-      record.innerHTML = `
-        <div class="record-line">
-          <span>Plan</span>
-          <strong>${escapeHtml(investment.plan_name)}</strong>
-        </div>
+    record.innerHTML = `
+      <div class="record-line">
+        <span>Plan</span>
+        <strong>${escapeHtml(investment.plan_name)}</strong>
+      </div>
 
-        <div class="record-line">
-          <span>Amount</span>
-          <strong>${money(investment.amount)}</strong>
-        </div>
+      <div class="record-line">
+        <span>Amount</span>
+        <strong>${money(investment.amount)}</strong>
+      </div>
 
-        <div class="record-line">
-          <span>Status</span>
-          <span class="status">${escapeHtml(investment.status)}</span>
-        </div>
+      <div class="record-line">
+        <span>Status</span>
+        <span class="status">${escapeHtml(investment.status)}</span>
+      </div>
 
-        <div class="record-line">
-          <span>Started</span>
-          <span>${formatDate(investment.started_at)}</span>
-        </div>
-      `;
+      <div class="record-line">
+        <span>Started</span>
+        <span>${formatDate(investment.started_at)}</span>
+      </div>
+    `;
 
-      list.appendChild(record);
-    }
-  );
+    list.appendChild(record);
+  });
 }
 
 
@@ -2034,15 +2042,10 @@ async function loadTransactions() {
       "transactionsList"
     );
 
-  if (!loading || !list) {
-    return;
-  }
+  if (!loading || !list) return;
 
-  loading.style.display =
-    "block";
-
-  list.innerHTML =
-    "";
+  loading.style.display = "block";
+  list.innerHTML = "";
 
   const {
     data,
@@ -2051,7 +2054,7 @@ async function loadTransactions() {
     await supabase
       .from("transactions")
       .select(
-        "id,transaction_type,amount,status,reference,description,created_at"
+        "id,transaction_type,amount,status,reference,description,network,txid,created_at"
       )
       .eq(
         "user_id",
@@ -2064,8 +2067,7 @@ async function loadTransactions() {
         }
       );
 
-  loading.style.display =
-    "none";
+  loading.style.display = "none";
 
   if (error) {
 
@@ -2085,72 +2087,73 @@ async function loadTransactions() {
     return;
   }
 
-  data.forEach(
-    transaction => {
+  data.forEach(transaction => {
 
-      const record =
-        document.createElement(
-          "div"
-        );
+    const record =
+      document.createElement("div");
 
-      record.className =
-        "record";
+    record.className = "record";
 
-      const status =
-        String(
-          transaction.status || ""
-        ).toLowerCase();
+    const status =
+      String(
+        transaction.status || ""
+      ).toLowerCase();
 
-      let statusClass =
-        "";
+    let statusClass = "";
 
-      if (status === "pending") {
-        statusClass = "pending";
-      }
-
-      if (status === "rejected") {
-        statusClass = "rejected";
-      }
-
-      if (
-        status === "completed" ||
-        status === "approved"
-      ) {
-        statusClass = "completed";
-      }
-
-      record.innerHTML = `
-        <div class="record-line">
-          <span>Type</span>
-          <strong>${escapeHtml(transaction.transaction_type)}</strong>
-        </div>
-
-        <div class="record-line">
-          <span>Amount</span>
-          <strong>${money(transaction.amount)}</strong>
-        </div>
-
-        <div class="record-line">
-          <span>Status</span>
-          <span class="status ${statusClass}">
-            ${escapeHtml(transaction.status)}
-          </span>
-        </div>
-
-        <div class="record-line">
-          <span>Reference</span>
-          <span>${escapeHtml(transaction.reference || "—")}</span>
-        </div>
-
-        <div class="record-line">
-          <span>Date</span>
-          <span>${formatDate(transaction.created_at)}</span>
-        </div>
-      `;
-
-      list.appendChild(record);
+    if (status === "pending") {
+      statusClass = "pending";
     }
-  );
+
+    if (status === "rejected") {
+      statusClass = "rejected";
+    }
+
+    if (
+      status === "completed" ||
+      status === "approved"
+    ) {
+      statusClass = "completed";
+    }
+
+    record.innerHTML = `
+      <div class="record-line">
+        <span>Type</span>
+        <strong>${escapeHtml(transaction.transaction_type)}</strong>
+      </div>
+
+      <div class="record-line">
+        <span>Amount</span>
+        <strong>${money(transaction.amount)}</strong>
+      </div>
+
+      <div class="record-line">
+        <span>Status</span>
+        <span class="status ${statusClass}">
+          ${escapeHtml(transaction.status)}
+        </span>
+      </div>
+
+      <div class="record-line">
+        <span>Network</span>
+        <span>${escapeHtml(transaction.network || "—")}</span>
+      </div>
+
+      <div class="record-line">
+        <span>TXID / Hash</span>
+        <span style="word-break:break-all;">
+          ${escapeHtml(transaction.txid || "—")}
+        </span>
+      </div>
+
+      <div class="record-line">
+        <span>Date</span>
+        <span>${formatDate(transaction.created_at)}</span>
+      </div>
+    `;
+
+    list.appendChild(record);
+  });
 }
 
 
@@ -2160,9 +2163,7 @@ async function loadTransactions() {
 
 async function loadReferral() {
 
-  if (!currentAccount) {
-    return;
-  }
+  if (!currentAccount) return;
 
   document
     .getElementById("referralBalance")
@@ -2179,43 +2180,22 @@ async function loadReferral() {
 
 document
   .querySelectorAll(".planBtn")
-  .forEach(
-    button => {
+  .forEach(button => {
 
-      button.addEventListener(
-        "click",
-        () => {
+    button.addEventListener(
+      "click",
+      () => {
 
-          const plan =
-            button.dataset.plan;
+        const plan =
+          button.dataset.plan;
 
-          alert(
-            plan +
-            " selected.\n\nInvestment activation will be connected to the secure Coretrex backend."
-          );
-        }
-      );
-    }
-  );
-
-
-/* -------------------------
-   DEPOSIT
-------------------------- */
-
-document
-  .getElementById("depositInfoBtn")
-  .addEventListener(
-    "click",
-    () => {
-
-      showMessage(
-        "depositMessage",
-        "Deposit request processing will be connected to the secure Coretrex backend.",
-        "success"
-      );
-    }
-  );
+        alert(
+          plan +
+          " selected.\n\nInvestment activation will be connected to the secure Coretrex backend."
+        );
+      }
+    );
+  });
 
 
 /* -------------------------
@@ -2274,19 +2254,9 @@ document
         return;
       }
 
-      /*
-        IMPORTANT:
-
-        Do not update accounts.available_balance here.
-
-        Withdrawal requests must be sent to a secure backend function
-        that validates the balance, creates the request, and prevents
-        users from changing their own financial records.
-      */
-
       showMessage(
         "withdrawMessage",
-        "Withdrawal request interface is ready. Secure backend processing must be connected before real withdrawal requests are accepted.",
+        "Withdrawal request interface is ready. Secure withdrawal backend processing must be connected before real requests are accepted.",
         "success"
       );
     }
@@ -2299,9 +2269,7 @@ document
 
 async function loadAdminRequests() {
 
-  if (!currentIsAdmin) {
-    return;
-  }
+  if (!currentIsAdmin) return;
 
   const loading =
     document.getElementById(
@@ -2313,15 +2281,10 @@ async function loadAdminRequests() {
       "adminRequests"
     );
 
-  if (!loading || !list) {
-    return;
-  }
+  if (!loading || !list) return;
 
-  loading.style.display =
-    "block";
-
-  list.innerHTML =
-    "";
+  loading.style.display = "block";
+  list.innerHTML = "";
 
   const {
     data,
@@ -2330,11 +2293,11 @@ async function loadAdminRequests() {
     await supabase
       .from("transactions")
       .select(
-        "id,user_id,transaction_type,amount,status,reference,description,created_at"
+        "id,user_id,transaction_type,amount,status,reference,description,network,txid,created_at"
       )
-      .in(
+      .eq(
         "status",
-        ["pending"]
+        "pending"
       )
       .order(
         "created_at",
@@ -2343,8 +2306,7 @@ async function loadAdminRequests() {
         }
       );
 
-  loading.style.display =
-    "none";
+  loading.style.display = "none";
 
   if (error) {
 
@@ -2371,84 +2333,170 @@ async function loadAdminRequests() {
     return;
   }
 
-  data.forEach(
-    transaction => {
+  data.forEach(transaction => {
 
-      const item =
-        document.createElement(
-          "div"
-        );
+    const item =
+      document.createElement(
+        "div"
+      );
 
-      item.className =
-        "admin-record";
+    item.className =
+      "admin-record";
 
-      item.innerHTML = `
-        <div class="record-line">
-          <span>Type</span>
-          <strong>
-            ${escapeHtml(transaction.transaction_type)}
-          </strong>
-        </div>
+    item.innerHTML = `
+      <div class="record-line">
+        <span>Type</span>
+        <strong>${escapeHtml(transaction.transaction_type)}</strong>
+      </div>
 
-        <div class="record-line">
-          <span>User</span>
-          <span>
-            ${escapeHtml(transaction.user_id)}
-          </span>
-        </div>
+      <div class="record-line">
+        <span>User</span>
+        <span>${escapeHtml(transaction.user_id)}</span>
+      </div>
 
-        <div class="record-line">
-          <span>Amount</span>
-          <strong>
-            ${money(transaction.amount)}
-          </strong>
-        </div>
+      <div class="record-line">
+        <span>Amount</span>
+        <strong>${money(transaction.amount)}</strong>
+      </div>
 
-        <div class="record-line">
-          <span>Reference</span>
-          <span>
-            ${escapeHtml(transaction.reference || "—")}
-          </span>
-        </div>
+      <div class="record-line">
+        <span>Network</span>
+        <strong>${escapeHtml(transaction.network || "—")}</strong>
+      </div>
 
-        <div class="record-line">
-          <span>Date</span>
-          <span>
-            ${formatDate(transaction.created_at)}
-          </span>
-        </div>
+      <div class="record-line">
+        <span>TXID / Hash</span>
+        <span style="word-break:break-all;">
+          ${escapeHtml(transaction.txid || "—")}
+        </span>
+      </div>
 
-        <div class="admin-actions">
+      <div class="record-line">
+        <span>Date</span>
+        <span>${formatDate(transaction.created_at)}</span>
+      </div>
 
-          <button
-            class="btn primary"
-            type="button"
-            disabled
-            title="Secure backend function required"
-          >
-            Accept
-          </button>
+      <div class="admin-actions">
 
-          <button
-            class="btn danger"
-            type="button"
-            disabled
-            title="Secure backend function required"
-          >
-            Reject
-          </button>
+        <button
+          class="btn primary adminApproveBtn"
+          type="button"
+          data-id="${escapeHtml(transaction.id)}"
+        >
+          Approve Deposit
+        </button>
 
-        </div>
+        <button
+          class="btn danger adminRejectBtn"
+          type="button"
+          data-id="${escapeHtml(transaction.id)}"
+        >
+          Reject
+        </button>
 
-        <p class="muted" style="font-size:12px;">
-          Admin actions are disabled until the secure backend
-          approval/rejection functions are connected.
-        </p>
-      `;
+      </div>
 
-      list.appendChild(item);
-    }
-  );
+      <p class="muted" style="font-size:12px;">
+        Verify the transaction independently before approving.
+      </p>
+    `;
+
+    list.appendChild(item);
+  });
+
+  document
+    .querySelectorAll(".adminApproveBtn")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => reviewDeposit(
+          button.dataset.id,
+          "approved"
+        )
+      );
+    });
+
+  document
+    .querySelectorAll(".adminRejectBtn")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => reviewDeposit(
+          button.dataset.id,
+          "rejected"
+        )
+      );
+    });
+}
+
+
+/* -------------------------
+   ADMIN DEPOSIT REVIEW
+------------------------- */
+
+async function reviewDeposit(
+  transactionId,
+  decision
+) {
+
+  if (!currentIsAdmin) {
+
+    alert("Admin access required.");
+
+    return;
+  }
+
+  const confirmation =
+    window.confirm(
+      decision === "approved"
+        ? "Have you independently verified this blockchain transaction before approving this deposit?"
+        : "Reject this pending deposit request?"
+    );
+
+  if (!confirmation) {
+    return;
+  }
+
+  const {
+    data,
+    error
+  } =
+    await supabase.rpc(
+      "admin_review_deposit",
+      {
+        p_transaction_id:
+          transactionId,
+        p_decision:
+          decision
+      }
+    );
+
+  if (error) {
+
+    alert(
+      error.message ||
+      "Unable to review deposit."
+    );
+
+    return;
+  }
+
+  if (data !== true) {
+
+    alert(
+      "The deposit review was not completed."
+    );
+
+    return;
+  }
+
+  await loadAdminRequests();
+
+  await loadAccount();
+
+  await loadTransactions();
 }
 
 
@@ -2483,23 +2531,15 @@ document
 
       await supabase.auth.signOut();
 
-      currentUser =
-        null;
-
-      currentAccount =
-        null;
-
-      currentProfile =
-        null;
-
-      currentIsAdmin =
-        false;
+      currentUser = null;
+      currentAccount = null;
+      currentProfile = null;
+      currentIsAdmin = false;
+      platformWallets = null;
 
       showAuth();
     }
   );
 
-</script>
-
-</body>
+</script></body>
 </html>
