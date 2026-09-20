@@ -46,6 +46,121 @@
       opacity: .9;
     }
 
+    .page {
+      display: none;
+      padding: 20px 18px;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .auth {
+      padding: 35px 20px;
+    }
+
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .auth-logo h1 {
+      color: #0b6b45;
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .auth-logo p {
+      color: #69756f;
+      font-size: 14px;
+    }
+
+    .auth-card {
+      border: 1px solid #dfe7e3;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    .auth-card h2 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .auth-card p {
+      font-size: 13px;
+      color: #69756f;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d7e0db;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #0b6b45;
+    }
+
+    button {
+      border: none;
+      border-radius: 13px;
+      padding: 15px 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #0b6b45;
+      color: white;
+    }
+
+    .secondary {
+      background: #e9f3ee;
+      color: #0b6b45;
+    }
+
+    .telegram {
+      background: #229ed9;
+      color: white;
+    }
+
+    .full {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .switch {
+      text-align: center;
+      font-size: 13px;
+      color: #69756f;
+      margin-top: 14px;
+    }
+
+    .switch button {
+      padding: 0;
+      background: transparent;
+      color: #0b6b45;
+      font-size: 13px;
+    }
+
+    .demo-note {
+      background: #fff7df;
+      color: #765900;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 15px;
+    }
+
     .balance-card {
       margin: 18px;
       padding: 22px;
@@ -75,25 +190,6 @@
       grid-template-columns: 1fr 1fr;
       gap: 12px;
       padding: 0 18px;
-    }
-
-    button {
-      border: none;
-      border-radius: 13px;
-      padding: 15px 10px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .primary {
-      background: #0b6b45;
-      color: white;
-    }
-
-    .secondary {
-      background: #e9f3ee;
-      color: #0b6b45;
     }
 
     .section {
@@ -138,15 +234,6 @@
       text-align: left;
       background: #f1f5f3;
       color: #17221d;
-    }
-
-    .page {
-      display: none;
-      padding: 20px 18px;
-    }
-
-    .page.active {
-      display: block;
     }
 
     .back {
@@ -194,24 +281,167 @@
     </div>
   </div>
 
+
+  <!-- AUTHENTICATION -->
+
+  <div id="auth" class="page active">
+
+    <div class="auth">
+
+      <div class="auth-logo">
+        <h1>Welcome to Coretrex</h1>
+        <p>Access your trading dashboard</p>
+      </div>
+
+      <!-- LOGIN -->
+
+      <div id="loginBox" class="auth-card">
+
+        <h2>Login</h2>
+
+        <p>
+          Sign in to your Coretrex account.
+        </p>
+
+        <input
+          type="email"
+          id="loginEmail"
+          placeholder="Email address"
+        >
+
+        <input
+          type="password"
+          id="loginPassword"
+          placeholder="Password"
+        >
+
+        <button
+          class="primary full"
+          onclick="demoLogin()"
+        >
+          Login
+        </button>
+
+        <button
+          class="telegram full"
+          onclick="continueWithTelegram()"
+        >
+          ✈️ Continue with Telegram
+        </button>
+
+        <div class="switch">
+          Don't have an account?
+          <button onclick="showRegister()">
+            Register
+          </button>
+        </div>
+
+      </div>
+
+
+      <!-- REGISTER -->
+
+      <div
+        id="registerBox"
+        class="auth-card"
+        style="display:none;"
+      >
+
+        <h2>Create Account</h2>
+
+        <p>
+          Create your Coretrex account.
+        </p>
+
+        <input
+          type="text"
+          id="registerName"
+          placeholder="Full name"
+        >
+
+        <input
+          type="email"
+          id="registerEmail"
+          placeholder="Email address"
+        >
+
+        <input
+          type="password"
+          id="registerPassword"
+          placeholder="Create password"
+        >
+
+        <button
+          class="primary full"
+          onclick="demoRegister()"
+        >
+          Register
+        </button>
+
+        <button
+          class="telegram full"
+          onclick="continueWithTelegram()"
+        >
+          ✈️ Continue with Telegram
+        </button>
+
+        <div class="switch">
+          Already have an account?
+          <button onclick="showLogin()">
+            Login
+          </button>
+        </div>
+
+      </div>
+
+
+      <div class="demo-note">
+        🔐 Demo mode: account registration and login are currently
+        frontend-only. Secure account storage and authentication will
+        require a backend before real user accounts are enabled.
+      </div>
+
+    </div>
+
+  </div>
+
+
   <!-- DASHBOARD -->
 
-  <div id="dashboard" class="page active">
+  <div id="dashboard" class="page">
 
     <div class="balance-card">
-      <div class="balance-label">Available Balance</div>
-      <div class="balance">$0.00</div>
-      <div class="small">Demo account</div>
+
+      <div class="balance-label">
+        Available Balance
+      </div>
+
+      <div class="balance">
+        $0.00
+      </div>
+
+      <div class="small">
+        Demo account
+      </div>
+
     </div>
 
     <div class="actions">
-      <button class="primary" onclick="showPage('deposit')">
+
+      <button
+        class="primary"
+        onclick="showPage('deposit')"
+      >
         💰 Deposit
       </button>
 
-      <button class="secondary" onclick="showPage('withdraw')">
+      <button
+        class="secondary"
+        onclick="showPage('withdraw')"
+      >
         💸 Withdraw
       </button>
+
     </div>
 
     <div class="section">
@@ -225,7 +455,11 @@
         <p>
           24 hours · Minimum $100 · Proposed return 10%
         </p>
-        <button class="primary" onclick="showPage('plans')">
+
+        <button
+          class="primary"
+          onclick="showPage('plans')"
+        >
           View Plan
         </button>
       </div>
@@ -235,7 +469,11 @@
         <p>
           72 hours · Minimum $250 · Proposed return 50%
         </p>
-        <button class="primary" onclick="showPage('plans')">
+
+        <button
+          class="primary"
+          onclick="showPage('plans')"
+        >
           View Plan
         </button>
       </div>
@@ -245,7 +483,11 @@
         <p>
           2 weeks · Minimum $500 · Proposed return 75%
         </p>
-        <button class="primary" onclick="showPage('plans')">
+
+        <button
+          class="primary"
+          onclick="showPage('plans')"
+        >
           View Plan
         </button>
       </div>
@@ -287,7 +529,10 @@
 
   <div id="plans" class="page">
 
-    <button class="back" onclick="showPage('dashboard')">
+    <button
+      class="back"
+      onclick="showPage('dashboard')"
+    >
       ← Back
     </button>
 
@@ -302,7 +547,10 @@
         Proposed return: 10%<br>
         Maximum activations: 1
       </p>
-      <button class="primary">Activate — Demo</button>
+
+      <button class="primary">
+        Activate — Demo
+      </button>
     </div>
 
     <div class="plan">
@@ -312,7 +560,10 @@
         Proposed return: 50%<br>
         Maximum activations: 2
       </p>
-      <button class="primary">Activate — Demo</button>
+
+      <button class="primary">
+        Activate — Demo
+      </button>
     </div>
 
     <div class="plan">
@@ -322,7 +573,10 @@
         Proposed return: 75%<br>
         Maximum activations: 3
       </p>
-      <button class="primary">Activate — Demo</button>
+
+      <button class="primary">
+        Activate — Demo
+      </button>
     </div>
 
     <div class="plan">
@@ -332,7 +586,10 @@
         Proposed return: 100%<br>
         Maximum activations: 5
       </p>
-      <button class="primary">Activate — Demo</button>
+
+      <button class="primary">
+        Activate — Demo
+      </button>
     </div>
 
     <div class="plan">
@@ -342,7 +599,10 @@
         Proposed target profit: $20,000<br>
         Completion period: 2½ months
       </p>
-      <button class="primary">Activate — Demo</button>
+
+      <button class="primary">
+        Activate — Demo
+      </button>
     </div>
 
   </div>
@@ -352,30 +612,47 @@
 
   <div id="deposit" class="page">
 
-    <button class="back" onclick="showPage('dashboard')">
+    <button
+      class="back"
+      onclick="showPage('dashboard')"
+    >
       ← Back
     </button>
 
-    <div class="section-title">💰 Deposit</div>
+    <div class="section-title">
+      💰 Deposit
+    </div>
 
     <div class="info">
       Select a supported cryptocurrency and network to view
       the deposit instructions.
     </div>
 
-    <button class="primary" style="width:100%;margin-bottom:10px;">
+    <button
+      class="primary"
+      style="width:100%;margin-bottom:10px;"
+    >
       USDT — TRC20
     </button>
 
-    <button class="secondary" style="width:100%;margin-bottom:10px;">
+    <button
+      class="secondary"
+      style="width:100%;margin-bottom:10px;"
+    >
       USDT — ERC20
     </button>
 
-    <button class="secondary" style="width:100%;margin-bottom:10px;">
+    <button
+      class="secondary"
+      style="width:100%;margin-bottom:10px;"
+    >
       BTC
     </button>
 
-    <button class="secondary" style="width:100%;">
+    <button
+      class="secondary"
+      style="width:100%;"
+    >
       ETH
     </button>
 
@@ -391,11 +668,16 @@
 
   <div id="withdraw" class="page">
 
-    <button class="back" onclick="showPage('dashboard')">
+    <button
+      class="back"
+      onclick="showPage('dashboard')"
+    >
       ← Back
     </button>
 
-    <div class="section-title">💸 Withdraw</div>
+    <div class="section-title">
+      💸 Withdraw
+    </div>
 
     <div class="info">
       Minimum withdrawal: $150<br>
@@ -415,11 +697,16 @@
 
   <div id="investments" class="page">
 
-    <button class="back" onclick="showPage('dashboard')">
+    <button
+      class="back"
+      onclick="showPage('dashboard')"
+    >
       ← Back
     </button>
 
-    <div class="section-title">📈 My Investments</div>
+    <div class="section-title">
+      📈 My Investments
+    </div>
 
     <div class="info">
       No active demo investments.
@@ -432,11 +719,16 @@
 
   <div id="transactions" class="page">
 
-    <button class="back" onclick="showPage('dashboard')">
+    <button
+      class="back"
+      onclick="showPage('dashboard')"
+    >
       ← Back
     </button>
 
-    <div class="section-title">📜 Transactions</div>
+    <div class="section-title">
+      📜 Transactions
+    </div>
 
     <div class="info">
       No transactions available.
@@ -449,11 +741,16 @@
 
   <div id="referral" class="page">
 
-    <button class="back" onclick="showPage('dashboard')">
+    <button
+      class="back"
+      onclick="showPage('dashboard')"
+    >
       ← Back
     </button>
 
-    <div class="section-title">👥 Referral Program</div>
+    <div class="section-title">
+      👥 Referral Program
+    </div>
 
     <div class="info">
       Referral commission: 5%<br>
@@ -468,11 +765,16 @@
 
   <div id="account" class="page">
 
-    <button class="back" onclick="showPage('dashboard')">
+    <button
+      class="back"
+      onclick="showPage('dashboard')"
+    >
       ← Back
     </button>
 
-    <div class="section-title">👤 My Account</div>
+    <div class="section-title">
+      👤 My Account
+    </div>
 
     <div class="info">
       Account status: Active<br>
@@ -488,11 +790,16 @@
 
   <div id="support" class="page">
 
-    <button class="back" onclick="showPage('dashboard')">
+    <button
+      class="back"
+      onclick="showPage('dashboard')"
+    >
       ← Back
     </button>
 
-    <div class="section-title">🎧 Support</div>
+    <div class="section-title">
+      🎧 Support
+    </div>
 
     <div class="info">
       Need assistance? Contact Coretrex support.
@@ -510,9 +817,17 @@
 
 <script>
 
-  const tg = window.Telegram && window.Telegram.WebApp;
+  const tg =
+    window.Telegram &&
+    window.Telegram.WebApp;
+
+
+  /*
+    TELEGRAM MINI APP
+  */
 
   if (tg) {
+
     tg.ready();
     tg.expand();
 
@@ -521,6 +836,7 @@
       tg.initDataUnsafe.user;
 
     if (user) {
+
       const name =
         user.first_name ||
         user.username ||
@@ -528,25 +844,157 @@
 
       document.getElementById("welcomeText").textContent =
         "Welcome, " + name;
+
     }
+
   }
 
+
+  /*
+    LOGIN / REGISTER DEMO
+  */
+
+  function showRegister() {
+
+    document.getElementById("loginBox").style.display =
+      "none";
+
+    document.getElementById("registerBox").style.display =
+      "block";
+
+  }
+
+
+  function showLogin() {
+
+    document.getElementById("registerBox").style.display =
+      "none";
+
+    document.getElementById("loginBox").style.display =
+      "block";
+
+  }
+
+
+  function demoRegister() {
+
+    const name =
+      document.getElementById("registerName").value.trim();
+
+    const email =
+      document.getElementById("registerEmail").value.trim();
+
+    const password =
+      document.getElementById("registerPassword").value;
+
+    if (!name || !email || !password) {
+
+      alert("Please complete all registration fields.");
+
+      return;
+
+    }
+
+    alert(
+      "Demo registration successful. Secure account creation will be enabled when the backend is connected."
+    );
+
+    showPage("dashboard");
+
+  }
+
+
+  function demoLogin() {
+
+    const email =
+      document.getElementById("loginEmail").value.trim();
+
+    const password =
+      document.getElementById("loginPassword").value;
+
+    if (!email || !password) {
+
+      alert(
+        "Please enter your email and password."
+      );
+
+      return;
+
+    }
+
+    alert(
+      "Demo login successful. Secure authentication will be enabled when the backend is connected."
+    );
+
+    showPage("dashboard");
+
+  }
+
+
+  /*
+    TELEGRAM LOGIN DEMO
+  */
+
+  function continueWithTelegram() {
+
+    if (tg) {
+
+      const user =
+        tg.initDataUnsafe &&
+        tg.initDataUnsafe.user;
+
+      if (user) {
+
+        const name =
+          user.first_name ||
+          user.username ||
+          "Telegram User";
+
+        document.getElementById("welcomeText").textContent =
+          "Welcome, " + name;
+
+        showPage("dashboard");
+
+        return;
+
+      }
+
+    }
+
+    alert(
+      "Please open Coretrex from Telegram to continue with Telegram."
+    );
+
+  }
+
+
+  /*
+    PAGE NAVIGATION
+  */
 
   function showPage(pageId) {
 
     document
       .querySelectorAll(".page")
       .forEach(function(page) {
+
         page.classList.remove("active");
+
       });
+
 
     const page =
       document.getElementById(pageId);
 
+
     if (page) {
+
       page.classList.add("active");
+
       window.scrollTo(0, 0);
+
     }
+
   }
 
 </script>
