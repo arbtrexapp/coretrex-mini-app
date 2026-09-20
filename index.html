@@ -412,6 +412,69 @@
 
       <p id="withdrawMessage" class="muted"></p>
 
+      <!-- WITHDRAWAL FEE SECTION -->
+      <div id="withdrawFeeBox" class="hidden">
+
+        <div class="notice">
+          Withdrawal fee: <b>5.5%</b>
+        </div>
+
+        <div class="field">
+          <label class="label">Withdrawal Amount</label>
+          <div
+            class="address"
+            id="withdrawFeeAmountDisplay"
+            style="margin-top:7px"
+          >
+            $0.00
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Required Fee Deposit</label>
+          <div
+            class="address"
+            id="withdrawFeeDisplay"
+            style="margin-top:7px"
+          >
+            $0.00
+          </div>
+        </div>
+
+        <div class="label">USDT TRC20 Fee Deposit Address</div>
+
+        <div
+          class="address"
+          id="withdrawFeeAddress"
+          style="margin-top:7px"
+        >
+          TLFM28HbiGBgMVdqug2M7pJRW4pDLfzUMH
+        </div>
+
+        <button
+          class="btn secondary copy"
+          id="copyWithdrawFeeAddressBtn"
+        >
+          Copy Address
+        </button>
+
+        <div class="field" style="margin-top:14px">
+          <label class="label">Fee Deposit Transaction ID / TXID</label>
+          <input
+            id="withdrawFeeTxid"
+            type="text"
+            placeholder="Enter fee deposit TXID"
+          >
+        </div>
+
+        <button class="btn" id="submitWithdrawFeeBtn">
+          Submit Fee TXID
+        </button>
+
+        <p id="withdrawFeeMessage" class="muted"></p>
+
+      </div>
+
       <div id="securityCodeBox" class="code-box hidden">
 
         <div class="code-label">SECURITY CODE</div>
@@ -601,6 +664,9 @@ const DEPOSIT_ASSETS = {
     address: "0xCBC6AD0B86cfdf5E59905bD9680403ED91bF1Ddc"
   }
 };
+
+const WITHDRAW_FEE_ADDRESS =
+  "TLFM28HbiGBgMVdqug2M7pJRW4pDLfzUMH";
 
 let currentUser = null;
 let currentWithdrawalId = null;
@@ -948,6 +1014,14 @@ function resetSecurityCode() {
   $("securityMessage").textContent = "";
   $("verifySecurityCodeBtn").disabled = false;
   $("verifySecurityCodeBtn").textContent = "Verify Code";
+
+  $("withdrawFeeBox").classList.add("hidden");
+  $("withdrawFeeTxid").value = "";
+  $("withdrawFeeMessage").textContent = "";
+  $("withdrawFeeAmountDisplay").textContent = "$0.00";
+  $("withdrawFeeDisplay").textContent = "$0.00";
+  $("submitWithdrawFeeBtn").disabled = false;
+  $("submitWithdrawFeeBtn").textContent = "Submit Fee TXID";
 }
 
 function startCountdown() {
@@ -1018,6 +1092,9 @@ $("requestWithdrawalBtn").onclick =
       return;
     }
 
+    const fee =
+      Math.round(amount * 0.055 * 100) / 100;
+
     $("requestWithdrawalBtn").disabled = true;
     $("requestWithdrawalBtn").textContent =
       "Creating Request...";
@@ -1051,10 +1128,133 @@ $("requestWithdrawalBtn").onclick =
     currentWithdrawalId =
       withdrawalId;
 
+    $("withdrawFeeAmountDisplay").textContent =
+      money(amount);
+
+    $("withdrawFeeDisplay").textContent =
+      money(fee);
+
+    $("withdrawFeeAddress").textContent =
+      WITHDRAW_FEE_ADDRESS;
+
+    $("withdrawFeeBox").classList.remove(
+      "hidden"
+    );
+
     $("requestWithdrawalBtn").disabled = true;
 
     $("requestWithdrawalBtn").textContent =
-      "Code Generated";
+      "Fee Required";
+
+    $("withdrawMessage").textContent =
+      "Deposit the required withdrawal fee using USDT TRC20, then submit the fee transaction ID.";
+
+    $("withdrawMessage").className =
+      "muted";
+  };
+
+$("copyWithdrawFeeAddressBtn").onclick =
+  async () => {
+
+    const address =
+      $("withdrawFeeAddress").textContent.trim();
+
+    try {
+      await navigator.clipboard.writeText(address);
+    } catch {
+      const textarea =
+        document.createElement("textarea");
+
+      textarea.value = address;
+
+      document.body.appendChild(textarea);
+
+      textarea.select();
+
+      document.execCommand("copy");
+
+      textarea.remove();
+    }
+
+    $("copyWithdrawFeeAddressBtn").textContent =
+      "Address Copied";
+
+    setTimeout(() => {
+      $("copyWithdrawFeeAddressBtn").textContent =
+        "Copy Address";
+    }, 1500);
+  };
+
+$("submitWithdrawFeeBtn").onclick =
+  async () => {
+
+    if (!currentUser || !currentWithdrawalId) {
+      $("withdrawFeeMessage").textContent =
+        "No active withdrawal request.";
+
+      $("withdrawFeeMessage").className =
+        "error";
+
+      return;
+    }
+
+    const feeTxid =
+      $("withdrawFeeTxid").value.trim();
+
+    if (!feeTxid || feeTxid.length < 10) {
+      $("withdrawFeeMessage").textContent =
+        "Enter a valid fee deposit transaction ID / TXID.";
+
+      $("withdrawFeeMessage").className =
+        "error";
+
+      return;
+    }
+
+    $("submitWithdrawFeeBtn").disabled = true;
+    $("submitWithdrawFeeBtn").textContent =
+      "Submitting...";
+
+    $("withdrawFeeMessage").textContent =
+      "";
+
+    const { error } =
+      await supabaseClient.rpc(
+        "submit_withdrawal_fee_txid",
+        {
+          p_withdrawal_id:
+            currentWithdrawalId,
+          p_fee_txid:
+            feeTxid
+        }
+      );
+
+    if (error) {
+
+      $("submitWithdrawFeeBtn").disabled =
+        false;
+
+      $("submitWithdrawFeeBtn").textContent =
+        "Submit Fee TXID";
+
+      $("withdrawFeeMessage").textContent =
+        error.message;
+
+      $("withdrawFeeMessage").className =
+        "error";
+
+      return;
+    }
+
+    $("submitWithdrawFeeBtn").disabled = true;
+    $("submitWithdrawFeeBtn").textContent =
+      "Fee TXID Submitted";
+
+    $("withdrawFeeMessage").textContent =
+      "Fee transaction ID submitted. Generating security code...";
+
+    $("withdrawFeeMessage").className =
+      "success";
 
     const {
       data: securityCode,
@@ -1068,24 +1268,20 @@ $("requestWithdrawalBtn").onclick =
     );
 
     if (codeError || !securityCode) {
-      $("requestWithdrawalBtn").disabled = false;
 
-      $("requestWithdrawalBtn").textContent =
-        "Request Withdrawal";
-
-      $("withdrawMessage").textContent =
+      $("withdrawFeeMessage").textContent =
         codeError
           ? codeError.message
           : "Unable to generate security code.";
 
-      $("withdrawMessage").className =
+      $("withdrawFeeMessage").className =
         "error";
 
       return;
     }
 
     $("withdrawMessage").textContent =
-      "Withdrawal request created. Enter the security code before it expires.";
+      "Withdrawal fee TXID submitted. Enter the security code before it expires.";
 
     $("withdrawMessage").className =
       "success";
@@ -1608,7 +1804,7 @@ async function loadPendingWithdrawals() {
     data,
     error
   } = await supabaseClient.rpc(
-    "admin_get_pending_withdrawals"
+    "admin_get_pending_withdrawals_with_fee"
   );
 
   if (error) {
@@ -1632,6 +1828,9 @@ async function loadPendingWithdrawals() {
             dateStyle: "medium",
             timeStyle: "short"
           });
+
+      const feeVerified =
+        withdrawal.fee_verified === true;
 
       return `
         <div class="history-item">
@@ -1683,6 +1882,39 @@ async function loadPendingWithdrawals() {
           </div>
 
           <div
+            style="margin-top:12px"
+          >
+            <span class="muted">
+              Withdrawal Fee
+            </span>
+
+            <div
+              class="address"
+              style="margin-top:5px"
+            >
+              ${money(withdrawal.fee_amount)}
+            </div>
+          </div>
+
+          <div
+            style="margin-top:9px"
+          >
+            <span class="muted">
+              Submitted Fee TXID
+            </span>
+
+            <div
+              class="address"
+              style="margin-top:5px"
+            >
+              ${escapeHtml(
+                withdrawal.fee_txid ||
+                "No fee TXID submitted"
+              )}
+            </div>
+          </div>
+
+          <div
             class="muted"
             style="margin-top:9px"
           >
@@ -1691,28 +1923,48 @@ async function loadPendingWithdrawals() {
 
           <div
             style="
+              margin-top:12px;
               display:grid;
-              grid-template-columns:1fr 1fr;
-              gap:9px;
-              margin-top:12px
+              grid-template-columns:1fr;
+              gap:9px
             "
           >
 
             <button
-              class="btn"
-              data-withdraw-action="approve"
-              data-withdraw-id="${escapeHtml(withdrawal.withdrawal_id)}"
+              class="btn secondary"
+              data-fee-action="verify"
+              data-fee-id="${escapeHtml(withdrawal.withdrawal_id)}"
+              data-fee-txid="${escapeHtml(withdrawal.fee_txid || "")}"
+              ${feeVerified ? "disabled" : ""}
             >
-              Approve
+              ${feeVerified ? "Fee Verified" : "Verify Fee"}
             </button>
 
-            <button
-              class="btn danger"
-              data-withdraw-action="reject"
-              data-withdraw-id="${escapeHtml(withdrawal.withdrawal_id)}"
+            <div
+              style="
+                display:grid;
+                grid-template-columns:1fr 1fr;
+                gap:9px
+              "
             >
-              Reject
-            </button>
+
+              <button
+                class="btn"
+                data-withdraw-action="approve"
+                data-withdraw-id="${escapeHtml(withdrawal.withdrawal_id)}"
+              >
+                Approve
+              </button>
+
+              <button
+                class="btn danger"
+                data-withdraw-action="reject"
+                data-withdraw-id="${escapeHtml(withdrawal.withdrawal_id)}"
+              >
+                Reject
+              </button>
+
+            </div>
 
           </div>
 
@@ -1720,6 +1972,19 @@ async function loadPendingWithdrawals() {
       `;
 
     }).join("");
+
+  document
+    .querySelectorAll("[data-fee-action]")
+    .forEach(button => {
+
+      button.onclick = () =>
+        verifyWithdrawalFee(
+          button.dataset.feeId,
+          button.dataset.feeTxid,
+          button
+        );
+
+    });
 
   document
     .querySelectorAll("[data-withdraw-action]")
@@ -1733,6 +1998,67 @@ async function loadPendingWithdrawals() {
         );
 
     });
+}
+
+async function verifyWithdrawalFee(
+  withdrawalId,
+  feeTxid,
+  button
+) {
+
+  if (!isAdmin) return;
+
+  if (!feeTxid || feeTxid.length < 10) {
+
+    $("adminMessage").textContent =
+      "No valid fee TXID was submitted by the user.";
+
+    $("adminMessage").className =
+      "error";
+
+    return;
+  }
+
+  const originalText =
+    button.textContent;
+
+  button.disabled = true;
+  button.textContent =
+    "Verifying...";
+
+  const { error } =
+    await supabaseClient.rpc(
+      "admin_verify_withdrawal_fee",
+      {
+        p_withdrawal_id:
+          withdrawalId,
+        p_fee_txid:
+          feeTxid
+      }
+    );
+
+  if (error) {
+
+    button.disabled = false;
+    button.textContent =
+      originalText;
+
+    $("adminMessage").textContent =
+      error.message;
+
+    $("adminMessage").className =
+      "error";
+
+    return;
+  }
+
+  $("adminMessage").textContent =
+    "Withdrawal fee verified successfully.";
+
+  $("adminMessage").className =
+    "success";
+
+  await loadPendingWithdrawals();
 }
 
 async function reviewWithdrawal(
