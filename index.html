@@ -1,2237 +1,740 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Coretrex</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    :root {
-      --bg: #080d16;
-      --surface: #0f1724;
-      --surface-2: #141e2d;
-      --surface-3: #1a2636;
-      --border: #263346;
-      --text: #f3f6fa;
-      --muted: #8d9aae;
-      --blue: #4f8cff;
-      --blue-dark: #2f6fe8;
-      --silver: #cbd5e1;
-      --danger: #ff6678;
-      --success: #46d39a;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:#080c14;
+      color:#f4f7fb;
+    }
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .app{max-width:480px;margin:auto;min-height:100vh;background:#0b1019}
+    .screen{display:none;padding:22px 18px 90px}
+    .screen.active{display:block}
+    .logo{
+      width:46px;height:46px;border:1px solid #334155;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:25px;font-weight:800;color:#dbeafe;background:#111827;
+    }
+    .brand{font-size:25px;font-weight:800;letter-spacing:-.6px}
+    .muted{color:#8b98aa;font-size:13px}
+    .top{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+    .eyebrow{font-size:10px;letter-spacing:2px;color:#718096}
+    .card{
+      background:#111824;border:1px solid #202b3b;border-radius:20px;padding:18px;
+      margin-bottom:14px;
+    }
+    .balance-card{
+      background:linear-gradient(145deg,#121c2b,#0d131e);
+      border:1px solid #26364b;border-radius:24px;padding:22px;margin-bottom:14px;
+    }
+    .balance{font-size:35px;font-weight:800;margin:8px 0 18px}
+    .label{font-size:12px;color:#8290a3}
+    .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .stat{
+      background:#0d141f;border:1px solid #1d2939;border-radius:15px;padding:14px
+    }
+    .stat strong{display:block;margin-top:5px;font-size:17px}
+    .quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .quick button{
+      background:#111a27;border:1px solid #253347;color:#e8eef7;
+      border-radius:16px;padding:16px;text-align:left
+    }
+    .quick b{display:block;margin-bottom:5px}
+    .btn{
+      width:100%;border:0;border-radius:14px;padding:14px;font-weight:700;
+      background:#dbeafe;color:#08111e
+    }
+    .btn.secondary{background:#172131;color:#dbe5f1;border:1px solid #29384d}
+    .btn.danger{background:#32171c;color:#ffb4bd;border:1px solid #54242c}
+    input,select{
+      width:100%;padding:14px;border-radius:13px;border:1px solid #29374a;
+      background:#0b121c;color:#fff;outline:none;margin-top:7px
+    }
+    input:focus,select:focus{border-color:#5d7fa8}
+    .field{margin-bottom:14px}
+    .notice{
+      padding:13px;border-radius:13px;background:#101b29;
+      border:1px solid #25364b;color:#aebdce;font-size:12px;margin:12px 0
+    }
+    .warning{
+      background:#211c12;border-color:#4c4025;color:#d8c28b
+    }
+    .success{color:#8dd6ad}
+    .error{color:#ff9da8}
+    .history-item{
+      padding:15px 0;border-bottom:1px solid #202b39
+    }
+    .history-item:last-child{border-bottom:0}
+    .row{display:flex;justify-content:space-between;gap:12px}
+    .status{
+      font-size:11px;padding:5px 9px;border-radius:20px;
+      background:#172131;color:#b8c6d8;white-space:nowrap
+    }
+    .status.approved{color:#9be1bb;background:#12251d}
+    .status.rejected{color:#ffadb5;background:#2a1519}
+    .status.pending{color:#e4cf91;background:#272215}
+    .address{
+      word-break:break-all;background:#0a111b;border:1px solid #202c3c;
+      padding:12px;border-radius:12px;font-size:12px;color:#b9c7d8
+    }
+    .copy{margin-top:8px}
+    .empty{text-align:center;padding:30px 10px;color:#718096;font-size:13px}
+    .bottom{
+      position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+      width:min(480px,100%);background:#0b1019;border-top:1px solid #1e2938;
+      display:grid;grid-template-columns:repeat(4,1fr);padding:8px 5px
+    }
+    .bottom button{
+      border:0;background:none;color:#718096;padding:9px 2px;font-size:11px
+    }
+    .bottom button.active{color:#dbeafe}
+    .auth{
+      min-height:100vh;display:flex;align-items:center;justify-content:center;
+      padding:25px
+    }
+    .auth-box{width:100%;max-width:400px}
+    .auth-title{font-size:32px;font-weight:800;margin:18px 0 5px}
+    .footer{text-align:center;color:#566274;font-size:11px;margin-top:25px}
+    .hidden{display:none!important}
+    .back{background:none;border:0;color:#94a3b8;padding:0;margin-bottom:18px}
+    .plan{
+      display:flex;justify-content:space-between;gap:12px;align-items:center;
+      padding:15px 0;border-bottom:1px solid #202b39
     }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at top right, #16233a 0, #080d16 38%),
-        var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    button,
-    input,
-    select {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 430px;
-      min-height: 100vh;
-      margin: auto;
-      background: var(--bg);
-      overflow-x: hidden;
-    }
-
-    /* LOGIN */
-
-    .login-top {
-      padding: 42px 25px 30px;
-      background:
-        linear-gradient(145deg, #17263b, #0c1420 72%);
-      border-bottom: 1px solid var(--border);
-      border-radius: 0 0 30px 30px;
-    }
-
-    .brand-row {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-    }
-
-    .logo {
-      width: 51px;
-      height: 51px;
-      border-radius: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(145deg, #ffffff, #cbd5e1);
-      color: #0a1320;
-      font-size: 24px;
-      font-weight: 800;
-      box-shadow: 0 10px 25px rgba(0,0,0,.25);
-    }
-
-    .brand-name {
-      font-size: 21px;
-      font-weight: 800;
-      letter-spacing: .3px;
-    }
-
-    .brand-sub {
-      margin-top: 3px;
-      color: #8e9caf;
-      font-size: 11px;
-      letter-spacing: .6px;
-    }
-
-    .login-heading {
-      margin-top: 32px;
-    }
-
-    .login-heading h1 {
-      margin: 0;
-      font-size: 30px;
-      letter-spacing: -.7px;
-    }
-
-    .login-heading p {
-      margin: 9px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .login-content {
-      padding: 25px;
-    }
-
-    .field {
-      margin-top: 17px;
-    }
-
-    .field label {
-      display: block;
-      margin-bottom: 8px;
-      color: #c5cedb;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .field input,
-    .field select {
-      width: 100%;
-      height: 52px;
-      padding: 0 15px;
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      background: #0d1521;
-      color: var(--text);
-      outline: none;
-      font-size: 15px;
-    }
-
-    .field input::placeholder {
-      color: #596679;
-    }
-
-    .field input:focus,
-    .field select:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(79,140,255,.10);
-    }
-
-    .primary-btn {
-      width: 100%;
-      height: 52px;
-      margin-top: 21px;
-      border: 0;
-      border-radius: 13px;
-      color: white;
-      background: linear-gradient(135deg, #5b94ff, #326fe4);
-      font-size: 14px;
-      font-weight: 800;
-      box-shadow: 0 10px 24px rgba(47,111,232,.18);
-    }
-
-    .primary-btn:disabled {
-      opacity: .55;
-      cursor: wait;
-    }
-
-    .telegram-btn {
-      width: 100%;
-      height: 50px;
-      margin-top: 12px;
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      background: #111b29;
-      color: #dce5f0;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .switch-btn {
-      width: 100%;
-      height: 46px;
-      margin-top: 10px;
-      border: 0;
-      background: transparent;
-      color: #769fe8;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .message {
-      display: none;
-      margin-top: 15px;
-      padding: 13px;
-      border-radius: 11px;
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    .message.success {
-      display: block;
-      color: #80e3ba;
-      background: rgba(70,211,154,.08);
-      border: 1px solid rgba(70,211,154,.18);
-    }
-
-    .message.error {
-      display: block;
-      color: #ff9ba7;
-      background: rgba(255,102,120,.08);
-      border: 1px solid rgba(255,102,120,.18);
-    }
-
-    .login-footer {
-      margin-top: 30px;
-      padding-top: 18px;
-      border-top: 1px solid #1d2838;
-      text-align: center;
-      color: #596679;
-      font-size: 10px;
-      letter-spacing: .5px;
-    }
-
-    /* DASHBOARD */
-
-    .dashboard-header {
-      padding: 25px 21px 20px;
-      background: linear-gradient(145deg, #111c2c, #080d16);
-      border-bottom: 1px solid #182334;
-    }
-
-    .dashboard-header .top-line {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .small-logo {
-      width: 41px;
-      height: 41px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #e8edf3;
-      color: #101927;
-      font-weight: 900;
-      font-size: 19px;
-    }
-
-    .profile-button {
-      width: 41px;
-      height: 41px;
-      border: 1px solid #304057;
-      border-radius: 50%;
-      background: #141e2d;
-      color: #bfc9d7;
-      font-size: 15px;
-    }
-
-    .dashboard-title {
-      margin-top: 22px;
-    }
-
-    .dashboard-title small {
-      color: #8190a4;
-      font-size: 11px;
-    }
-
-    .dashboard-title h1 {
-      margin: 5px 0 0;
-      font-size: 25px;
-      letter-spacing: -.5px;
-    }
-
-    .content {
-      padding: 18px 19px 95px;
-    }
-
-    .balance-card {
-      position: relative;
-      overflow: hidden;
-      padding: 21px;
-      border: 1px solid #30415a;
-      border-radius: 20px;
-      background:
-        radial-gradient(circle at 90% 10%, rgba(79,140,255,.24), transparent 35%),
-        linear-gradient(145deg, #17263a, #0e1725);
-      box-shadow: 0 15px 35px rgba(0,0,0,.20);
-    }
-
-    .balance-label {
-      color: #9caabd;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .balance-value {
-      margin-top: 7px;
-      font-size: 33px;
-      font-weight: 800;
-      letter-spacing: -.8px;
-    }
-
-    .balance-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 9px;
-      color: #83dfba;
-      font-size: 11px;
-    }
-
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--success);
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 17px;
-    }
-
-    .stat {
-      padding: 15px;
-      border: 1px solid var(--border);
-      border-radius: 15px;
-      background: var(--surface);
-    }
-
-    .stat span {
-      display: block;
-      color: #78879b;
-      font-size: 10px;
-      margin-bottom: 7px;
-    }
-
-    .stat strong {
-      font-size: 14px;
-    }
-
-    .section {
-      margin-top: 23px;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 11px;
-    }
-
-    .section-header h2 {
-      margin: 0;
-      font-size: 16px;
-    }
-
-    .section-header span {
-      color: #6e98e3;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: .4px;
-    }
-
-    .quick-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-
-    .quick-card {
-      min-height: 104px;
-      padding: 15px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: var(--surface);
-      color: var(--text);
-      text-align: left;
-    }
-
-    .quick-card:active {
-      transform: scale(.98);
-    }
-
-    .quick-icon {
-      width: 33px;
-      height: 33px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 11px;
-      border-radius: 10px;
-      background: #17263b;
-      color: #75a2ff;
-      font-size: 15px;
-    }
-
-    .quick-card strong {
-      display: block;
-      font-size: 13px;
-    }
-
-    .quick-card small {
-      display: block;
-      margin-top: 4px;
-      color: #748297;
-      font-size: 10px;
-    }
-
-    .plan {
-      padding: 17px;
-      margin-bottom: 10px;
-      border: 1px solid var(--border);
-      border-radius: 17px;
-      background: linear-gradient(145deg, #111a28, #0d141f);
-    }
-
-    .plan-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .plan-name {
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .plan-badge {
-      padding: 5px 8px;
-      border-radius: 7px;
-      background: #18283f;
-      color: #78a3ff;
-      font-size: 9px;
-      font-weight: 800;
-      letter-spacing: .5px;
-    }
-
-    .plan-info {
-      display: flex;
-      gap: 25px;
-      margin-top: 13px;
-    }
-
-    .plan-info span {
-      display: block;
-      color: #69788c;
-      font-size: 9px;
-      margin-bottom: 4px;
-    }
-
-    .plan-info strong {
-      font-size: 12px;
-    }
-
-    .info-card {
-      margin-top: 17px;
-      padding: 15px;
-      border: 1px solid var(--border);
-      border-radius: 15px;
-      background: #0d1520;
-    }
-
-    .info-card strong {
-      font-size: 12px;
-    }
-
-    .info-card p {
-      margin: 6px 0 0;
-      color: #758398;
-      font-size: 11px;
-      line-height: 1.55;
-    }
-
-    /* OTHER SCREENS */
-
-    .screen {
-      display: none;
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    .screen-heading {
-      margin-bottom: 18px;
-    }
-
-    .screen-heading h1 {
-      margin: 0;
-      font-size: 24px;
-    }
-
-    .screen-heading p {
-      margin: 7px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    .empty {
-      padding: 35px 20px;
-      border: 1px dashed #2b394d;
-      border-radius: 17px;
-      text-align: center;
-      background: #0c131e;
-    }
-
-    .empty-icon {
-      font-size: 27px;
-      color: #6d91ce;
-      margin-bottom: 11px;
-    }
-
-    .empty strong {
-      display: block;
-      font-size: 13px;
-    }
-
-    .empty p {
-      color: #718096;
-      font-size: 11px;
-      line-height: 1.5;
-    }
-
-    /* DEPOSIT */
-
-    .deposit-card {
-      padding: 17px;
-      border: 1px solid var(--border);
-      border-radius: 17px;
-      background: linear-gradient(145deg, #111a28, #0c141f);
-    }
-
-    .asset-buttons {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .asset-button {
-      min-height: 48px;
-      border: 1px solid #2a384b;
-      border-radius: 11px;
-      background: #0d1521;
-      color: #aeb9c8;
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .asset-button.active {
-      border-color: var(--blue);
-      background: #14233a;
-      color: #78a3ff;
-    }
-
-    .address-box {
-      margin-top: 18px;
-      padding: 14px;
-      border: 1px solid #2a384b;
-      border-radius: 13px;
-      background: #09111c;
-    }
-
-    .address-label {
-      color: #748297;
-      font-size: 9px;
-      font-weight: 800;
-      letter-spacing: .7px;
-    }
-
-    .network-name {
-      margin-top: 5px;
-      color: #b9c5d4;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .address-row {
-      display: flex;
-      gap: 8px;
-      align-items: stretch;
-      margin-top: 11px;
-    }
-
-    .address-text {
-      flex: 1;
-      min-width: 0;
-      padding: 12px;
-      border: 1px solid #222f41;
-      border-radius: 10px;
-      background: #0f1825;
-      color: #cbd5e1;
-      font-size: 10px;
-      line-height: 1.45;
-      word-break: break-all;
-    }
-
-    .copy-btn {
-      min-width: 70px;
-      border: 1px solid #30415a;
-      border-radius: 10px;
-      background: #17263b;
-      color: #78a3ff;
-      font-size: 10px;
-      font-weight: 800;
-    }
-
-    .warning {
-      margin-top: 12px;
-      padding: 11px;
-      border-radius: 10px;
-      background: rgba(255,102,120,.06);
-      border: 1px solid rgba(255,102,120,.16);
-      color: #d997a0;
-      font-size: 10px;
-      line-height: 1.5;
-    }
-
-    .deposit-form {
-      margin-top: 18px;
-    }
-
-    .submit-deposit {
-      margin-top: 18px;
-    }
-
-    .deposit-note {
-      margin-top: 12px;
-      color: #68778c;
-      font-size: 10px;
-      line-height: 1.55;
-      text-align: center;
-    }
-
-    /* ACCOUNT */
-
-    .account-row {
-      padding: 15px 0;
-      border-bottom: 1px solid #1d2838;
-    }
-
-    .account-row:last-child {
-      border-bottom: 0;
-    }
-
-    .account-row span {
-      display: block;
-      color: #748297;
-      font-size: 10px;
-      margin-bottom: 5px;
-    }
-
-    .account-row strong {
-      font-size: 13px;
-      word-break: break-word;
-    }
-
-    .logout {
-      width: 100%;
-      height: 49px;
-      margin-top: 18px;
-      border: 1px solid #344153;
-      border-radius: 12px;
-      background: transparent;
-      color: #bdc8d6;
-      font-weight: 700;
-      font-size: 13px;
-    }
-
-    /* NAVIGATION */
-
-    .bottom-nav {
-      position: fixed;
-      z-index: 20;
-      bottom: 0;
-      left: 50%;
-      width: min(430px, 100%);
-      transform: translateX(-50%);
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      padding: 8px 7px 9px;
-      border-top: 1px solid #1e2a3a;
-      background: rgba(9,14,22,.96);
-      backdrop-filter: blur(12px);
-    }
-
-    .nav-item {
-      min-height: 52px;
-      border: 0;
-      background: transparent;
-      color: #69778a;
-      font-size: 9px;
-      font-weight: 700;
-    }
-
-    .nav-icon {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 17px;
-    }
-
-    .nav-item.active {
-      color: #75a2ff;
-    }
-
-    .hidden {
-      display: none !important;
-    }
+    .plan:last-child{border-bottom:0}
   </style>
 </head>
 
 <body>
 
-<div class="app">
+<div id="authScreen" class="auth">
+  <div class="auth-box">
+    <div class="logo">C</div>
+    <div class="auth-title">Coretrex</div>
+    <div class="eyebrow">DIGITAL FINANCE PLATFORM</div>
 
-  <!-- LOGIN / REGISTRATION -->
+    <div class="card" style="margin-top:25px">
+      <div id="loginForm">
+        <h3>Welcome back</h3>
+        <p class="muted">Sign in to your Coretrex account.</p>
 
-  <div id="loginScreen">
-
-    <div class="login-top">
-
-      <div class="brand-row">
-
-        <div class="logo">C</div>
-
-        <div>
-          <div class="brand-name">Coretrex</div>
-          <div class="brand-sub">DIGITAL FINANCE PLATFORM</div>
+        <div class="field">
+          <label class="label">Email</label>
+          <input id="loginEmail" type="email" placeholder="you@example.com">
         </div>
 
+        <div class="field">
+          <label class="label">Password</label>
+          <input id="loginPassword" type="password" placeholder="Password">
+        </div>
+
+        <button class="btn" id="loginBtn">Login</button>
+        <button class="btn secondary" id="showRegisterBtn" style="margin-top:9px">
+          Create Account
+        </button>
+        <button class="btn secondary" style="margin-top:9px" id="telegramBtn">
+          Continue with Telegram
+        </button>
+        <p id="loginMessage" class="muted"></p>
       </div>
 
-      <div class="login-heading">
+      <div id="registerForm" class="hidden">
+        <button class="back" id="backLoginBtn">← Back to login</button>
+        <h3>Create account</h3>
+        <p class="muted">Create your Coretrex account.</p>
 
-        <h1 id="title">Welcome back</h1>
+        <div class="field">
+          <label class="label">Full name</label>
+          <input id="regName" type="text" placeholder="Full name">
+        </div>
 
-        <p id="subtitle">
-          Sign in to access your Coretrex account.
-        </p>
+        <div class="field">
+          <label class="label">Email</label>
+          <input id="regEmail" type="email" placeholder="you@example.com">
+        </div>
 
+        <div class="field">
+          <label class="label">Password</label>
+          <input id="regPassword" type="password" placeholder="Minimum 6 characters">
+        </div>
+
+        <button class="btn" id="registerBtn">Create Account</button>
+        <p id="registerMessage" class="muted"></p>
       </div>
-
     </div>
 
-    <div class="login-content">
-
-      <div id="nameField" class="field hidden">
-        <label for="name">FULL NAME</label>
-        <input id="name" type="text" placeholder="Enter your full name">
-      </div>
-
-      <div class="field">
-        <label for="email">EMAIL ADDRESS</label>
-        <input id="email" type="email" placeholder="Enter your email">
-      </div>
-
-      <div class="field">
-        <label for="password">PASSWORD</label>
-        <input id="password" type="password" placeholder="Enter your password">
-      </div>
-
-      <button id="loginBtn" class="primary-btn" type="button">
-        Login
-      </button>
-
-      <button id="telegramBtn" class="telegram-btn" type="button">
-        Continue with Telegram
-      </button>
-
-      <button id="modeBtn" class="switch-btn" type="button">
-        Create a new account
-      </button>
-
-      <div id="message" class="message"></div>
-
-      <div class="login-footer">
-        Coretrex © 2026
-      </div>
-
-    </div>
-
+    <div class="footer">Coretrex © 2026</div>
   </div>
-
-
-  <!-- DASHBOARD -->
-
-  <div id="dashboard" class="hidden">
-
-    <header class="dashboard-header">
-
-      <div class="top-line">
-
-        <div class="small-logo">C</div>
-
-        <button class="profile-button" id="profileButton" type="button">
-          ●
-        </button>
-
-      </div>
-
-      <div class="dashboard-title">
-
-        <small>CORETREX ACCOUNT</small>
-
-        <h1>Dashboard</h1>
-
-      </div>
-
-    </header>
-
-
-    <main class="content">
-
-
-      <!-- HOME -->
-
-      <section id="homeScreen" class="screen active">
-
-        <div class="balance-card">
-
-          <div class="balance-label">
-            Available Balance
-          </div>
-
-          <div class="balance-value">
-            $0.00
-          </div>
-
-          <div class="balance-status">
-            <span class="status-dot"></span>
-            Account active
-          </div>
-
-        </div>
-
-
-        <div class="stats">
-
-          <div class="stat">
-            <span>INVESTED CAPITAL</span>
-            <strong>$0.00</strong>
-          </div>
-
-          <div class="stat">
-            <span>REALIZED P/L</span>
-            <strong>$0.00</strong>
-          </div>
-
-        </div>
-
-
-        <div class="section">
-
-          <div class="section-header">
-            <h2>Quick Access</h2>
-          </div>
-
-
-          <div class="quick-grid">
-
-            <button
-              class="quick-card"
-              data-screen="depositScreen"
-              type="button">
-
-              <div class="quick-icon">↓</div>
-              <strong>Deposit</strong>
-              <small>Add funds</small>
-
-            </button>
-
-
-            <button
-              class="quick-card"
-              data-screen="withdrawScreen"
-              type="button">
-
-              <div class="quick-icon">↑</div>
-              <strong>Withdraw</strong>
-              <small>Request funds</small>
-
-            </button>
-
-
-            <button
-              class="quick-card"
-              data-screen="investmentsScreen"
-              type="button">
-
-              <div class="quick-icon">↗</div>
-              <strong>Investments</strong>
-              <small>View portfolio</small>
-
-            </button>
-
-
-            <button
-              class="quick-card"
-              data-screen="transactionsScreen"
-              type="button">
-
-              <div class="quick-icon">≡</div>
-              <strong>Activity</strong>
-              <small>Transaction history</small>
-
-            </button>
-
-          </div>
-
-        </div>
-
-
-        <div class="section">
-
-          <div class="section-header">
-            <h2>Investment Plans</h2>
-            <span>AVAILABLE</span>
-          </div>
-
-
-          <div class="plan">
-
-            <div class="plan-top">
-
-              <div class="plan-name">
-                Starter
-              </div>
-
-              <div class="plan-badge">
-                STARTER
-              </div>
-
-            </div>
-
-            <div class="plan-info">
-
-              <div>
-                <span>MINIMUM</span>
-                <strong>$100</strong>
-              </div>
-
-              <div>
-                <span>DURATION</span>
-                <strong>48 Hours</strong>
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <div class="plan">
-
-            <div class="plan-top">
-
-              <div class="plan-name">
-                Growth
-              </div>
-
-              <div class="plan-badge">
-                GROWTH
-              </div>
-
-            </div>
-
-            <div class="plan-info">
-
-              <div>
-                <span>MINIMUM</span>
-                <strong>$500</strong>
-              </div>
-
-              <div>
-                <span>STATUS</span>
-                <strong>Available</strong>
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <div class="plan">
-
-            <div class="plan-top">
-
-              <div class="plan-name">
-                Advanced
-              </div>
-
-              <div class="plan-badge">
-                ADVANCED
-              </div>
-
-            </div>
-
-            <div class="plan-info">
-
-              <div>
-                <span>MINIMUM</span>
-                <strong>$1,000</strong>
-              </div>
-
-              <div>
-                <span>STATUS</span>
-                <strong>Available</strong>
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div class="info-card">
-
-          <strong>Account overview</strong>
-
-          <p>
-            Manage your Coretrex account, review activity and access
-            available account services from your dashboard.
-          </p>
-
-        </div>
-
-      </section>
-
-
-      <!-- INVESTMENTS -->
-
-      <section id="investmentsScreen" class="screen">
-
-        <div class="screen-heading">
-
-          <h1>Investments</h1>
-
-          <p>
-            Monitor your Coretrex investment activity.
-          </p>
-
-        </div>
-
-        <div class="empty">
-
-          <div class="empty-icon">↗</div>
-
-          <strong>No investments yet</strong>
-
-          <p>
-            Your investment records will appear here.
-          </p>
-
-        </div>
-
-      </section>
-
-
-      <!-- ACTIVITY -->
-
-      <section id="transactionsScreen" class="screen">
-
-        <div class="screen-heading">
-
-          <h1>Activity</h1>
-
-          <p>
-            Review deposits, withdrawals and account transactions.
-          </p>
-
-        </div>
-
-        <div class="empty">
-
-          <div class="empty-icon">≡</div>
-
-          <strong>No activity yet</strong>
-
-          <p>
-            Your transaction history will appear here.
-          </p>
-
-        </div>
-
-      </section>
-
-
-      <!-- ACCOUNT -->
-
-      <section id="accountScreen" class="screen">
-
-        <div class="screen-heading">
-
-          <h1>Account</h1>
-
-          <p>
-            Your Coretrex account information.
-          </p>
-
-        </div>
-
-
-        <div class="info-card">
-
-          <div class="account-row">
-
-            <span>EMAIL ADDRESS</span>
-
-            <strong id="accountEmail"></strong>
-
-          </div>
-
-
-          <div class="account-row">
-
-            <span>ACCOUNT STATUS</span>
-
-            <strong>Active</strong>
-
-          </div>
-
-        </div>
-
-
-        <button id="logoutBtn" class="logout" type="button">
-          Log Out
-        </button>
-
-      </section>
-
-
-      <!-- DEPOSIT -->
-
-      <section id="depositScreen" class="screen">
-
-        <div class="screen-heading">
-
-          <h1>Deposit</h1>
-
-          <p>
-            Select an asset and send your deposit to the corresponding
-            Coretrex address.
-          </p>
-
-        </div>
-
-
-        <div class="deposit-card">
-
-
-          <div class="field" style="margin-top:0;">
-
-            <label>SELECT ASSET</label>
-
-            <div class="asset-buttons">
-
-              <button
-                class="asset-button active"
-                data-asset="USDT"
-                type="button">
-
-                USDT
-
-              </button>
-
-              <button
-                class="asset-button"
-                data-asset="BTC"
-                type="button">
-
-                BTC
-
-              </button>
-
-              <button
-                class="asset-button"
-                data-asset="ETH"
-                type="button">
-
-                ETH
-
-              </button>
-
-            </div>
-
-          </div>
-
-
-          <div class="address-box">
-
-            <div class="address-label">
-              DEPOSIT ADDRESS
-            </div>
-
-            <div
-              id="networkName"
-              class="network-name">
-
-              USDT — TRC20
-
-            </div>
-
-
-            <div class="address-row">
-
-              <div
-                id="depositAddress"
-                class="address-text">
-
-                TLFM28HbiGBgMVdqug2M7pJRW4pDLfzUMH
-
-              </div>
-
-              <button
-                id="copyAddressBtn"
-                class="copy-btn"
-                type="button">
-
-                Copy
-
-              </button>
-
-            </div>
-
-          </div>
-
-
-          <div class="warning">
-
-            ⚠️ Send only the selected asset through the displayed
-            network. Sending through another network may result in
-            loss of funds.
-
-          </div>
-
-
-          <div class="deposit-form">
-
-
-            <div class="field" style="margin-top:0;">
-
-              <label for="depositAmount">
-                DEPOSIT AMOUNT
-              </label>
-
-              <input
-                id="depositAmount"
-                type="number"
-                min="0"
-                step="any"
-                placeholder="Enter amount">
-
-            </div>
-
-
-            <div class="field">
-
-              <label for="depositTxid">
-                TRANSACTION ID / TX HASH
-              </label>
-
-              <input
-                id="depositTxid"
-                type="text"
-                placeholder="Paste your transaction ID or hash">
-
-            </div>
-
-
-            <button
-              id="submitDepositBtn"
-              class="primary-btn submit-deposit"
-              type="button">
-
-              Submit Deposit
-
-            </button>
-
-
-            <div
-              id="depositMessage"
-              class="message">
-            </div>
-
-
-            <div class="deposit-note">
-
-              Your deposit will remain pending until it has been
-              reviewed and approved. Your balance is not credited
-              automatically.
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- WITHDRAW -->
-
-      <section id="withdrawScreen" class="screen">
-
-        <div class="screen-heading">
-
-          <h1>Withdraw</h1>
-
-          <p>
-            Withdrawal requests will be handled through the secure
-            Coretrex withdrawal system.
-          </p>
-
-        </div>
-
-        <div class="empty">
-
-          <div class="empty-icon">↑</div>
-
-          <strong>Withdrawal centre</strong>
-
-          <p>
-            The withdrawal request form will be added next.
-          </p>
-
-        </div>
-
-      </section>
-
-
-    </main>
-
-
-    <nav class="bottom-nav">
-
-      <button
-        class="nav-item active"
-        data-screen="homeScreen"
-        type="button">
-
-        <span class="nav-icon">⌂</span>
-        Home
-
-      </button>
-
-
-      <button
-        class="nav-item"
-        data-screen="investmentsScreen"
-        type="button">
-
-        <span class="nav-icon">↗</span>
-        Invest
-
-      </button>
-
-
-      <button
-        class="nav-item"
-        data-screen="transactionsScreen"
-        type="button">
-
-        <span class="nav-icon">≡</span>
-        Activity
-
-      </button>
-
-
-      <button
-        class="nav-item"
-        data-screen="accountScreen"
-        type="button">
-
-        <span class="nav-icon">●</span>
-        Account
-
-      </button>
-
-    </nav>
-
-  </div>
-
 </div>
 
+<div id="app" class="app hidden">
+
+  <!-- HOME -->
+  <section id="homeScreen" class="screen active">
+    <div class="top">
+      <div class="logo">C</div>
+      <div>
+        <div class="brand">Coretrex</div>
+        <div class="eyebrow">DIGITAL FINANCE</div>
+      </div>
+    </div>
+
+    <div class="balance-card">
+      <div class="label">AVAILABLE BALANCE</div>
+      <div class="balance" id="balance">$0.00</div>
+
+      <div class="stats">
+        <div class="stat">
+          <span class="label">Invested Capital</span>
+          <strong id="invested">$0.00</strong>
+        </div>
+        <div class="stat">
+          <span class="label">Realized P/L</span>
+          <strong id="pl">$0.00</strong>
+        </div>
+      </div>
+    </div>
+
+    <h3>Quick Access</h3>
+
+    <div class="quick">
+      <button data-screen="depositScreen"><b>Deposit</b><span class="muted">Fund account</span></button>
+      <button data-screen="withdrawScreen"><b>Withdraw</b><span class="muted">Request withdrawal</span></button>
+      <button data-screen="investScreen"><b>Investments</b><span class="muted">View plans</span></button>
+      <button data-screen="activityScreen"><b>Activity</b><span class="muted">Transaction history</span></button>
+    </div>
+
+    <div class="card" style="margin-top:15px">
+      <div class="label">ACCOUNT STATUS</div>
+      <h3 style="margin-bottom:5px">Active Account</h3>
+      <div class="muted" id="homeEmail"></div>
+    </div>
+  </section>
+
+  <!-- DEPOSIT -->
+  <section id="depositScreen" class="screen">
+    <button class="back" data-screen="homeScreen">← Back</button>
+    <h2>Deposit Centre</h2>
+    <p class="muted">Send funds to the selected Coretrex deposit address, then submit your transaction details for review.</p>
+
+    <div class="card">
+      <div class="field">
+        <label class="label">Asset</label>
+        <select id="depositAsset">
+          <option value="USDT">USDT</option>
+          <option value="BTC">BTC</option>
+          <option value="ETH">ETH</option>
+        </select>
+      </div>
+
+      <div class="label">Network</div>
+      <div id="depositNetwork" style="font-weight:700;margin:6px 0 10px">USDT — TRC20</div>
+
+      <div class="label">Deposit Address</div>
+      <div class="address" id="depositAddress"></div>
+
+      <button class="btn secondary copy" id="copyAddressBtn">Copy Address</button>
+
+      <div class="notice warning">
+        Make sure you use the correct network. Sending an asset through the wrong network may result in loss of funds.
+      </div>
+
+      <div class="field">
+        <label class="label">Amount</label>
+        <input id="depositAmount" type="number" min="0" step="any" placeholder="Enter amount">
+      </div>
+
+      <div class="field">
+        <label class="label">Transaction ID / TX Hash</label>
+        <input id="depositTxid" type="text" placeholder="Enter transaction hash">
+      </div>
+
+      <button class="btn" id="submitDepositBtn">Submit Deposit</button>
+      <p id="depositMessage" class="muted"></p>
+    </div>
+  </section>
+
+  <!-- ACTIVITY -->
+  <section id="activityScreen" class="screen">
+    <button class="back" data-screen="homeScreen">← Back</button>
+
+    <div class="row">
+      <div>
+        <h2 style="margin-bottom:4px">Activity</h2>
+        <p class="muted">Your recent account transactions.</p>
+      </div>
+      <button id="refreshActivity" class="btn secondary" style="width:auto;padding:10px 13px">Refresh</button>
+    </div>
+
+    <div class="card" id="activityList">
+      <div class="empty">Loading activity...</div>
+    </div>
+  </section>
+
+  <!-- INVEST -->
+  <section id="investScreen" class="screen">
+    <button class="back" data-screen="homeScreen">← Back</button>
+    <h2>Investment Plans</h2>
+    <p class="muted">Available Coretrex plans.</p>
+
+    <div class="card">
+      <div class="plan">
+        <div>
+          <b>Starter</b>
+          <div class="muted">Minimum $100 · 48 hours</div>
+        </div>
+        <span>$100+</span>
+      </div>
+
+      <div class="plan">
+        <div>
+          <b>Growth</b>
+          <div class="muted">Minimum $500</div>
+        </div>
+        <span>$500+</span>
+      </div>
+
+      <div class="plan">
+        <div>
+          <b>Advanced</b>
+          <div class="muted">Minimum $1,000</div>
+        </div>
+        <span>$1,000+</span>
+      </div>
+    </div>
+
+    <div class="notice">
+      Investment processing will be enabled through secure server-side functions before funds can be moved from your account.
+    </div>
+  </section>
+
+  <!-- WITHDRAW -->
+  <section id="withdrawScreen" class="screen">
+    <button class="back" data-screen="homeScreen">← Back</button>
+    <h2>Withdraw</h2>
+
+    <div class="card">
+      <div class="notice">
+        USDT TRC20 withdrawals will be available here after the secure withdrawal processing system is enabled.
+      </div>
+
+      <div class="field">
+        <label class="label">Amount</label>
+        <input type="number" placeholder="Minimum $150" disabled>
+      </div>
+
+      <div class="field">
+        <label class="label">USDT TRC20 Wallet</label>
+        <input type="text" placeholder="Wallet address" disabled>
+      </div>
+
+      <button class="btn" disabled>Withdrawal Currently Unavailable</button>
+    </div>
+  </section>
+
+  <!-- ACCOUNT -->
+  <section id="accountScreen" class="screen">
+    <h2>Account</h2>
+
+    <div class="card">
+      <div class="label">EMAIL</div>
+      <p id="accountEmail"></p>
+
+      <div class="label" style="margin-top:18px">STATUS</div>
+      <p>Active</p>
+    </div>
+
+    <button class="btn danger" id="logoutBtn">Logout</button>
+  </section>
+
+  <nav class="bottom">
+    <button class="active" data-screen="homeScreen">⌂<br>Home</button>
+    <button data-screen="investScreen">◆<br>Invest</button>
+    <button data-screen="activityScreen">◷<br>Activity</button>
+    <button data-screen="accountScreen">○<br>Account</button>
+  </nav>
+</div>
 
 <script>
+const SUPABASE_URL = "https://gttfjmoyggyunhaojcxg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_UPsL7MaeNjsbh8InoyfmxQ_LPi8LLkm";
 
-  const SUPABASE_URL =
-    "https://gttfjmoyggyunhaojcxg.supabase.co";
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
-  const SUPABASE_ANON_KEY =
-    "sb_publishable_UPsL7MaeNjsbh8InoyfmxQ_LPi8LLkm";
+const DEPOSIT_ASSETS = {
+  USDT: {
+    network: "USDT — TRC20",
+    address: "TLFM28HbiGBgMVdqug2M7pJRW4pDLfzUMH"
+  },
+  BTC: {
+    network: "BTC — Bitcoin Network",
+    address: "bc1q6ejj3fr5r98haam0g7gck6cr37sset96gqzhkt"
+  },
+  ETH: {
+    network: "ETH — Ethereum Network",
+    address: "0xCBC6AD0B86cfdf5E59905bD9680403ED91bF1Ddc"
+  }
+};
 
+let currentUser = null;
 
-  const DEPOSIT_ASSETS = {
+const $ = id => document.getElementById(id);
 
-    USDT: {
-      network: "USDT — TRC20",
-      address: "TLFM28HbiGBgMVdqug2M7pJRW4pDLfzUMH"
-    },
+function money(value) {
+  const n = Number(value || 0);
+  return "$" + n.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
 
-    BTC: {
-      network: "BTC — Bitcoin Network",
-      address: "bc1q6ejj3fr5r98haam0g7gck6cr37sset96gqzhkt"
-    },
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  const screen = $(id);
+  if (screen) screen.classList.add("active");
 
-    ETH: {
-      network: "ETH — Ethereum Network",
-      address: "0xCBC6AD0B86cfdf5E59905bD9680403ED91bF1Ddc"
-    }
+  document.querySelectorAll(".bottom button").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.screen === id);
+  });
 
-  };
+  if (id === "activityScreen") loadActivity();
+  if (id === "homeScreen") loadAccount();
+}
 
+document.querySelectorAll("[data-screen]").forEach(btn => {
+  btn.addEventListener("click", () => showScreen(btn.dataset.screen));
+});
 
-  let supabaseClient = null;
+$("showRegisterBtn").onclick = () => {
+  $("loginForm").classList.add("hidden");
+  $("registerForm").classList.remove("hidden");
+};
 
-  let registerMode = false;
+$("backLoginBtn").onclick = () => {
+  $("registerForm").classList.add("hidden");
+  $("loginForm").classList.remove("hidden");
+};
 
-  let selectedAsset = "USDT";
+$("telegramBtn").onclick = () => {
+  $("loginMessage").textContent =
+    "Telegram login is not connected yet. Please use email and password.";
+};
 
+$("registerBtn").onclick = async () => {
+  const name = $("regName").value.trim();
+  const email = $("regEmail").value.trim();
+  const password = $("regPassword").value;
 
-  const message =
-    document.getElementById("message");
-
-
-  const depositMessage =
-    document.getElementById("depositMessage");
-
-
-  function showMessage(text, type) {
-
-    message.textContent = text;
-
-    message.className =
-      "message " + type;
-
+  if (!name || !email || password.length < 6) {
+    $("registerMessage").textContent =
+      "Enter your name, a valid email and a password of at least 6 characters.";
+    return;
   }
 
+  $("registerMessage").textContent = "Creating account...";
 
-  function showDepositMessage(text, type) {
+  const { error } = await supabaseClient.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: name }
+    }
+  });
 
-    depositMessage.textContent = text;
-
-    depositMessage.className =
-      "message " + type;
-
+  if (error) {
+    $("registerMessage").textContent = error.message;
+    return;
   }
 
+  $("registerMessage").textContent =
+    "Account created. You can now log in.";
 
-  function setRegisterMode(value) {
+  setTimeout(() => {
+    $("registerForm").classList.add("hidden");
+    $("loginForm").classList.remove("hidden");
+  }, 800);
+};
 
-    registerMode = value;
+$("loginBtn").onclick = async () => {
+  const email = $("loginEmail").value.trim();
+  const password = $("loginPassword").value;
 
-    const title =
-      document.getElementById("title");
-
-    const subtitle =
-      document.getElementById("subtitle");
-
-    const nameField =
-      document.getElementById("nameField");
-
-    const loginBtn =
-      document.getElementById("loginBtn");
-
-    const modeBtn =
-      document.getElementById("modeBtn");
-
-
-    if (registerMode) {
-
-      title.textContent =
-        "Create your account";
-
-      subtitle.textContent =
-        "Create a Coretrex account using your email and password.";
-
-      nameField.classList.remove("hidden");
-
-      loginBtn.textContent =
-        "Create Account";
-
-      modeBtn.textContent =
-        "Back to login";
-
-    } else {
-
-      title.textContent =
-        "Welcome back";
-
-      subtitle.textContent =
-        "Sign in to access your Coretrex account.";
-
-      nameField.classList.add("hidden");
-
-      loginBtn.textContent =
-        "Login";
-
-      modeBtn.textContent =
-        "Create a new account";
-
-    }
-
+  if (!email || !password) {
+    $("loginMessage").textContent = "Enter your email and password.";
+    return;
   }
 
+  $("loginMessage").textContent = "Signing in...";
 
-  async function start() {
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
 
-    try {
-
-      if (
-        !window.supabase ||
-        !window.supabase.createClient
-      ) {
-
-        showMessage(
-          "Supabase could not be loaded.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      supabaseClient =
-        window.supabase.createClient(
-          SUPABASE_URL,
-          SUPABASE_ANON_KEY
-        );
-
-
-      const {
-        data,
-        error
-      } =
-        await supabaseClient.auth.getSession();
-
-
-      if (error) {
-
-        throw error;
-
-      }
-
-
-      if (
-        data &&
-        data.session &&
-        data.session.user
-      ) {
-
-        showDashboard(
-          data.session.user
-        );
-
-      }
-
-    } catch (error) {
-
-      console.error(error);
-
-      showMessage(
-        error.message ||
-        "Unable to initialize Coretrex.",
-        "error"
-      );
-
-    }
-
+  if (error) {
+    $("loginMessage").textContent = error.message;
+    return;
   }
 
-
-  async function login() {
-
-    if (!supabaseClient) {
-
-      showMessage(
-        "Coretrex is still loading. Please refresh.",
-        "error"
-      );
-
-      return;
-
-    }
-
-
-    const email =
-      document
-        .getElementById("email")
-        .value
-        .trim();
-
-
-    const password =
-      document
-        .getElementById("password")
-        .value;
-
-
-    const name =
-      document
-        .getElementById("name")
-        .value
-        .trim();
-
-
-    if (!email) {
-
-      showMessage(
-        "Please enter your email address.",
-        "error"
-      );
-
-      return;
-
-    }
-
-
-    if (!password) {
-
-      showMessage(
-        "Please enter your password.",
-        "error"
-      );
-
-      return;
-
-    }
-
-
-    if (
-      registerMode &&
-      !name
-    ) {
-
-      showMessage(
-        "Please enter your full name.",
-        "error"
-      );
-
-      return;
-
-    }
-
-
-    const button =
-      document.getElementById("loginBtn");
-
-
-    button.disabled = true;
-
-    button.textContent =
-      registerMode
-        ? "Creating..."
-        : "Signing in...";
-
-
-    try {
-
-      if (registerMode) {
-
-        const {
-          data,
-          error
-        } =
-          await supabaseClient.auth.signUp({
-
-            email: email,
-
-            password: password,
-
-            options: {
-
-              data: {
-                full_name: name
-              }
-
-            }
-
-          });
-
-
-        if (error) {
-
-          throw error;
-
-        }
-
-
-        if (
-          data &&
-          data.session &&
-          data.user
-        ) {
-
-          showDashboard(
-            data.user
-          );
-
-        } else {
-
-          showMessage(
-            "Account created. You can now sign in.",
-            "success"
-          );
-
-        }
-
-      } else {
-
-        const {
-          data,
-          error
-        } =
-          await supabaseClient.auth
-            .signInWithPassword({
-
-              email: email,
-
-              password: password
-
-            });
-
-
-        if (error) {
-
-          throw error;
-
-        }
-
-
-        showDashboard(
-          data.user
-        );
-
-      }
-
-    } catch (error) {
-
-      console.error(error);
-
-      showMessage(
-        error.message ||
-        "Authentication failed.",
-        "error"
-      );
-
-    } finally {
-
-      button.disabled = false;
-
-      button.textContent =
-        registerMode
-          ? "Create Account"
-          : "Login";
-
-    }
-
+  currentUser = data.user;
+  await openApp();
+};
+
+async function openApp() {
+  $("authScreen").classList.add("hidden");
+  $("app").classList.remove("hidden");
+
+  $("accountEmail").textContent = currentUser.email || "";
+  $("homeEmail").textContent = currentUser.email || "";
+
+  updateDepositAsset();
+  await loadAccount();
+  await loadActivity();
+}
+
+async function loadAccount() {
+  if (!currentUser) return;
+
+  const { data, error } = await supabaseClient
+    .from("accounts")
+    .select("available_balance, invested_capital, realized_pl")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if (error || !data) return;
+
+  $("balance").textContent = money(data.available_balance);
+  $("invested").textContent = money(data.invested_capital);
+  $("pl").textContent = money(data.realized_pl);
+}
+
+function updateDepositAsset() {
+  const asset = $("depositAsset").value;
+  const info = DEPOSIT_ASSETS[asset];
+
+  $("depositNetwork").textContent = info.network;
+  $("depositAddress").textContent = info.address;
+}
+
+$("depositAsset").addEventListener("change", updateDepositAsset);
+
+$("copyAddressBtn").onclick = async () => {
+  const address = $("depositAddress").textContent;
+
+  try {
+    await navigator.clipboard.writeText(address);
+    $("copyAddressBtn").textContent = "Address Copied";
+    setTimeout(() => {
+      $("copyAddressBtn").textContent = "Copy Address";
+    }, 1500);
+  } catch {
+    const textarea = document.createElement("textarea");
+    textarea.value = address;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+    $("copyAddressBtn").textContent = "Address Copied";
+    setTimeout(() => {
+      $("copyAddressBtn").textContent = "Copy Address";
+    }, 1500);
+  }
+};
+
+$("submitDepositBtn").onclick = async () => {
+  if (!currentUser) return;
+
+  const amount = Number($("depositAmount").value);
+  const txid = $("depositTxid").value.trim();
+
+  if (!amount || amount <= 0) {
+    $("depositMessage").textContent = "Enter a valid deposit amount.";
+    $("depositMessage").className = "error";
+    return;
   }
 
-
-  function showDashboard(user) {
-
-    document
-      .getElementById("loginScreen")
-      .classList.add("hidden");
-
-    document
-      .getElementById("dashboard")
-      .classList.remove("hidden");
-
-
-    const email =
-      user.email || "";
-
-
-    document
-      .getElementById("accountEmail")
-      .textContent =
-        email;
-
+  if (!txid) {
+    $("depositMessage").textContent =
+      "Enter your transaction ID / TX hash.";
+    $("depositMessage").className = "error";
+    return;
   }
 
+  $("submitDepositBtn").disabled = true;
+  $("submitDepositBtn").textContent = "Submitting...";
+  $("depositMessage").textContent = "";
 
-  function showScreen(screenId) {
+  const asset = $("depositAsset").value;
+  const network = DEPOSIT_ASSETS[asset].network;
 
-    document
-      .querySelectorAll(".screen")
-      .forEach(
-        screen => {
-
-          screen.classList.remove(
-            "active"
-          );
-
-        }
-      );
-
-
-    const selected =
-      document.getElementById(screenId);
-
-
-    if (selected) {
-
-      selected.classList.add(
-        "active"
-      );
-
+  const { error } = await supabaseClient.rpc(
+    "create_deposit_request",
+    {
+      p_amount: amount,
+      p_reference: txid,
+      p_description: `Deposit via ${asset} · ${network}`
     }
+  );
 
+  $("submitDepositBtn").disabled = false;
+  $("submitDepositBtn").textContent = "Submit Deposit";
 
-    document
-      .querySelectorAll(".nav-item")
-      .forEach(
-        item => {
+  if (error) {
+    $("depositMessage").textContent = error.message;
+    $("depositMessage").className = "error";
+    return;
+  }
 
-          item.classList.toggle(
-            "active",
-            item.dataset.screen === screenId
-          );
+  $("depositMessage").textContent =
+    "Deposit submitted successfully. It is now pending review.";
+  $("depositMessage").className = "success";
 
-        }
-      );
+  $("depositAmount").value = "";
+  $("depositTxid").value = "";
 
+  await loadActivity();
+};
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
+async function loadActivity() {
+  if (!currentUser) return;
+
+  $("activityList").innerHTML =
+    '<div class="empty">Loading activity...</div>';
+
+  const { data, error } = await supabaseClient
+    .from("transactions")
+    .select("id, transaction_type, amount, status, reference, description, created_at")
+    .eq("user_id", currentUser.id)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  if (error) {
+    $("activityList").innerHTML =
+      `<div class="empty error">${escapeHtml(error.message)}</div>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    $("activityList").innerHTML =
+      '<div class="empty">No transactions yet.</div>';
+    return;
+  }
+
+  $("activityList").innerHTML = data.map(tx => {
+    const status = String(tx.status || "pending").toLowerCase();
+
+    const date = new Date(tx.created_at).toLocaleString("en-NG", {
+      dateStyle: "medium",
+      timeStyle: "short"
     });
 
-  }
-
-
-  function updateDepositAsset(asset) {
-
-    if (!DEPOSIT_ASSETS[asset]) {
-      return;
-    }
-
-
-    selectedAsset = asset;
-
-
-    const details =
-      DEPOSIT_ASSETS[asset];
-
-
-    document
-      .getElementById("networkName")
-      .textContent =
-        details.network;
-
-
-    document
-      .getElementById("depositAddress")
-      .textContent =
-        details.address;
-
-
-    document
-      .querySelectorAll(".asset-button")
-      .forEach(
-        button => {
-
-          button.classList.toggle(
-            "active",
-            button.dataset.asset === asset
-          );
-
-        }
-      );
-
-
-    showDepositMessage(
-      "",
-      ""
-    );
-
-    depositMessage.className =
-      "message";
-
-  }
-
-
-  async function copyDepositAddress() {
-
-    const address =
-      DEPOSIT_ASSETS[selectedAsset].address;
-
-
-    try {
-
-      if (
-        navigator.clipboard &&
-        navigator.clipboard.writeText
-      ) {
-
-        await navigator.clipboard.writeText(
-          address
-        );
-
-      } else {
-
-        const temp =
-          document.createElement("textarea");
-
-        temp.value = address;
-
-        document.body.appendChild(temp);
-
-        temp.select();
-
-        document.execCommand("copy");
-
-        temp.remove();
-
-      }
-
-
-      const button =
-        document.getElementById("copyAddressBtn");
-
-
-      button.textContent =
-        "Copied";
-
-
-      setTimeout(
-        () => {
-
-          button.textContent =
-            "Copy";
-
-        },
-        1500
-      );
-
-    } catch (error) {
-
-      showDepositMessage(
-        "Unable to copy the address. Please copy it manually.",
-        "error"
-      );
-
-    }
-
-  }
-
-
-  async function submitDeposit() {
-
-    if (!supabaseClient) {
-
-      showDepositMessage(
-        "Coretrex is still loading. Please refresh.",
-        "error"
-      );
-
-      return;
-
-    }
-
-
-    const amountInput =
-      document.getElementById(
-        "depositAmount"
-      );
-
-
-    const txidInput =
-      document.getElementById(
-        "depositTxid"
-      );
-
-
-    const amount =
-      Number(amountInput.value);
-
-
-    const txid =
-      txidInput.value.trim();
-
-
-    if (
-      !Number.isFinite(amount) ||
-      amount <= 0
-    ) {
-
-      showDepositMessage(
-        "Please enter a valid deposit amount.",
-        "error"
-      );
-
-      return;
-
-    }
-
-
-    if (!txid) {
-
-      showDepositMessage(
-        "Please enter the transaction ID or transaction hash.",
-        "error"
-      );
-
-      return;
-
-    }
-
-
-    const button =
-      document.getElementById(
-        "submitDepositBtn"
-      );
-
-
-    button.disabled = true;
-
-    button.textContent =
-      "Submitting...";
-
-
-    try {
-
-      const {
-        data,
-        error
-      } =
-        await supabaseClient.rpc(
-          "create_deposit_request",
-          {
-            p_amount: amount,
-            p_reference: txid,
-            p_description:
-              `Deposit via ${selectedAsset}`
-          }
-        );
-
-
-      if (error) {
-
-        throw error;
-
-      }
-
-
-      showDepositMessage(
-        "Deposit request submitted successfully. Your request is now pending review.",
-        "success"
-      );
-
-
-      amountInput.value = "";
-
-      txidInput.value = "";
-
-
-    } catch (error) {
-
-      console.error(error);
-
-      showDepositMessage(
-        error.message ||
-        "Unable to submit the deposit request.",
-        "error"
-      );
-
-    } finally {
-
-      button.disabled = false;
-
-      button.textContent =
-        "Submit Deposit";
-
-    }
-
-  }
-
-
-  document
-    .getElementById("loginBtn")
-    .addEventListener(
-      "click",
-      login
-    );
-
-
-  document
-    .getElementById("modeBtn")
-    .addEventListener(
-      "click",
-      () => {
-
-        setRegisterMode(
-          !registerMode
-        );
-
-        message.className =
-          "message";
-
-      }
-    );
-
-
-  document
-    .getElementById("telegramBtn")
-    .addEventListener(
-      "click",
-      () => {
-
-        showMessage(
-          "Telegram login is not connected yet.",
-          "error"
-        );
-
-      }
-    );
-
-
-  document
-    .querySelectorAll(
-      "[data-screen]"
-    )
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            showScreen(
-              button.dataset.screen
-            );
-
-          }
-        );
-
-      }
-    );
-
-
-  document
-    .querySelectorAll(
-      ".asset-button"
-    )
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            updateDepositAsset(
-              button.dataset.asset
-            );
-
-          }
-        );
-
-      }
-    );
-
-
-  document
-    .getElementById(
-      "copyAddressBtn"
-    )
-    .addEventListener(
-      "click",
-      copyDepositAddress
-    );
-
-
-  document
-    .getElementById(
-      "submitDepositBtn"
-    )
-    .addEventListener(
-      "click",
-      submitDeposit
-    );
-
-
-  document
-    .getElementById("profileButton")
-    .addEventListener(
-      "click",
-      () => {
-
-        showScreen(
-          "accountScreen"
-        );
-
-      }
-    );
-
-
-  document
-    .getElementById("logoutBtn")
-    .addEventListener(
-      "click",
-      async () => {
-
-        if (supabaseClient) {
-
-          await supabaseClient.auth.signOut();
-
+    return `
+      <div class="history-item">
+        <div class="row">
+          <div>
+            <b>${escapeHtml(formatTransactionType(tx.transaction_type))}</b>
+            <div class="muted">${escapeHtml(tx.description || "")}</div>
+          </div>
+          <span class="status ${escapeHtml(status)}">
+            ${escapeHtml(capitalize(status))}
+          </span>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <span class="muted">Amount</span>
+          <b>${money(tx.amount)}</b>
+        </div>
+
+        ${
+          tx.reference
+          ? `<div style="margin-top:9px">
+              <span class="muted">Reference / TXID</span>
+              <div class="address" style="margin-top:5px">
+                ${escapeHtml(tx.reference)}
+              </div>
+            </div>`
+          : ""
         }
 
-        location.reload();
+        <div class="muted" style="margin-top:9px">${date}</div>
+      </div>
+    `;
+  }).join("");
+}
 
-      }
-    );
+function formatTransactionType(type) {
+  if (!type) return "Transaction";
 
+  return type
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
 
-  start();
+function capitalize(value) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+$("refreshActivity").onclick = loadActivity;
+
+$("logoutBtn").onclick = async () => {
+  await supabaseClient.auth.signOut();
+  currentUser = null;
+
+  $("app").classList.add("hidden");
+  $("authScreen").classList.remove("hidden");
+
+  $("loginEmail").value = "";
+  $("loginPassword").value = "";
+  $("loginMessage").textContent = "";
+
+  showScreen("homeScreen");
+};
+
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+  if (session?.user && !currentUser) {
+    currentUser = session.user;
+    await openApp();
+  }
+
+  if (!session && event === "SIGNED_OUT") {
+    currentUser = null;
+    $("app").classList.add("hidden");
+    $("authScreen").classList.remove("hidden");
+  }
+});
+
+(async function init() {
+  updateDepositAsset();
+
+  const { data } = await supabaseClient.auth.getSession();
+
+  if (data.session?.user) {
+    currentUser = data.session.user;
+    await openApp();
+  }
+})();
 </script>
 
 </body>
