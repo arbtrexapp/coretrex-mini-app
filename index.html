@@ -1,116 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Coretrex</title>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:#080c14;
-      color:#f4f7fb;
-    }
+    body{margin:0;background:#080c14;color:#f4f7fb;font-family:Inter,system-ui,sans-serif}
     button,input,select{font:inherit}
     button{cursor:pointer}
     .app{max-width:480px;margin:auto;min-height:100vh;background:#0b1019}
-    .screen{display:none;padding:22px 18px 90px}
+    .screen{display:none;padding:22px 18px 95px}
     .screen.active{display:block}
+    .hidden{display:none!important}
+
     .logo{
       width:46px;height:46px;border:1px solid #334155;border-radius:14px;
       display:flex;align-items:center;justify-content:center;
-      font-size:25px;font-weight:800;color:#dbeafe;background:#111827;
+      font-size:25px;font-weight:800;color:#dbeafe;background:#111827
     }
-    .brand{font-size:25px;font-weight:800;letter-spacing:-.6px}
-    .muted{color:#8b98aa;font-size:13px}
+
     .top{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+    .brand{font-size:25px;font-weight:800}
     .eyebrow{font-size:10px;letter-spacing:2px;color:#718096}
+    .muted{color:#8b98aa;font-size:13px}
+
     .card{
-      background:#111824;border:1px solid #202b3b;border-radius:20px;padding:18px;
-      margin-bottom:14px;
+      background:#111824;border:1px solid #202b3b;border-radius:20px;
+      padding:18px;margin-bottom:14px
     }
+
     .balance-card{
       background:linear-gradient(145deg,#121c2b,#0d131e);
-      border:1px solid #26364b;border-radius:24px;padding:22px;margin-bottom:14px;
+      border:1px solid #26364b;border-radius:24px;padding:22px;margin-bottom:14px
     }
-    .balance{font-size:35px;font-weight:800;margin:8px 0 18px}
+
     .label{font-size:12px;color:#8290a3}
+    .balance{font-size:35px;font-weight:800;margin:8px 0 18px}
+
     .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .stat{
-      background:#0d141f;border:1px solid #1d2939;border-radius:15px;padding:14px
-    }
+    .stat{background:#0d141f;border:1px solid #1d2939;border-radius:15px;padding:14px}
     .stat strong{display:block;margin-top:5px;font-size:17px}
+
     .quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .quick button{
       background:#111a27;border:1px solid #253347;color:#e8eef7;
       border-radius:16px;padding:16px;text-align:left
     }
-    .quick b{display:block;margin-bottom:5px}
+
     .btn{
-      width:100%;border:0;border-radius:14px;padding:14px;font-weight:700;
-      background:#dbeafe;color:#08111e
+      width:100%;border:0;border-radius:14px;padding:14px;
+      font-weight:700;background:#dbeafe;color:#08111e
     }
+
     .btn.secondary{background:#172131;color:#dbe5f1;border:1px solid #29384d}
     .btn.danger{background:#32171c;color:#ffb4bd;border:1px solid #54242c}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+
     input,select{
       width:100%;padding:14px;border-radius:13px;border:1px solid #29374a;
       background:#0b121c;color:#fff;outline:none;margin-top:7px
     }
-    input:focus,select:focus{border-color:#5d7fa8}
+
     .field{margin-bottom:14px}
     .notice{
       padding:13px;border-radius:13px;background:#101b29;
       border:1px solid #25364b;color:#aebdce;font-size:12px;margin:12px 0
     }
-    .warning{
-      background:#211c12;border-color:#4c4025;color:#d8c28b
-    }
+
+    .warning{background:#211c12;border-color:#4c4025;color:#d8c28b}
     .success{color:#8dd6ad}
     .error{color:#ff9da8}
-    .history-item{
-      padding:15px 0;border-bottom:1px solid #202b39
-    }
-    .history-item:last-child{border-bottom:0}
-    .row{display:flex;justify-content:space-between;gap:12px}
-    .status{
-      font-size:11px;padding:5px 9px;border-radius:20px;
-      background:#172131;color:#b8c6d8;white-space:nowrap
-    }
-    .status.approved{color:#9be1bb;background:#12251d}
-    .status.rejected{color:#ffadb5;background:#2a1519}
-    .status.pending{color:#e4cf91;background:#272215}
+
+    .row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+
     .address{
       word-break:break-all;background:#0a111b;border:1px solid #202c3c;
       padding:12px;border-radius:12px;font-size:12px;color:#b9c7d8
     }
-    .copy{margin-top:8px}
+
+    .history-item{
+      padding:15px 0;border-bottom:1px solid #202b39
+    }
+
+    .history-item:last-child{border-bottom:0}
+
+    .status{
+      font-size:11px;padding:5px 9px;border-radius:20px;
+      background:#172131;color:#b8c6d8;white-space:nowrap
+    }
+
+    .status.approved{color:#9be1bb;background:#12251d}
+    .status.rejected{color:#ffadb5;background:#2a1519}
+    .status.pending{color:#e4cf91;background:#272215}
+
     .empty{text-align:center;padding:30px 10px;color:#718096;font-size:13px}
+
+    .admin-badge{
+      display:inline-block;padding:5px 9px;border-radius:20px;
+      background:#172131;color:#c8d8eb;font-size:10px;
+      letter-spacing:1px;margin-top:5px
+    }
+
+    .admin-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+
     .bottom{
       position:fixed;bottom:0;left:50%;transform:translateX(-50%);
       width:min(480px,100%);background:#0b1019;border-top:1px solid #1e2938;
-      display:grid;grid-template-columns:repeat(4,1fr);padding:8px 5px
+      display:grid;grid-template-columns:repeat(5,1fr);padding:8px 4px
     }
+
     .bottom button{
-      border:0;background:none;color:#718096;padding:9px 2px;font-size:11px
+      border:0;background:none;color:#718096;padding:9px 2px;font-size:10px
     }
+
     .bottom button.active{color:#dbeafe}
+
     .auth{
       min-height:100vh;display:flex;align-items:center;justify-content:center;
       padding:25px
     }
+
     .auth-box{width:100%;max-width:400px}
     .auth-title{font-size:32px;font-weight:800;margin:18px 0 5px}
     .footer{text-align:center;color:#566274;font-size:11px;margin-top:25px}
-    .hidden{display:none!important}
     .back{background:none;border:0;color:#94a3b8;padding:0;margin-bottom:18px}
-    .plan{
-      display:flex;justify-content:space-between;gap:12px;align-items:center;
-      padding:15px 0;border-bottom:1px solid #202b39
-    }
+    .plan{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:15px 0;border-bottom:1px solid #202b39}
     .plan:last-child{border-bottom:0}
   </style>
 </head>
@@ -124,6 +141,7 @@
     <div class="eyebrow">DIGITAL FINANCE PLATFORM</div>
 
     <div class="card" style="margin-top:25px">
+
       <div id="loginForm">
         <h3>Welcome back</h3>
         <p class="muted">Sign in to your Coretrex account.</p>
@@ -139,17 +157,21 @@
         </div>
 
         <button class="btn" id="loginBtn">Login</button>
+
         <button class="btn secondary" id="showRegisterBtn" style="margin-top:9px">
           Create Account
         </button>
-        <button class="btn secondary" style="margin-top:9px" id="telegramBtn">
+
+        <button class="btn secondary" id="telegramBtn" style="margin-top:9px">
           Continue with Telegram
         </button>
+
         <p id="loginMessage" class="muted"></p>
       </div>
 
       <div id="registerForm" class="hidden">
         <button class="back" id="backLoginBtn">← Back to login</button>
+
         <h3>Create account</h3>
         <p class="muted">Create your Coretrex account.</p>
 
@@ -171,16 +193,19 @@
         <button class="btn" id="registerBtn">Create Account</button>
         <p id="registerMessage" class="muted"></p>
       </div>
+
     </div>
 
     <div class="footer">Coretrex © 2026</div>
   </div>
 </div>
 
+
 <div id="app" class="app hidden">
 
   <!-- HOME -->
   <section id="homeScreen" class="screen active">
+
     <div class="top">
       <div class="logo">C</div>
       <div>
@@ -198,6 +223,7 @@
           <span class="label">Invested Capital</span>
           <strong id="invested">$0.00</strong>
         </div>
+
         <div class="stat">
           <span class="label">Realized P/L</span>
           <strong id="pl">$0.00</strong>
@@ -208,10 +234,25 @@
     <h3>Quick Access</h3>
 
     <div class="quick">
-      <button data-screen="depositScreen"><b>Deposit</b><span class="muted">Fund account</span></button>
-      <button data-screen="withdrawScreen"><b>Withdraw</b><span class="muted">Request withdrawal</span></button>
-      <button data-screen="investScreen"><b>Investments</b><span class="muted">View plans</span></button>
-      <button data-screen="activityScreen"><b>Activity</b><span class="muted">Transaction history</span></button>
+      <button data-screen="depositScreen">
+        <b>Deposit</b>
+        <span class="muted">Fund account</span>
+      </button>
+
+      <button data-screen="withdrawScreen">
+        <b>Withdraw</b>
+        <span class="muted">Request withdrawal</span>
+      </button>
+
+      <button data-screen="investScreen">
+        <b>Investments</b>
+        <span class="muted">View plans</span>
+      </button>
+
+      <button data-screen="activityScreen">
+        <b>Activity</b>
+        <span class="muted">Transaction history</span>
+      </button>
     </div>
 
     <div class="card" style="margin-top:15px">
@@ -219,17 +260,25 @@
       <h3 style="margin-bottom:5px">Active Account</h3>
       <div class="muted" id="homeEmail"></div>
     </div>
+
   </section>
+
 
   <!-- DEPOSIT -->
   <section id="depositScreen" class="screen">
+
     <button class="back" data-screen="homeScreen">← Back</button>
+
     <h2>Deposit Centre</h2>
-    <p class="muted">Send funds to the selected Coretrex deposit address, then submit your transaction details for review.</p>
+    <p class="muted">
+      Send funds to the selected Coretrex deposit address, then submit your transaction details for review.
+    </p>
 
     <div class="card">
+
       <div class="field">
         <label class="label">Asset</label>
+
         <select id="depositAsset">
           <option value="USDT">USDT</option>
           <option value="BTC">BTC</option>
@@ -238,12 +287,14 @@
       </div>
 
       <div class="label">Network</div>
-      <div id="depositNetwork" style="font-weight:700;margin:6px 0 10px">USDT — TRC20</div>
+      <div id="depositNetwork" style="font-weight:700;margin:6px 0 10px"></div>
 
       <div class="label">Deposit Address</div>
       <div class="address" id="depositAddress"></div>
 
-      <button class="btn secondary copy" id="copyAddressBtn">Copy Address</button>
+      <button class="btn secondary" id="copyAddressBtn" style="margin-top:8px">
+        Copy Address
+      </button>
 
       <div class="notice warning">
         Make sure you use the correct network. Sending an asset through the wrong network may result in loss of funds.
@@ -261,11 +312,14 @@
 
       <button class="btn" id="submitDepositBtn">Submit Deposit</button>
       <p id="depositMessage" class="muted"></p>
+
     </div>
   </section>
 
+
   <!-- ACTIVITY -->
   <section id="activityScreen" class="screen">
+
     <button class="back" data-screen="homeScreen">← Back</button>
 
     <div class="row">
@@ -273,21 +327,30 @@
         <h2 style="margin-bottom:4px">Activity</h2>
         <p class="muted">Your recent account transactions.</p>
       </div>
-      <button id="refreshActivity" class="btn secondary" style="width:auto;padding:10px 13px">Refresh</button>
+
+      <button id="refreshActivity" class="btn secondary"
+        style="width:auto;padding:10px 13px">
+        Refresh
+      </button>
     </div>
 
     <div class="card" id="activityList">
       <div class="empty">Loading activity...</div>
     </div>
+
   </section>
+
 
   <!-- INVEST -->
   <section id="investScreen" class="screen">
+
     <button class="back" data-screen="homeScreen">← Back</button>
+
     <h2>Investment Plans</h2>
     <p class="muted">Available Coretrex plans.</p>
 
     <div class="card">
+
       <div class="plan">
         <div>
           <b>Starter</b>
@@ -311,16 +374,21 @@
         </div>
         <span>$1,000+</span>
       </div>
+
     </div>
 
     <div class="notice">
-      Investment processing will be enabled through secure server-side functions before funds can be moved from your account.
+      Investment processing will be enabled through secure server-side functions.
     </div>
+
   </section>
+
 
   <!-- WITHDRAW -->
   <section id="withdrawScreen" class="screen">
+
     <button class="back" data-screen="homeScreen">← Back</button>
+
     <h2>Withdraw</h2>
 
     <div class="card">
@@ -338,124 +406,284 @@
         <input type="text" placeholder="Wallet address" disabled>
       </div>
 
-      <button class="btn" disabled>Withdrawal Currently Unavailable</button>
+      <button class="btn" disabled>
+        Withdrawal Currently Unavailable
+      </button>
     </div>
+
   </section>
+
 
   <!-- ACCOUNT -->
   <section id="accountScreen" class="screen">
+
     <h2>Account</h2>
 
     <div class="card">
+
       <div class="label">EMAIL</div>
       <p id="accountEmail"></p>
 
       <div class="label" style="margin-top:18px">STATUS</div>
       <p>Active</p>
+
+      <div id="adminBadge" class="admin-badge hidden">
+        ADMIN ACCESS
+      </div>
+
     </div>
 
     <button class="btn danger" id="logoutBtn">Logout</button>
+
   </section>
 
+
+  <!-- ADMIN -->
+  <section id="adminScreen" class="screen">
+
+    <button class="back" data-screen="homeScreen">← Back</button>
+
+    <div class="row">
+      <div>
+        <h2 style="margin-bottom:4px">Admin Panel</h2>
+        <p class="muted">Deposit review centre.</p>
+      </div>
+
+      <button id="refreshAdmin" class="btn secondary"
+        style="width:auto;padding:10px 13px">
+        Refresh
+      </button>
+    </div>
+
+    <div class="notice">
+      Only deposits verified by the administrator should be approved.
+      Approval credits the user's available balance.
+    </div>
+
+    <div class="card" id="adminDepositList">
+      <div class="empty">Loading pending deposits...</div>
+    </div>
+
+  </section>
+
+
   <nav class="bottom">
-    <button class="active" data-screen="homeScreen">⌂<br>Home</button>
-    <button data-screen="investScreen">◆<br>Invest</button>
-    <button data-screen="activityScreen">◷<br>Activity</button>
-    <button data-screen="accountScreen">○<br>Account</button>
+
+    <button class="active" data-screen="homeScreen">
+      ⌂<br>Home
+    </button>
+
+    <button data-screen="investScreen">
+      ◆<br>Invest
+    </button>
+
+    <button data-screen="activityScreen">
+      ◷<br>Activity
+    </button>
+
+    <button data-screen="accountScreen">
+      ○<br>Account
+    </button>
+
+    <button id="adminNavBtn" class="hidden" data-screen="adminScreen">
+      ⚙<br>Admin
+    </button>
+
   </nav>
+
 </div>
 
-<script>
-const SUPABASE_URL = "https://gttfjmoyggyunhaojcxg.supabase.co";
-const SUPABASE_KEY = "sb_publishable_UPsL7MaeNjsbh8InoyfmxQ_LPi8LLkm";
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+<script>
+
+const SUPABASE_URL =
+  "https://gttfjmoyggyunhaojcxg.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_UPsL7MaeNjsbh8InoyfmxQ_LPi8LLkm";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
 
 const DEPOSIT_ASSETS = {
-  USDT: {
-    network: "USDT — TRC20",
-    address: "TLFM28HbiGBgMVdqug2M7pJRW4pDLfzUMH"
+
+  USDT:{
+    network:"USDT — TRC20",
+    address:"TLFM28HbiGBgMVdqug2M7pJRW4pDLfzUMH"
   },
-  BTC: {
-    network: "BTC — Bitcoin Network",
-    address: "bc1q6ejj3fr5r98haam0g7gck6cr37sset96gqzhkt"
+
+  BTC:{
+    network:"BTC — Bitcoin Network",
+    address:"bc1q6ejj3fr5r98haam0g7gck6cr37sset96gqzhkt"
   },
-  ETH: {
-    network: "ETH — Ethereum Network",
-    address: "0xCBC6AD0B86cfdf5E59905bD9680403ED91bF1Ddc"
+
+  ETH:{
+    network:"ETH — Ethereum Network",
+    address:"0xCBC6AD0B86cfdf5E59905bD9680403ED91bF1Ddc"
   }
+
 };
 
+
 let currentUser = null;
+let isAdmin = false;
+
 
 const $ = id => document.getElementById(id);
 
-function money(value) {
+
+function money(value){
+
   const n = Number(value || 0);
-  return "$" + n.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+
+  return "$" + n.toLocaleString("en-US",{
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
   });
+
 }
 
-function showScreen(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function capitalize(value){
+
+  if(!value)return "";
+
+  return value.charAt(0).toUpperCase() +
+    value.slice(1);
+
+}
+
+
+function showScreen(id){
+
+  document.querySelectorAll(".screen")
+    .forEach(s => s.classList.remove("active"));
+
   const screen = $(id);
-  if (screen) screen.classList.add("active");
 
-  document.querySelectorAll(".bottom button").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.screen === id);
-  });
+  if(screen)screen.classList.add("active");
 
-  if (id === "activityScreen") loadActivity();
-  if (id === "homeScreen") loadAccount();
+  document.querySelectorAll(".bottom button")
+    .forEach(btn => {
+
+      btn.classList.toggle(
+        "active",
+        btn.dataset.screen === id
+      );
+
+    });
+
+  if(id === "activityScreen"){
+    loadActivity();
+  }
+
+  if(id === "homeScreen"){
+    loadAccount();
+  }
+
+  if(id === "adminScreen" && isAdmin){
+    loadAdminDeposits();
+  }
+
 }
 
-document.querySelectorAll("[data-screen]").forEach(btn => {
-  btn.addEventListener("click", () => showScreen(btn.dataset.screen));
-});
+
+document.querySelectorAll("[data-screen]")
+  .forEach(btn => {
+
+    btn.addEventListener("click",() => {
+
+      const target = btn.dataset.screen;
+
+      if(target === "adminScreen" && !isAdmin){
+        return;
+      }
+
+      showScreen(target);
+
+    });
+
+  });
+
+
+/* AUTH */
 
 $("showRegisterBtn").onclick = () => {
+
   $("loginForm").classList.add("hidden");
   $("registerForm").classList.remove("hidden");
+
 };
+
 
 $("backLoginBtn").onclick = () => {
+
   $("registerForm").classList.add("hidden");
   $("loginForm").classList.remove("hidden");
+
 };
+
 
 $("telegramBtn").onclick = () => {
+
   $("loginMessage").textContent =
     "Telegram login is not connected yet. Please use email and password.";
+
 };
 
+
 $("registerBtn").onclick = async () => {
+
   const name = $("regName").value.trim();
   const email = $("regEmail").value.trim();
   const password = $("regPassword").value;
 
-  if (!name || !email || password.length < 6) {
+  if(!name || !email || password.length < 6){
+
     $("registerMessage").textContent =
       "Enter your name, a valid email and a password of at least 6 characters.";
+
     return;
   }
 
-  $("registerMessage").textContent = "Creating account...";
+  $("registerMessage").textContent =
+    "Creating account...";
 
-  const { error } = await supabaseClient.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: name }
-    }
-  });
+  const {error} =
+    await supabaseClient.auth.signUp({
 
-  if (error) {
-    $("registerMessage").textContent = error.message;
+      email,
+      password,
+
+      options:{
+        data:{
+          full_name:name
+        }
+      }
+
+    });
+
+  if(error){
+
+    $("registerMessage").textContent =
+      error.message;
+
     return;
   }
 
@@ -463,278 +691,714 @@ $("registerBtn").onclick = async () => {
     "Account created. You can now log in.";
 
   setTimeout(() => {
+
     $("registerForm").classList.add("hidden");
     $("loginForm").classList.remove("hidden");
-  }, 800);
+
+  },800);
+
 };
 
+
 $("loginBtn").onclick = async () => {
+
   const email = $("loginEmail").value.trim();
   const password = $("loginPassword").value;
 
-  if (!email || !password) {
-    $("loginMessage").textContent = "Enter your email and password.";
+  if(!email || !password){
+
+    $("loginMessage").textContent =
+      "Enter your email and password.";
+
     return;
   }
 
-  $("loginMessage").textContent = "Signing in...";
+  $("loginMessage").textContent =
+    "Signing in...";
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
-  });
+  const {data,error} =
+    await supabaseClient.auth.signInWithPassword({
 
-  if (error) {
-    $("loginMessage").textContent = error.message;
+      email,
+      password
+
+    });
+
+  if(error){
+
+    $("loginMessage").textContent =
+      error.message;
+
     return;
   }
 
   currentUser = data.user;
+
   await openApp();
+
 };
 
-async function openApp() {
+
+/* APP */
+
+async function openApp(){
+
   $("authScreen").classList.add("hidden");
   $("app").classList.remove("hidden");
 
-  $("accountEmail").textContent = currentUser.email || "";
-  $("homeEmail").textContent = currentUser.email || "";
+  $("accountEmail").textContent =
+    currentUser.email || "";
+
+  $("homeEmail").textContent =
+    currentUser.email || "";
 
   updateDepositAsset();
+
+  await checkAdmin();
+
   await loadAccount();
+
   await loadActivity();
+
 }
 
-async function loadAccount() {
-  if (!currentUser) return;
 
-  const { data, error } = await supabaseClient
-    .from("accounts")
-    .select("available_balance, invested_capital, realized_pl")
-    .eq("user_id", currentUser.id)
-    .maybeSingle();
+async function checkAdmin(){
 
-  if (error || !data) return;
+  if(!currentUser)return;
 
-  $("balance").textContent = money(data.available_balance);
-  $("invested").textContent = money(data.invested_capital);
-  $("pl").textContent = money(data.realized_pl);
+  const {data,error} =
+    await supabaseClient
+      .from("admin_users")
+      .select("user_id")
+      .eq("user_id",currentUser.id)
+      .maybeSingle();
+
+  isAdmin = !error && !!data;
+
+  $("adminNavBtn")
+    .classList.toggle("hidden",!isAdmin);
+
+  $("adminBadge")
+    .classList.toggle("hidden",!isAdmin);
+
 }
 
-function updateDepositAsset() {
-  const asset = $("depositAsset").value;
-  const info = DEPOSIT_ASSETS[asset];
 
-  $("depositNetwork").textContent = info.network;
-  $("depositAddress").textContent = info.address;
+/* ACCOUNT */
+
+async function loadAccount(){
+
+  if(!currentUser)return;
+
+  const {data,error} =
+    await supabaseClient
+      .from("accounts")
+      .select(
+        "available_balance, invested_capital, realized_pl"
+      )
+      .eq("user_id",currentUser.id)
+      .maybeSingle();
+
+  if(error || !data)return;
+
+  $("balance").textContent =
+    money(data.available_balance);
+
+  $("invested").textContent =
+    money(data.invested_capital);
+
+  $("pl").textContent =
+    money(data.realized_pl);
+
 }
 
-$("depositAsset").addEventListener("change", updateDepositAsset);
+
+/* DEPOSIT */
+
+function updateDepositAsset(){
+
+  const asset =
+    $("depositAsset").value;
+
+  const info =
+    DEPOSIT_ASSETS[asset];
+
+  $("depositNetwork").textContent =
+    info.network;
+
+  $("depositAddress").textContent =
+    info.address;
+
+}
+
+
+$("depositAsset")
+  .addEventListener("change",updateDepositAsset);
+
 
 $("copyAddressBtn").onclick = async () => {
-  const address = $("depositAddress").textContent;
 
-  try {
+  const address =
+    $("depositAddress").textContent;
+
+  try{
+
     await navigator.clipboard.writeText(address);
-    $("copyAddressBtn").textContent = "Address Copied";
-    setTimeout(() => {
-      $("copyAddressBtn").textContent = "Copy Address";
-    }, 1500);
-  } catch {
-    const textarea = document.createElement("textarea");
+
+  }catch{
+
+    const textarea =
+      document.createElement("textarea");
+
     textarea.value = address;
+
     document.body.appendChild(textarea);
+
     textarea.select();
+
     document.execCommand("copy");
+
     textarea.remove();
-    $("copyAddressBtn").textContent = "Address Copied";
-    setTimeout(() => {
-      $("copyAddressBtn").textContent = "Copy Address";
-    }, 1500);
+
   }
+
+  $("copyAddressBtn").textContent =
+    "Address Copied";
+
+  setTimeout(() => {
+
+    $("copyAddressBtn").textContent =
+      "Copy Address";
+
+  },1500);
+
 };
 
+
 $("submitDepositBtn").onclick = async () => {
-  if (!currentUser) return;
 
-  const amount = Number($("depositAmount").value);
-  const txid = $("depositTxid").value.trim();
+  if(!currentUser)return;
 
-  if (!amount || amount <= 0) {
-    $("depositMessage").textContent = "Enter a valid deposit amount.";
-    $("depositMessage").className = "error";
+  const amount =
+    Number($("depositAmount").value);
+
+  const txid =
+    $("depositTxid").value.trim();
+
+  const asset =
+    $("depositAsset").value;
+
+  const network =
+    DEPOSIT_ASSETS[asset].network;
+
+
+  if(!amount || amount <= 0){
+
+    $("depositMessage").textContent =
+      "Enter a valid deposit amount.";
+
+    $("depositMessage").className =
+      "error";
+
     return;
   }
 
-  if (!txid) {
+
+  if(!txid){
+
     $("depositMessage").textContent =
       "Enter your transaction ID / TX hash.";
-    $("depositMessage").className = "error";
+
+    $("depositMessage").className =
+      "error";
+
     return;
   }
+
 
   $("submitDepositBtn").disabled = true;
-  $("submitDepositBtn").textContent = "Submitting...";
-  $("depositMessage").textContent = "";
 
-  const asset = $("depositAsset").value;
-  const network = DEPOSIT_ASSETS[asset].network;
+  $("submitDepositBtn").textContent =
+    "Submitting...";
 
-  const { error } = await supabaseClient.rpc(
-    "create_deposit_request",
-    {
-      p_amount: amount,
-      p_reference: txid,
-      p_description: `Deposit via ${asset} · ${network}`
-    }
-  );
+
+  const {error} =
+    await supabaseClient.rpc(
+      "create_deposit_request",
+      {
+        p_amount:amount,
+        p_reference:txid,
+        p_description:
+          `Deposit via ${asset} · ${network}`
+      }
+    );
+
 
   $("submitDepositBtn").disabled = false;
-  $("submitDepositBtn").textContent = "Submit Deposit";
 
-  if (error) {
-    $("depositMessage").textContent = error.message;
-    $("depositMessage").className = "error";
+  $("submitDepositBtn").textContent =
+    "Submit Deposit";
+
+
+  if(error){
+
+    $("depositMessage").textContent =
+      error.message;
+
+    $("depositMessage").className =
+      "error";
+
     return;
   }
+
 
   $("depositMessage").textContent =
     "Deposit submitted successfully. It is now pending review.";
-  $("depositMessage").className = "success";
+
+  $("depositMessage").className =
+    "success";
+
 
   $("depositAmount").value = "";
+
   $("depositTxid").value = "";
 
+
   await loadActivity();
+
 };
 
-async function loadActivity() {
-  if (!currentUser) return;
+
+/* ACTIVITY */
+
+async function loadActivity(){
+
+  if(!currentUser)return;
 
   $("activityList").innerHTML =
     '<div class="empty">Loading activity...</div>';
 
-  const { data, error } = await supabaseClient
-    .from("transactions")
-    .select("id, transaction_type, amount, status, reference, description, created_at")
-    .eq("user_id", currentUser.id)
-    .order("created_at", { ascending: false })
-    .limit(50);
 
-  if (error) {
+  const {data,error} =
+    await supabaseClient
+      .from("transactions")
+      .select(
+        "id,transaction_type,amount,status,reference,description,created_at"
+      )
+      .eq("user_id",currentUser.id)
+      .order("created_at",{ascending:false})
+      .limit(50);
+
+
+  if(error){
+
     $("activityList").innerHTML =
-      `<div class="empty error">${escapeHtml(error.message)}</div>`;
+      `<div class="empty error">
+        ${escapeHtml(error.message)}
+      </div>`;
+
     return;
   }
 
-  if (!data || data.length === 0) {
+
+  if(!data || data.length === 0){
+
     $("activityList").innerHTML =
       '<div class="empty">No transactions yet.</div>';
+
     return;
   }
 
-  $("activityList").innerHTML = data.map(tx => {
-    const status = String(tx.status || "pending").toLowerCase();
 
-    const date = new Date(tx.created_at).toLocaleString("en-NG", {
-      dateStyle: "medium",
-      timeStyle: "short"
-    });
+  $("activityList").innerHTML =
+    data.map(tx => {
 
-    return `
-      <div class="history-item">
-        <div class="row">
-          <div>
-            <b>${escapeHtml(formatTransactionType(tx.transaction_type))}</b>
-            <div class="muted">${escapeHtml(tx.description || "")}</div>
-          </div>
-          <span class="status ${escapeHtml(status)}">
-            ${escapeHtml(capitalize(status))}
-          </span>
-        </div>
+      const status =
+        String(tx.status || "pending").toLowerCase();
 
-        <div class="row" style="margin-top:12px">
-          <span class="muted">Amount</span>
-          <b>${money(tx.amount)}</b>
-        </div>
+      const date =
+        new Date(tx.created_at)
+          .toLocaleString("en-NG",{
+            dateStyle:"medium",
+            timeStyle:"short"
+          });
 
-        ${
-          tx.reference
-          ? `<div style="margin-top:9px">
-              <span class="muted">Reference / TXID</span>
-              <div class="address" style="margin-top:5px">
-                ${escapeHtml(tx.reference)}
+
+      return `
+
+        <div class="history-item">
+
+          <div class="row">
+
+            <div>
+              <b>
+                ${escapeHtml(
+                  formatTransactionType(tx.transaction_type)
+                )}
+              </b>
+
+              <div class="muted">
+                ${escapeHtml(tx.description || "")}
               </div>
-            </div>`
-          : ""
-        }
+            </div>
 
-        <div class="muted" style="margin-top:9px">${date}</div>
-      </div>
-    `;
-  }).join("");
+            <span class="status ${escapeHtml(status)}">
+              ${escapeHtml(capitalize(status))}
+            </span>
+
+          </div>
+
+
+          <div class="row" style="margin-top:12px">
+
+            <span class="muted">Amount</span>
+
+            <b>${money(tx.amount)}</b>
+
+          </div>
+
+
+          ${
+            tx.reference
+            ? `
+              <div style="margin-top:9px">
+
+                <span class="muted">
+                  Reference / TXID
+                </span>
+
+                <div class="address" style="margin-top:5px">
+                  ${escapeHtml(tx.reference)}
+                </div>
+
+              </div>
+            `
+            : ""
+          }
+
+
+          <div class="muted" style="margin-top:9px">
+            ${date}
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+
 }
 
-function formatTransactionType(type) {
-  if (!type) return "Transaction";
+
+function formatTransactionType(type){
+
+  if(!type)return "Transaction";
 
   return type
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, c => c.toUpperCase());
+    .replace(/_/g," ")
+    .replace(/\b\w/g,c => c.toUpperCase());
+
 }
 
-function capitalize(value) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
+
+$("refreshActivity").onclick =
+  loadActivity;
+
+
+/* ADMIN */
+
+async function loadAdminDeposits(){
+
+  if(!currentUser || !isAdmin)return;
+
+
+  $("adminDepositList").innerHTML =
+    '<div class="empty">Loading pending deposits...</div>';
+
+
+  const {data,error} =
+    await supabaseClient
+      .from("transactions")
+      .select(
+        "id,user_id,amount,status,reference,description,created_at"
+      )
+      .eq("transaction_type","deposit")
+      .eq("status","pending")
+      .order("created_at",{ascending:false})
+      .limit(50);
+
+
+  if(error){
+
+    $("adminDepositList").innerHTML =
+      `<div class="empty error">
+        ${escapeHtml(error.message)}
+      </div>`;
+
+    return;
+  }
+
+
+  if(!data || data.length === 0){
+
+    $("adminDepositList").innerHTML =
+      '<div class="empty">No pending deposits.</div>';
+
+    return;
+  }
+
+
+  $("adminDepositList").innerHTML =
+    data.map(tx => {
+
+      const date =
+        new Date(tx.created_at)
+          .toLocaleString("en-NG",{
+            dateStyle:"medium",
+            timeStyle:"short"
+          });
+
+
+      return `
+
+        <div class="history-item">
+
+          <div class="row">
+
+            <div>
+
+              <b>Deposit Request</b>
+
+              <div class="muted" style="margin-top:4px">
+                User ID
+              </div>
+
+              <div class="address" style="margin-top:4px">
+                ${escapeHtml(tx.user_id)}
+              </div>
+
+            </div>
+
+            <span class="status pending">
+              Pending
+            </span>
+
+          </div>
+
+
+          <div class="row" style="margin-top:12px">
+
+            <span class="muted">Amount</span>
+
+            <b>${money(tx.amount)}</b>
+
+          </div>
+
+
+          <div style="margin-top:10px">
+
+            <span class="muted">
+              Asset / Network
+            </span>
+
+            <div style="margin-top:4px">
+              ${escapeHtml(tx.description || "Deposit")}
+            </div>
+
+          </div>
+
+
+          <div style="margin-top:10px">
+
+            <span class="muted">
+              Transaction ID / TX Hash
+            </span>
+
+            <div class="address" style="margin-top:4px">
+              ${escapeHtml(tx.reference || "Not provided")}
+            </div>
+
+          </div>
+
+
+          <div class="muted" style="margin-top:9px">
+            ${date}
+          </div>
+
+
+          <div class="admin-actions">
+
+            <button
+              class="btn"
+              data-admin-action="approve"
+              data-id="${escapeHtml(tx.id)}">
+              Approve
+            </button>
+
+            <button
+              class="btn danger"
+              data-admin-action="reject"
+              data-id="${escapeHtml(tx.id)}">
+              Reject
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+
+
+  document
+    .querySelectorAll("[data-admin-action]")
+    .forEach(button => {
+
+      button.addEventListener("click",() => {
+
+        reviewDeposit(
+          button.dataset.id,
+          button.dataset.adminAction,
+          button
+        );
+
+      });
+
+    });
+
 }
 
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+
+async function reviewDeposit(
+  transactionId,
+  decision,
+  button
+){
+
+  if(!isAdmin)return;
+
+
+  const question =
+    decision === "approve"
+      ? "Approve this deposit? Only approve after verifying the transaction."
+      : "Reject this deposit?";
+
+
+  if(!confirm(question))return;
+
+
+  const originalText =
+    button.textContent;
+
+  button.disabled = true;
+
+  button.textContent =
+    "Processing...";
+
+
+  const {error} =
+    await supabaseClient.rpc(
+      "admin_review_deposit",
+      {
+        p_transaction_id:transactionId,
+        p_decision:decision
+      }
+    );
+
+
+  if(error){
+
+    alert(error.message);
+
+    button.disabled = false;
+
+    button.textContent =
+      originalText;
+
+    return;
+  }
+
+
+  await loadAdminDeposits();
+
+  await loadAccount();
+
+  await loadActivity();
+
 }
 
-$("refreshActivity").onclick = loadActivity;
+
+$("refreshAdmin").onclick =
+  loadAdminDeposits;
+
+
+/* LOGOUT */
 
 $("logoutBtn").onclick = async () => {
+
   await supabaseClient.auth.signOut();
+
   currentUser = null;
+  isAdmin = false;
 
   $("app").classList.add("hidden");
   $("authScreen").classList.remove("hidden");
 
   $("loginEmail").value = "";
   $("loginPassword").value = "";
+
   $("loginMessage").textContent = "";
 
-  showScreen("homeScreen");
 };
 
-supabaseClient.auth.onAuthStateChange(async (event, session) => {
-  if (session?.user && !currentUser) {
-    currentUser = session.user;
-    await openApp();
-  }
 
-  if (!session && event === "SIGNED_OUT") {
-    currentUser = null;
-    $("app").classList.add("hidden");
-    $("authScreen").classList.remove("hidden");
-  }
-});
+supabaseClient.auth.onAuthStateChange(
+  async (event,session) => {
 
-(async function init() {
+    if(session?.user && !currentUser){
+
+      currentUser = session.user;
+
+      await openApp();
+
+    }
+
+    if(!session && event === "SIGNED_OUT"){
+
+      currentUser = null;
+      isAdmin = false;
+
+      $("app").classList.add("hidden");
+      $("authScreen").classList.remove("hidden");
+
+    }
+
+  }
+);
+
+
+/* INITIALIZE */
+
+(async function init(){
+
   updateDepositAsset();
 
-  const { data } = await supabaseClient.auth.getSession();
+  const {data} =
+    await supabaseClient.auth.getSession();
 
-  if (data.session?.user) {
-    currentUser = data.session.user;
+  if(data.session?.user){
+
+    currentUser =
+      data.session.user;
+
     await openApp();
+
   }
+
 })();
+
 </script>
 
 </body>
