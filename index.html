@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coretrex</title>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f7f6;
+      color: #17221d;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: auto;
+      min-height: 100vh;
+      background: #ffffff;
+    }
+
+    .header {
+      background: #0b6b45;
+      color: white;
+      padding: 22px 18px;
+      border-radius: 0 0 22px 22px;
+    }
+
+    .brand {
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .welcome {
+      margin-top: 7px;
+      font-size: 14px;
+      opacity: .9;
+    }
+
+    .balance-card {
+      margin: 18px;
+      padding: 22px;
+      border-radius: 18px;
+      background: #0b6b45;
+      color: white;
+    }
+
+    .balance-label {
+      font-size: 13px;
+      opacity: .85;
+    }
+
+    .balance {
+      font-size: 34px;
+      font-weight: 800;
+      margin: 8px 0;
+    }
+
+    .small {
+      font-size: 13px;
+      opacity: .85;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 0 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 13px;
+      padding: 15px 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #0b6b45;
+      color: white;
+    }
+
+    .secondary {
+      background: #e9f3ee;
+      color: #0b6b45;
+    }
+
+    .section {
+      padding: 22px 18px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 13px;
+    }
+
+    .plan {
+      border: 1px solid #dfe7e3;
+      border-radius: 16px;
+      padding: 17px;
+      margin-bottom: 12px;
+    }
+
+    .plan h3 {
+      margin-bottom: 8px;
+    }
+
+    .plan p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #5d6964;
+    }
+
+    .plan button {
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    .menu {
+      padding: 0 18px 25px;
+    }
+
+    .menu button {
+      width: 100%;
+      margin-top: 9px;
+      text-align: left;
+      background: #f1f5f3;
+      color: #17221d;
+    }
+
+    .page {
+      display: none;
+      padding: 20px 18px;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .back {
+      margin-bottom: 18px;
+      background: #e9f3ee;
+      color: #0b6b45;
+    }
+
+    .info {
+      background: #f5f8f6;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .notice {
+      background: #fff7df;
+      color: #765900;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-top: 12px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: #7b8580;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <div class="brand">CORETREX</div>
+    <div class="welcome" id="welcomeText">
+      Trading & investment dashboard
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+
+  <div id="dashboard" class="page active">
+
+    <div class="balance-card">
+      <div class="balance-label">Available Balance</div>
+      <div class="balance">$0.00</div>
+      <div class="small">Demo account</div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" onclick="showPage('deposit')">
+        💰 Deposit
+      </button>
+
+      <button class="secondary" onclick="showPage('withdraw')">
+        💸 Withdraw
+      </button>
+    </div>
+
+    <div class="section">
+
+      <div class="section-title">
+        Trading Plans
+      </div>
+
+      <div class="plan">
+        <h3>Plan 1</h3>
+        <p>
+          24 hours · Minimum $100 · Proposed return 10%
+        </p>
+        <button class="primary" onclick="showPage('plans')">
+          View Plan
+        </button>
+      </div>
+
+      <div class="plan">
+        <h3>Plan 2</h3>
+        <p>
+          72 hours · Minimum $250 · Proposed return 50%
+        </p>
+        <button class="primary" onclick="showPage('plans')">
+          View Plan
+        </button>
+      </div>
+
+      <div class="plan">
+        <h3>Plan 3</h3>
+        <p>
+          2 weeks · Minimum $500 · Proposed return 75%
+        </p>
+        <button class="primary" onclick="showPage('plans')">
+          View Plan
+        </button>
+      </div>
+
+    </div>
+
+    <div class="menu">
+
+      <button onclick="showPage('plans')">
+        📊 All Trading Plans
+      </button>
+
+      <button onclick="showPage('investments')">
+        📈 My Investments
+      </button>
+
+      <button onclick="showPage('transactions')">
+        📜 Transactions
+      </button>
+
+      <button onclick="showPage('referral')">
+        👥 Referral Program
+      </button>
+
+      <button onclick="showPage('account')">
+        👤 My Account
+      </button>
+
+      <button onclick="showPage('support')">
+        🎧 Support
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- PLANS -->
+
+  <div id="plans" class="page">
+
+    <button class="back" onclick="showPage('dashboard')">
+      ← Back
+    </button>
+
+    <div class="section-title">
+      📊 Coretrex Trading Plans
+    </div>
+
+    <div class="plan">
+      <h3>Plan 1 — 24 Hours</h3>
+      <p>
+        Minimum: $100<br>
+        Proposed return: 10%<br>
+        Maximum activations: 1
+      </p>
+      <button class="primary">Activate — Demo</button>
+    </div>
+
+    <div class="plan">
+      <h3>Plan 2 — 72 Hours</h3>
+      <p>
+        Minimum: $250<br>
+        Proposed return: 50%<br>
+        Maximum activations: 2
+      </p>
+      <button class="primary">Activate — Demo</button>
+    </div>
+
+    <div class="plan">
+      <h3>Plan 3 — 2 Weeks</h3>
+      <p>
+        Minimum: $500<br>
+        Proposed return: 75%<br>
+        Maximum activations: 3
+      </p>
+      <button class="primary">Activate — Demo</button>
+    </div>
+
+    <div class="plan">
+      <h3>Plan 4 — 1 Month</h3>
+      <p>
+        Minimum: $1,200<br>
+        Proposed return: 100%<br>
+        Maximum activations: 5
+      </p>
+      <button class="primary">Activate — Demo</button>
+    </div>
+
+    <div class="plan">
+      <h3>Plan 5 — 3 Months</h3>
+      <p>
+        Minimum activation: $2,000<br>
+        Proposed target profit: $20,000<br>
+        Completion period: 2½ months
+      </p>
+      <button class="primary">Activate — Demo</button>
+    </div>
+
+  </div>
+
+
+  <!-- DEPOSIT -->
+
+  <div id="deposit" class="page">
+
+    <button class="back" onclick="showPage('dashboard')">
+      ← Back
+    </button>
+
+    <div class="section-title">💰 Deposit</div>
+
+    <div class="info">
+      Select a supported cryptocurrency and network to view
+      the deposit instructions.
+    </div>
+
+    <button class="primary" style="width:100%;margin-bottom:10px;">
+      USDT — TRC20
+    </button>
+
+    <button class="secondary" style="width:100%;margin-bottom:10px;">
+      USDT — ERC20
+    </button>
+
+    <button class="secondary" style="width:100%;margin-bottom:10px;">
+      BTC
+    </button>
+
+    <button class="secondary" style="width:100%;">
+      ETH
+    </button>
+
+    <div class="notice">
+      ⚠️ This is currently a demonstration interface.
+      No real deposit is processed by this frontend.
+    </div>
+
+  </div>
+
+
+  <!-- WITHDRAW -->
+
+  <div id="withdraw" class="page">
+
+    <button class="back" onclick="showPage('dashboard')">
+      ← Back
+    </button>
+
+    <div class="section-title">💸 Withdraw</div>
+
+    <div class="info">
+      Minimum withdrawal: $150<br>
+      Proposed withdrawal fee: 5.5%<br>
+      KYC review threshold: withdrawals above $5,000
+    </div>
+
+    <div class="notice">
+      🔐 Email verification and secure server-side processing
+      will be added when the backend is connected.
+    </div>
+
+  </div>
+
+
+  <!-- INVESTMENTS -->
+
+  <div id="investments" class="page">
+
+    <button class="back" onclick="showPage('dashboard')">
+      ← Back
+    </button>
+
+    <div class="section-title">📈 My Investments</div>
+
+    <div class="info">
+      No active demo investments.
+    </div>
+
+  </div>
+
+
+  <!-- TRANSACTIONS -->
+
+  <div id="transactions" class="page">
+
+    <button class="back" onclick="showPage('dashboard')">
+      ← Back
+    </button>
+
+    <div class="section-title">📜 Transactions</div>
+
+    <div class="info">
+      No transactions available.
+    </div>
+
+  </div>
+
+
+  <!-- REFERRAL -->
+
+  <div id="referral" class="page">
+
+    <button class="back" onclick="showPage('dashboard')">
+      ← Back
+    </button>
+
+    <div class="section-title">👥 Referral Program</div>
+
+    <div class="info">
+      Referral commission: 5%<br>
+      Transfer threshold: $50<br>
+      Current referral earnings: $0.00
+    </div>
+
+  </div>
+
+
+  <!-- ACCOUNT -->
+
+  <div id="account" class="page">
+
+    <button class="back" onclick="showPage('dashboard')">
+      ← Back
+    </button>
+
+    <div class="section-title">👤 My Account</div>
+
+    <div class="info">
+      Account status: Active<br>
+      Available balance: $0.00<br>
+      Invested capital: $0.00<br>
+      Realized P/L: $0.00
+    </div>
+
+  </div>
+
+
+  <!-- SUPPORT -->
+
+  <div id="support" class="page">
+
+    <button class="back" onclick="showPage('dashboard')">
+      ← Back
+    </button>
+
+    <div class="section-title">🎧 Support</div>
+
+    <div class="info">
+      Need assistance? Contact Coretrex support.
+    </div>
+
+  </div>
+
+
+  <div class="footer">
+    Coretrex · Demo interface
+  </div>
+
+</div>
+
+
+<script>
+
+  const tg = window.Telegram && window.Telegram.WebApp;
+
+  if (tg) {
+    tg.ready();
+    tg.expand();
+
+    const user =
+      tg.initDataUnsafe &&
+      tg.initDataUnsafe.user;
+
+    if (user) {
+      const name =
+        user.first_name ||
+        user.username ||
+        "User";
+
+      document.getElementById("welcomeText").textContent =
+        "Welcome, " + name;
+    }
+  }
+
+
+  function showPage(pageId) {
+
+    document
+      .querySelectorAll(".page")
+      .forEach(function(page) {
+        page.classList.remove("active");
+      });
+
+    const page =
+      document.getElementById(pageId);
+
+    if (page) {
+      page.classList.add("active");
+      window.scrollTo(0, 0);
+    }
+  }
+
+</script>
+
+</body>
+</html>
