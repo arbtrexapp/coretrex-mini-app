@@ -459,7 +459,6 @@
       <p>Active</p>
     </div>
 
-    <!-- ADMIN BUTTON ADDED -->
     <button
       class="btn secondary hidden"
       id="adminBtn"
@@ -527,6 +526,30 @@
 
       <div id="adminWithdrawalList" style="margin-top:10px">
         <div class="empty">Loading withdrawals...</div>
+      </div>
+
+    </div>
+
+    <!-- APPROVED WITHDRAWALS -->
+    <div class="card">
+
+      <div class="row" style="align-items:center">
+        <div>
+          <h3 style="margin:0 0 4px">Approved Withdrawals</h3>
+          <div class="muted">Enter the actual blockchain TXID after sending.</div>
+        </div>
+
+        <button
+          id="refreshApprovedWithdrawalsBtn"
+          class="btn secondary"
+          style="width:auto;padding:10px 13px"
+        >
+          Refresh
+        </button>
+      </div>
+
+      <div id="adminApprovedWithdrawalList" style="margin-top:10px">
+        <div class="empty">Loading approved withdrawals...</div>
       </div>
 
     </div>
@@ -1356,6 +1379,7 @@ $("adminBtn").onclick = async () => {
 };
 
 async function loadAdminData() {
+
   if (!isAdmin) {
     return;
   }
@@ -1365,7 +1389,8 @@ async function loadAdminData() {
 
   await Promise.all([
     loadPendingDeposits(),
-    loadPendingWithdrawals()
+    loadPendingWithdrawals(),
+    loadApprovedWithdrawals()
   ]);
 
   $("adminMessage").textContent = "";
@@ -1760,8 +1785,234 @@ async function reviewWithdrawal(
     "success";
 
   await loadPendingWithdrawals();
+  await loadApprovedWithdrawals();
   await loadAccount();
   await loadActivity();
+}
+
+/* =========================
+   APPROVED WITHDRAWALS
+========================= */
+
+async function loadApprovedWithdrawals() {
+
+  $("adminApprovedWithdrawalList").innerHTML =
+    '<div class="empty">Loading approved withdrawals...</div>';
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "admin_get_approved_withdrawals"
+  );
+
+  if (error) {
+    $("adminApprovedWithdrawalList").innerHTML =
+      `<div class="empty error">${escapeHtml(error.message)}</div>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    $("adminApprovedWithdrawalList").innerHTML =
+      '<div class="empty">No approved withdrawals awaiting completion.</div>';
+    return;
+  }
+
+  $("adminApprovedWithdrawalList").innerHTML =
+    data.map(withdrawal => {
+
+      const date =
+        new Date(withdrawal.created_at)
+          .toLocaleString("en-NG", {
+            dateStyle: "medium",
+            timeStyle: "short"
+          });
+
+      return `
+        <div class="history-item">
+
+          <div class="row">
+
+            <div>
+              <b>${money(withdrawal.amount)}</b>
+
+              <div class="muted">
+                ${escapeHtml(
+                  withdrawal.full_name ||
+                  withdrawal.user_email ||
+                  "User"
+                )}
+              </div>
+            </div>
+
+            <span class="status approved">
+              Approved
+            </span>
+
+          </div>
+
+          ${
+            withdrawal.user_email
+              ? `
+                <div
+                  class="muted"
+                  style="margin-top:9px"
+                >
+                  ${escapeHtml(withdrawal.user_email)}
+                </div>
+              `
+              : ""
+          }
+
+          <div style="margin-top:9px">
+
+            <span class="muted">
+              ${escapeHtml(withdrawal.network || "TRC20")} Wallet
+            </span>
+
+            <div
+              class="address"
+              style="margin-top:5px"
+            >
+              ${escapeHtml(withdrawal.wallet_address)}
+            </div>
+
+          </div>
+
+          <div
+            class="muted"
+            style="margin-top:9px"
+          >
+            Approved request created:
+            ${date}
+          </div>
+
+          <div class="field" style="margin-top:12px">
+
+            <label class="label">
+              Blockchain TXID
+            </label>
+
+            <input
+              type="text"
+              placeholder="Enter actual transaction ID / TXID"
+              data-approved-txid
+              data-approved-id="${escapeHtml(withdrawal.withdrawal_id)}"
+            >
+
+          </div>
+
+          <button
+            class="btn"
+            data-complete-withdrawal
+            data-complete-id="${escapeHtml(withdrawal.withdrawal_id)}"
+          >
+            Complete Withdrawal
+          </button>
+
+        </div>
+      `;
+
+    }).join("");
+
+  document
+    .querySelectorAll("[data-complete-withdrawal]")
+    .forEach(button => {
+
+      button.onclick = () =>
+        completeWithdrawal(
+          button.dataset.completeId,
+          button
+        );
+
+    });
+}
+
+async function completeWithdrawal(
+  withdrawalId,
+  button
+) {
+
+  if (!isAdmin) return;
+
+  const input =
+    document.querySelector(
+      `[data-approved-txid][data-approved-id="${withdrawalId}"]`
+    );
+
+  if (!input) {
+    $("adminMessage").textContent =
+      "TXID input not found.";
+
+    $("adminMessage").className =
+      "error";
+
+    return;
+  }
+
+  const txid =
+    input.value.trim();
+
+  if (!txid || txid.length < 10) {
+    $("adminMessage").textContent =
+      "Enter the actual blockchain transaction ID / TXID.";
+
+    $("adminMessage").className =
+      "error";
+
+    input.focus();
+
+    return;
+  }
+
+  const originalText =
+    button.textContent;
+
+  button.disabled = true;
+
+  button.textContent =
+    "Completing...";
+
+  $("adminMessage").textContent =
+    "Recording completed withdrawal...";
+
+  $("adminMessage").className =
+    "muted";
+
+  const { error } =
+    await supabaseClient.rpc(
+      "admin_complete_withdrawal",
+      {
+        p_withdrawal_id: withdrawalId,
+        p_txid: txid
+      }
+    );
+
+  if (error) {
+
+    button.disabled = false;
+
+    button.textContent =
+      originalText;
+
+    $("adminMessage").textContent =
+      error.message;
+
+    $("adminMessage").className =
+      "error";
+
+    return;
+  }
+
+  $("adminMessage").textContent =
+    "Withdrawal completed successfully.";
+
+  $("adminMessage").className =
+    "success";
+
+  await loadApprovedWithdrawals();
+  await loadActivity();
+  await loadAccount();
 }
 
 $("refreshDepositsBtn").onclick =
@@ -1769,6 +2020,9 @@ $("refreshDepositsBtn").onclick =
 
 $("refreshWithdrawalsBtn").onclick =
   loadPendingWithdrawals;
+
+$("refreshApprovedWithdrawalsBtn").onclick =
+  loadApprovedWithdrawals;
 
 /* =========================
    LOGOUT
