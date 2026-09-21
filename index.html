@@ -1301,13 +1301,13 @@ $("loginBtn").onclick =
       data,
       error
     } =
-      await supabaseClient.auth
-        .signInWithPassword({
+    await supabaseClient.auth
+      .signInWithPassword({
 
-          email,
-          password
+        email,
+        password
 
-        });
+      });
 
 
     if (error) {
@@ -1346,14 +1346,14 @@ async function checkAdmin() {
     data,
     error
   } =
-    await supabaseClient
-      .from("admin_users")
-      .select("user_id")
-      .eq(
-        "user_id",
-        currentUser.id
-      )
-      .maybeSingle();
+  await supabaseClient
+    .from("admin_users")
+    .select("user_id")
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .maybeSingle();
 
 
   isAdmin =
@@ -1416,16 +1416,16 @@ async function loadAccount() {
     data,
     error
   } =
-    await supabaseClient
-      .from("accounts")
-      .select(
-        "available_balance, invested_capital, realized_pl"
-      )
-      .eq(
-        "user_id",
-        currentUser.id
-      )
-      .maybeSingle();
+  await supabaseClient
+    .from("accounts")
+    .select(
+      "available_balance, invested_capital, realized_pl"
+    )
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .maybeSingle();
 
 
   if (error || !data) return;
@@ -1607,15 +1607,15 @@ $("submitDepositBtn").onclick =
     const {
       error
     } =
-      await supabaseClient.rpc(
-        "create_deposit_request",
-        {
-          p_amount:amount,
-          p_reference:txid,
-          p_description:
-            `Deposit via ${asset} · ${network}`
-        }
-      );
+    await supabaseClient.rpc(
+      "create_deposit_request",
+      {
+        p_amount:amount,
+        p_reference:txid,
+        p_description:
+          `Deposit via ${asset} · ${network}`
+      }
+    );
 
 
     $("submitDepositBtn")
@@ -1671,27 +1671,72 @@ const INVESTMENT_PLANS = {
 
   starter: {
     name:"Starter",
-    minimum:100
+    minimum:100,
+    details:
+`STARTER PLAN
+
+Minimum investment: $100
+Duration: 24 hours
+Profit: 10%
+Withdrawal: Profits only
+Investment limit: 1 activation`
   },
 
   growth: {
     name:"Growth",
-    minimum:250
+    minimum:250,
+    details:
+`GROWTH PLAN
+
+Minimum investment: $250
+Duration: 72 hours
+Profit: 50%
+Withdrawal: Profits only
+Investment limit: 2 activations`
   },
 
   advanced: {
     name:"Advanced",
-    minimum:500
+    minimum:500,
+    details:
+`ADVANCED PLAN
+
+Minimum investment: $500
+Duration: 2 weeks
+Profit: 75%
+Withdrawal: Profits only
+Investment limit: 3 activations`
   },
 
   fourth: {
     name:"Fourth",
-    minimum:1200
+    minimum:1200,
+    details:
+`FOURTH PLAN
+
+Minimum investment: $1,200
+Duration: 1 month
+Profit: 100%
+Withdrawal: Profits + capital
+Investment limit: 5 activations`
   },
 
   fifth: {
     name:"Fifth",
-    minimum:2000
+    minimum:2000,
+    details:
+`FIFTH PLAN
+
+Minimum activation: $2,000
+Target investment: $7,500
+Duration: 3 months
+Profit target: $20,000
+
+Completion period: 2½ months
+
+If the $7,500 target is not completed within the 2½-month completion period, the investment is cancelled and the capital is deducted automatically.
+
+Investment limit: Unlimited`
   }
 
 };
@@ -1750,6 +1795,31 @@ async function activateInvestment(
   }
 
 
+  /*
+    STEP 1
+    Show the complete details of the
+    selected plan before amount entry.
+  */
+
+  const detailsConfirmed =
+    confirm(
+      plan.details +
+      "\n\nPress OK to continue."
+    );
+
+
+  if (!detailsConfirmed) {
+
+    return;
+
+  }
+
+
+  /*
+    STEP 2
+    Ask for investment amount.
+  */
+
   const amountText =
     prompt(
       `Enter the amount you want to invest in ${plan.name}.\nMinimum: $${plan.minimum.toLocaleString()}`
@@ -1803,6 +1873,11 @@ async function activateInvestment(
   }
 
 
+  /*
+    STEP 3
+    Final confirmation.
+  */
+
   const confirmed =
     confirm(
       `Activate ${plan.name} with ${money(amount)}?`
@@ -1835,17 +1910,22 @@ async function activateInvestment(
       "muted";
 
 
+  /*
+    STEP 4
+    Secure server-side activation.
+  */
+
   const {
     data:investmentId,
     error
   } =
-    await supabaseClient.rpc(
-      "activate_investment",
-      {
-        p_plan_name:planName,
-        p_amount:amount
-      }
-    );
+  await supabaseClient.rpc(
+    "activate_investment",
+    {
+      p_plan_name:planName,
+      p_amount:amount
+    }
+  );
 
 
   if (error) {
@@ -2063,7 +2143,7 @@ $("requestWithdrawalBtn").onclick =
 
       $("withdrawMessage")
         .textContent =
-          "Minimum withdrawal is $150.";
+        "Minimum withdrawal is $150.";
 
       $("withdrawMessage")
         .className =
@@ -2081,11 +2161,11 @@ $("requestWithdrawalBtn").onclick =
 
       $("withdrawMessage")
         .textContent =
-          "Enter a valid USDT TRC20 wallet address.";
+        "Enter a valid USDT TRC20 wallet address.";
 
       $("withdrawMessage")
         .className =
-          "error";
+        "error";
 
       return;
 
@@ -2115,13 +2195,13 @@ $("requestWithdrawalBtn").onclick =
       data:withdrawalId,
       error
     } =
-      await supabaseClient.rpc(
-        "create_withdrawal_request",
-        {
-          p_amount:amount,
-          p_wallet_address:wallet
-        }
-      );
+    await supabaseClient.rpc(
+      "create_withdrawal_request",
+      {
+        p_amount:amount,
+        p_wallet_address:wallet
+      }
+    );
 
 
     if (error) {
@@ -2260,7 +2340,7 @@ $("submitWithdrawFeeBtn").onclick =
 
       $("withdrawFeeMessage")
         .textContent =
-          "No active withdrawal request.";
+        "No active withdrawal request.";
 
       $("withdrawFeeMessage")
         .className =
@@ -2283,7 +2363,7 @@ $("submitWithdrawFeeBtn").onclick =
 
       $("withdrawFeeMessage")
         .textContent =
-          "Enter a valid fee deposit transaction ID / TXID.";
+        "Enter a valid fee deposit transaction ID / TXID.";
 
       $("withdrawFeeMessage")
         .className =
@@ -2310,16 +2390,16 @@ $("submitWithdrawFeeBtn").onclick =
     const {
       error
     } =
-      await supabaseClient.rpc(
-        "submit_withdrawal_fee_txid",
-        {
-          p_withdrawal_id:
-            currentWithdrawalId,
+    await supabaseClient.rpc(
+      "submit_withdrawal_fee_txid",
+      {
+        p_withdrawal_id:
+          currentWithdrawalId,
 
-          p_fee_txid:
-            feeTxid
-        }
-      );
+        p_fee_txid:
+          feeTxid
+      }
+    );
 
 
     if (error) {
@@ -2366,13 +2446,13 @@ $("submitWithdrawFeeBtn").onclick =
       data:securityCode,
       error:codeError
     } =
-      await supabaseClient.rpc(
-        "generate_withdrawal_security_code",
-        {
-          p_withdrawal_id:
-            currentWithdrawalId
-        }
-      );
+    await supabaseClient.rpc(
+      "generate_withdrawal_security_code",
+      {
+        p_withdrawal_id:
+          currentWithdrawalId
+      }
+    );
 
 
     if (
@@ -2382,9 +2462,9 @@ $("submitWithdrawFeeBtn").onclick =
 
       $("withdrawFeeMessage")
         .textContent =
-          codeError
-            ? codeError.message
-            : "Unable to generate security code.";
+        codeError
+          ? codeError.message
+          : "Unable to generate security code.";
 
       $("withdrawFeeMessage")
         .className =
@@ -2397,7 +2477,7 @@ $("submitWithdrawFeeBtn").onclick =
 
     $("withdrawMessage")
       .textContent =
-        "Withdrawal fee TXID submitted. Enter the security code before it expires.";
+      "Withdrawal fee TXID submitted. Enter the security code before it expires.";
 
     $("withdrawMessage")
       .className =
@@ -2455,7 +2535,7 @@ $("verifySecurityCodeBtn").onclick =
 
       $("securityMessage")
         .textContent =
-          "No active withdrawal request.";
+        "No active withdrawal request.";
 
       $("securityMessage")
         .className =
@@ -2475,7 +2555,7 @@ $("verifySecurityCodeBtn").onclick =
 
       $("securityMessage")
         .textContent =
-          "Enter the 6-digit security code.";
+        "Enter the 6-digit security code.";
 
       $("securityMessage")
         .className =
@@ -2499,22 +2579,22 @@ $("verifySecurityCodeBtn").onclick =
       data:verified,
       error
     } =
-      await supabaseClient.rpc(
-        "verify_withdrawal_security_code",
-        {
-          p_withdrawal_id:
-            currentWithdrawalId,
+    await supabaseClient.rpc(
+      "verify_withdrawal_security_code",
+      {
+        p_withdrawal_id:
+          currentWithdrawalId,
 
-          p_code:code
-        }
-      );
+        p_code:code
+      }
+    );
 
 
     if (error) {
 
       $("securityMessage")
         .textContent =
-          error.message;
+        error.message;
 
       $("securityMessage")
         .className =
@@ -2538,7 +2618,7 @@ $("verifySecurityCodeBtn").onclick =
 
       $("securityMessage")
         .textContent =
-          "Incorrect or expired security code.";
+        "Incorrect or expired security code.";
 
       $("securityMessage")
         .className =
@@ -2621,22 +2701,22 @@ async function loadActivity() {
     data,
     error
   } =
-    await supabaseClient
-      .from("transactions")
-      .select(
-        "id, transaction_type, amount, status, reference, description, created_at"
-      )
-      .eq(
-        "user_id",
-        currentUser.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      )
-      .limit(50);
+  await supabaseClient
+    .from("transactions")
+    .select(
+      "id, transaction_type, amount, status, reference, description, created_at"
+    )
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .order(
+      "created_at",
+      {
+        ascending:false
+      }
+    )
+    .limit(50);
 
 
   if (error) {
@@ -2904,9 +2984,9 @@ async function loadPendingDeposits() {
     data,
     error
   } =
-    await supabaseClient.rpc(
-      "admin_get_pending_deposits"
-    );
+  await supabaseClient.rpc(
+    "admin_get_pending_deposits"
+  );
 
 
   if (error) {
@@ -3137,16 +3217,16 @@ async function reviewDeposit(
   const {
     error
   } =
-    await supabaseClient.rpc(
-      "admin_review_deposit",
-      {
-        p_transaction_id:
-          transactionId,
+  await supabaseClient.rpc(
+    "admin_review_deposit",
+    {
+      p_transaction_id:
+        transactionId,
 
-        p_decision:
-          decision
-      }
-    );
+      p_decision:
+        decision
+    }
+  );
 
 
   if (error) {
@@ -3197,9 +3277,9 @@ async function loadPendingWithdrawals() {
     data,
     error
   } =
-    await supabaseClient.rpc(
-      "admin_get_pending_withdrawals_with_fee"
-    );
+  await supabaseClient.rpc(
+    "admin_get_pending_withdrawals_with_fee"
+  );
 
 
   if (error) {
@@ -3514,16 +3594,16 @@ async function verifyWithdrawalFee(
   const {
     error
   } =
-    await supabaseClient.rpc(
-      "admin_verify_withdrawal_fee",
-      {
-        p_withdrawal_id:
-          withdrawalId,
+  await supabaseClient.rpc(
+    "admin_verify_withdrawal_fee",
+    {
+      p_withdrawal_id:
+        withdrawalId,
 
-        p_fee_txid:
-          feeTxid
-      }
-    );
+      p_fee_txid:
+        feeTxid
+    }
+  );
 
 
   if (error) {
@@ -3586,16 +3666,16 @@ async function reviewWithdrawal(
   const {
     error
   } =
-    await supabaseClient.rpc(
-      "admin_review_withdrawal",
-      {
-        p_withdrawal_id:
-          withdrawalId,
+  await supabaseClient.rpc(
+    "admin_review_withdrawal",
+    {
+      p_withdrawal_id:
+        withdrawalId,
 
-        p_decision:
-          decision
-      }
-    );
+      p_decision:
+        decision
+    }
+  );
 
 
   if (error) {
@@ -3654,9 +3734,9 @@ async function loadApprovedWithdrawals() {
     data,
     error
   } =
-    await supabaseClient.rpc(
-      "admin_get_approved_withdrawals"
-    );
+  await supabaseClient.rpc(
+    "admin_get_approved_withdrawals"
+  );
 
 
   if (error) {
@@ -3915,16 +3995,16 @@ async function completeWithdrawal(
   const {
     error
   } =
-    await supabaseClient.rpc(
-      "admin_complete_withdrawal",
-      {
-        p_withdrawal_id:
-          withdrawalId,
+  await supabaseClient.rpc(
+    "admin_complete_withdrawal",
+    {
+      p_withdrawal_id:
+        withdrawalId,
 
-        p_txid:
-          txid
-      }
-    );
+      p_txid:
+        txid
+    }
+  );
 
 
   if (error) {
@@ -4101,8 +4181,8 @@ supabaseClient.auth
   const {
     data
   } =
-    await supabaseClient
-      .auth.getSession();
+  await supabaseClient
+    .auth.getSession();
 
 
   if (
