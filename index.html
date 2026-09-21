@@ -1949,6 +1949,105 @@ async function processMaturedGrowthInvestments() {
 
 
 /*
+  Process Advanced investments that have
+  reached their 14-day maturity time.
+*/
+async function processMaturedAdvancedInvestments() {
+
+  if (!currentUser) {
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+    .from("investments")
+    .select(
+      "id, started_at"
+    )
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .eq(
+      "status",
+      "active"
+    )
+    .eq(
+      "plan_name",
+      "advanced"
+    );
+
+
+  if (error || !data) {
+    return;
+  }
+
+
+  for (
+    const investment
+    of data
+  ) {
+
+    const startedAt =
+      new Date(
+        investment.started_at
+      );
+
+
+    const maturityTime =
+      startedAt.getTime() +
+      (
+        14 *
+        24 *
+        60 *
+        60 *
+        1000
+      );
+
+
+    if (
+      Date.now() >= maturityTime
+    ) {
+
+      const {
+        error:
+          processError
+      } =
+      await supabaseClient.rpc(
+        "process_advanced_investment",
+        {
+          p_investment_id:
+            investment.id
+        }
+      );
+
+
+      /*
+        Do not stop the remaining
+        investments if one fails.
+      */
+
+      if (processError) {
+
+        console.error(
+          "Advanced maturity error:",
+          processError.message
+        );
+
+      }
+
+    }
+
+  }
+
+}
+
+
+/*
   Process all currently supported
   matured investment plans.
 */
@@ -1962,6 +2061,8 @@ async function processMaturedInvestments() {
   await processMaturedStarterInvestments();
 
   await processMaturedGrowthInvestments();
+
+  await processMaturedAdvancedInvestments();
 
 }
 
@@ -2803,7 +2904,7 @@ $("verifySecurityCodeBtn").onclick =
 
     $("verifySecurityCodeBtn")
       .textContent =
-      "Verifying...";
+        "Verifying...";
 
 
     const {
@@ -2879,12 +2980,12 @@ $("verifySecurityCodeBtn").onclick =
 
     $("countdown")
       .textContent =
-        "Code verified";
+      "Code verified";
 
 
     $("securityMessage")
       .textContent =
-        "Security code verified. Your withdrawal is now pending processing.";
+      "Security code verified. Your withdrawal is now pending processing.";
 
     $("securityMessage")
       .className =
@@ -2893,7 +2994,7 @@ $("verifySecurityCodeBtn").onclick =
 
     $("verifySecurityCodeBtn")
       .textContent =
-        "Code Verified";
+      "Code Verified";
 
 
     $("securityCodeInput")
@@ -2902,7 +3003,7 @@ $("verifySecurityCodeBtn").onclick =
 
     $("withdrawMessage")
       .textContent =
-        "Withdrawal request submitted successfully.";
+      "Withdrawal request submitted successfully.";
 
     $("withdrawMessage")
       .className =
@@ -4168,7 +4269,7 @@ async function completeWithdrawal(
 
     $("adminMessage")
       .textContent =
-        "TXID input not found.";
+      "TXID input not found.";
 
     $("adminMessage")
       .className =
