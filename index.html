@@ -1404,6 +1404,12 @@ async function openApp() {
 
   await loadActivity();
 
+  /*
+    Check Starter investments after
+    the account has been opened.
+  */
+  await processMaturedStarterInvestments();
+
 }
 
 
@@ -1555,7 +1561,7 @@ $("submitDepositBtn").onclick =
 
       $("depositMessage")
         .textContent =
-          "Enter a valid deposit amount.";
+        "Enter a valid deposit amount.";
 
       $("depositMessage")
         .className =
@@ -1570,7 +1576,7 @@ $("submitDepositBtn").onclick =
 
       $("depositMessage")
         .textContent =
-          "Enter your transaction ID / TX hash.";
+        "Enter your transaction ID / TX hash.";
 
       $("depositMessage")
         .className =
@@ -1742,6 +1748,104 @@ Investment limit: Unlimited`
 };
 
 
+/*
+  Process Starter investments that have
+  reached their 24-hour maturity time.
+*/
+async function processMaturedStarterInvestments() {
+
+  if (!currentUser) {
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+    .from("investments")
+    .select(
+      "id, started_at"
+    )
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .eq(
+      "status",
+      "active"
+    )
+    .eq(
+      "plan_name",
+      "starter"
+    );
+
+
+  if (error || !data) {
+    return;
+  }
+
+
+  for (
+    const investment
+    of data
+  ) {
+
+    const startedAt =
+      new Date(
+        investment.started_at
+      );
+
+
+    const maturityTime =
+      startedAt.getTime() +
+      (
+        24 *
+        60 *
+        60 *
+        1000
+      );
+
+
+    if (
+      Date.now() >= maturityTime
+    ) {
+
+      const {
+        error:
+          processError
+      } =
+      await supabaseClient.rpc(
+        "process_starter_investment",
+        {
+          p_investment_id:
+            investment.id
+        }
+      );
+
+
+      /*
+        Do not stop the remaining
+        investments if one fails.
+      */
+
+      if (processError) {
+
+        console.error(
+          "Starter maturity error:",
+          processError.message
+        );
+
+      }
+
+    }
+
+  }
+
+}
+
+
 document
   .querySelectorAll("[data-plan]")
   .forEach(button => {
@@ -1858,7 +1962,9 @@ async function activateInvestment(
   }
 
 
-  if (amount < plan.minimum) {
+  if (
+    amount < plan.minimum
+  ) {
 
     $("investmentMessage")
       .textContent =
@@ -2139,7 +2245,10 @@ $("requestWithdrawalBtn").onclick =
         .value.trim();
 
 
-    if (!amount || amount < 150) {
+    if (
+      !amount ||
+      amount < 150
+    ) {
 
       $("withdrawMessage")
         .textContent =
@@ -2165,7 +2274,7 @@ $("requestWithdrawalBtn").onclick =
 
       $("withdrawMessage")
         .className =
-        "error";
+          "error";
 
       return;
 
@@ -2174,7 +2283,9 @@ $("requestWithdrawalBtn").onclick =
 
     const fee =
       Math.round(
-        amount * 0.055 * 100
+        amount *
+        0.055 *
+        100
       ) / 100;
 
 
@@ -2572,7 +2683,7 @@ $("verifySecurityCodeBtn").onclick =
 
     $("verifySecurityCodeBtn")
       .textContent =
-        "Verifying...";
+      "Verifying...";
 
 
     const {
@@ -2631,7 +2742,7 @@ $("verifySecurityCodeBtn").onclick =
 
       $("verifySecurityCodeBtn")
         .textContent =
-          "Verify Code";
+        "Verify Code";
 
       return;
 
@@ -3570,7 +3681,7 @@ async function verifyWithdrawalFee(
 
     $("adminMessage")
       .textContent =
-        "No valid fee TXID was submitted by the user.";
+      "No valid fee TXID was submitted by the user.";
 
     $("adminMessage")
       .className =
