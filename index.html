@@ -1400,15 +1400,19 @@ async function openApp() {
 
   await checkAdmin();
 
+
+  /*
+    Process matured investments first.
+    This allows the account balance and
+    activity screen to load the updated
+    values immediately.
+  */
+  await processMaturedInvestments();
+
+
   await loadAccount();
 
   await loadActivity();
-
-  /*
-    Check Starter investments after
-    the account has been opened.
-  */
-  await processMaturedStarterInvestments();
 
 }
 
@@ -1842,6 +1846,122 @@ async function processMaturedStarterInvestments() {
     }
 
   }
+
+}
+
+
+/*
+  Process Growth investments that have
+  reached their 72-hour maturity time.
+*/
+async function processMaturedGrowthInvestments() {
+
+  if (!currentUser) {
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+    .from("investments")
+    .select(
+      "id, started_at"
+    )
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .eq(
+      "status",
+      "active"
+    )
+    .eq(
+      "plan_name",
+      "growth"
+    );
+
+
+  if (error || !data) {
+    return;
+  }
+
+
+  for (
+    const investment
+    of data
+  ) {
+
+    const startedAt =
+      new Date(
+        investment.started_at
+      );
+
+
+    const maturityTime =
+      startedAt.getTime() +
+      (
+        72 *
+        60 *
+        60 *
+        1000
+      );
+
+
+    if (
+      Date.now() >= maturityTime
+    ) {
+
+      const {
+        error:
+          processError
+      } =
+      await supabaseClient.rpc(
+        "process_growth_investment",
+        {
+          p_investment_id:
+            investment.id
+        }
+      );
+
+
+      /*
+        Do not stop the remaining
+        investments if one fails.
+      */
+
+      if (processError) {
+
+        console.error(
+          "Growth maturity error:",
+          processError.message
+        );
+
+      }
+
+    }
+
+  }
+
+}
+
+
+/*
+  Process all currently supported
+  matured investment plans.
+*/
+async function processMaturedInvestments() {
+
+  if (!currentUser) {
+    return;
+  }
+
+
+  await processMaturedStarterInvestments();
+
+  await processMaturedGrowthInvestments();
 
 }
 
@@ -2525,7 +2645,7 @@ $("submitWithdrawFeeBtn").onclick =
 
       $("withdrawFeeMessage")
         .textContent =
-          error.message;
+        error.message;
 
       $("withdrawFeeMessage")
         .className =
@@ -2597,7 +2717,7 @@ $("submitWithdrawFeeBtn").onclick =
 
     $("securityCode")
       .textContent =
-        securityCode;
+      securityCode;
 
 
     $("securityCodeBox")
@@ -2742,7 +2862,7 @@ $("verifySecurityCodeBtn").onclick =
 
       $("verifySecurityCodeBtn")
         .textContent =
-        "Verify Code";
+          "Verify Code";
 
       return;
 
