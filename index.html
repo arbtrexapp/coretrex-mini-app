@@ -2063,7 +2063,10 @@ async function processMaturedInvestments() {
   await processMaturedGrowthInvestments();
 
   await processMaturedAdvancedInvestments();
-
+  
+await supabaseClient.rpc(
+    "process_fifth_plan"
+  );
 }
 
 
