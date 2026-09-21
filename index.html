@@ -2048,6 +2048,86 @@ async function processMaturedAdvancedInvestments() {
 
 
 /*
+  Process Fourth investments that have
+  reached their 1-month maturity time.
+*/  
+  async function processMaturedFourthInvestments() {
+
+  if (!currentUser) {
+    return;
+  }
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+    .from("investments")
+    .select(
+      "id, started_at"
+    )
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .eq(
+      "status",
+      "active"
+    )
+    .eq(
+      "plan_name",
+      "fourth"
+    );
+
+  if (error || !data) {
+    return;
+  }
+
+  for (
+    const investment
+    of data
+  ) {
+
+    const startedAt =
+      new Date(
+        investment.started_at
+      );
+
+    const maturityTime =
+      new Date(startedAt);
+
+    maturityTime.setMonth(
+      maturityTime.getMonth() + 1
+    );
+
+    if (
+      Date.now() >=
+      maturityTime.getTime()
+    ) {
+
+      const {
+        error:
+          processError
+      } =
+      await supabaseClient.rpc(
+        "process_fourth_investment",
+        {
+          p_investment_id:
+            investment.id
+        }
+      );
+
+      if (processError) {
+        console.error(
+          "Fourth maturity error:",
+          processError.message
+        );
+      }
+    }
+  }
+}
+
+/*
   Process all currently supported
   matured investment plans.
 */
@@ -2063,6 +2143,8 @@ async function processMaturedInvestments() {
   await processMaturedGrowthInvestments();
 
   await processMaturedAdvancedInvestments();
+  
+  await processMaturedFourthInvestments();
   
 await supabaseClient.rpc(
     "process_fifth_plan"
