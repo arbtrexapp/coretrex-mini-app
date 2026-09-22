@@ -1524,9 +1524,14 @@ function showScreen(id) {
   
 if (id === "contactScreen") {
 
-  loadMySupportMessages();
+  setTimeout(() => {
+
+    loadMySupportMessages();
+
+  }, 100);
 
 }
+  
   if (id === "adminScreen" && isAdmin) {
 
   loadAdminData();
