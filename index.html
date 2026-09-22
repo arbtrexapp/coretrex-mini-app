@@ -1834,6 +1834,7 @@ async function openApp() {
   */
   await processMaturedInvestments();
 
+  await loadMySupportMessages();
 
   await loadAccount();
 
@@ -5285,7 +5286,126 @@ $("transferReferralBtn")?.addEventListener(
 
   }
 );
+  
+async function loadMySupportMessages() {
 
+  const list =
+    $("mySupportList");
+
+  if (!list || !currentUser) return;
+
+
+  list.innerHTML =
+    '<div class="empty">Loading messages...</div>';
+
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+    .from("support_messages")
+    .select(
+      "id, subject, message, admin_reply, status, created_at, replied_at, resolved_at"
+    )
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
+    );
+
+
+  if (error) {
+
+    console.error(
+      "My support messages error:",
+      error.message
+    );
+
+    list.innerHTML =
+      '<div class="empty">Unable to load your messages.</div>';
+
+    return;
+
+  }
+
+
+  if (!data || data.length === 0) {
+
+    list.innerHTML =
+      '<div class="empty">You have not sent any support messages yet.</div>';
+
+    return;
+
+  }
+
+
+  list.innerHTML = "";
+
+
+  data.forEach(
+    (item) => {
+
+      const card =
+        document.createElement("div");
+
+      card.className =
+        "card";
+
+      card.style.marginTop =
+        "10px";
+
+
+      card.innerHTML = `
+
+        <div class="label">
+          ${item.status || "open"}
+        </div>
+
+        <h3 style="margin:6px 0">
+          ${item.subject}
+        </h3>
+
+        <p>
+          ${item.message}
+        </p>
+
+        ${
+          item.admin_reply
+            ? `
+              <div
+                class="label"
+                style="margin-top:12px"
+              >
+                ADMIN REPLY
+              </div>
+
+              <p>
+                ${item.admin_reply}
+              </p>
+            `
+            : `
+              <p class="muted">
+                Awaiting support response.
+              </p>
+            `
+        }
+
+      `;
+
+
+      list.appendChild(card);
+
+    }
+  );
+
+}
+  
 let selectedSupportMessageId = null;
 
 
