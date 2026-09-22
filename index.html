@@ -1524,7 +1524,20 @@ function showScreen(id) {
   
 if (id === "contactScreen") {
 
-  loadMySupportMessages();
+  loadMySupportMessages()
+    .catch(error => {
+
+      console.error(
+        "Support loader failed:",
+        error
+      );
+
+      $("mySupportList").innerHTML =
+        '<div class="empty">Support loading error: ' +
+        error.message +
+        '</div>';
+
+    });
 
 }
   
