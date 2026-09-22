@@ -5090,6 +5090,94 @@ $("transferReferralBtn")?.addEventListener(
 
   }
 );  
+  $("contactForm")?.addEventListener(
+  "submit",
+  async (e) => {
+
+    e.preventDefault();
+
+
+    if (!currentUser) {
+
+      $("contactFormMessage").textContent =
+        "Please log in to send a message.";
+
+      return;
+
+    }
+
+
+    const subject =
+      $("contactSubject")
+        .value
+        .trim();
+
+    const message =
+      $("contactMessage")
+        .value
+        .trim();
+
+
+    if (!subject || !message) {
+
+      $("contactFormMessage").textContent =
+        "Please enter a subject and message.";
+
+      return;
+
+    }
+
+
+    $("contactFormMessage").textContent =
+      "Sending message...";
+
+
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("support_messages")
+      .insert({
+
+        user_id:
+          currentUser.id,
+
+        subject:
+          subject,
+
+        message:
+          message
+
+      });
+
+
+    if (error) {
+
+      console.error(
+        "Support message error:",
+        error.message
+      );
+
+      $("contactFormMessage").textContent =
+        "Unable to send your message. Please try again.";
+
+      return;
+
+    }
+
+
+    $("contactFormMessage").textContent =
+      "Your message has been sent successfully.";
+
+
+    $("contactSubject").value =
+      "";
+
+    $("contactMessage").value =
+      "";
+
+  }
+);
 
 })();
   
