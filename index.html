@@ -1590,6 +1590,29 @@ document
     );
 
   });
+  
+  $("liveChatFloatBtn")?.addEventListener(
+  "click",
+  () => {
+
+    $("liveChatPanel")
+      ?.classList
+      .remove("hidden");
+
+  }
+);
+
+
+$("closeLiveChatBtn")?.addEventListener(
+  "click",
+  () => {
+
+    $("liveChatPanel")
+      ?.classList
+      .add("hidden");
+
+  }
+);
 
 
 $("showRegisterBtn").onclick =
