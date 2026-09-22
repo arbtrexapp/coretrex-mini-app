@@ -6108,6 +6108,137 @@ $("closeLiveChatBtn")?.addEventListener(
   }
 );
 
+ let selectedLiveChatUserId = null;
+
+
+async function loadAdminLiveChatUsers() {
+
+  const list =
+    $("adminLiveChatUsers");
+
+  if (!list || !currentUser) return;
+
+
+  list.innerHTML =
+    '<div class="empty">Loading chats...</div>';
+
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+    .from("live_chat_messages")
+    .select(
+      "user_id, message, created_at"
+    )
+    .eq(
+      "sender",
+      "user"
+    )
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
+    );
+
+
+  if (error) {
+
+    console.error(
+      "Admin live chat users error:",
+      error.message
+    );
+
+    list.innerHTML =
+      '<div class="empty">Unable to load chats.</div>';
+
+    return;
+
+  }
+
+
+  if (!data || data.length === 0) {
+
+    list.innerHTML =
+      '<div class="empty">No live chats yet.</div>';
+
+    return;
+
+  }
+
+
+  const users = [];
+
+  data.forEach(
+    item => {
+
+      if (
+        !users.some(
+          user =>
+            user.user_id === item.user_id
+        )
+      ) {
+
+        users.push(item);
+
+      }
+
+    }
+  );
+
+
+  list.innerHTML = "";
+
+
+  users.forEach(
+    item => {
+
+      const button =
+        document.createElement("button");
+
+      button.type =
+        "button";
+
+      button.className =
+        "btn secondary";
+
+      button.style.marginTop =
+        "8px";
+
+      button.style.textAlign =
+        "left";
+
+      button.textContent =
+        "User: " +
+        item.user_id;
+
+
+      button.addEventListener(
+        "click",
+        async () => {
+
+          selectedLiveChatUserId =
+            item.user_id;
+
+          $("adminLiveChatBox")
+            ?.classList
+            .remove("hidden");
+
+          await loadAdminLiveChatMessages();
+
+        }
+      );
+
+
+      list.appendChild(button);
+
+    }
+  );
+
+} 
+
 })();
   
 </script>
