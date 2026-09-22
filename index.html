@@ -6244,6 +6244,119 @@ async function loadAdminLiveChatUsers() {
   );
 
 } 
+  
+  async function loadAdminLiveChatMessages() {
+
+  const box =
+    $("adminLiveChatMessages");
+
+  if (!box || !selectedLiveChatUserId) {
+    return;
+  }
+
+
+  box.innerHTML =
+    '<div class="empty">Loading chat...</div>';
+
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+    .from("live_chat_messages")
+    .select(
+      "id, sender, message, created_at"
+    )
+    .eq(
+      "user_id",
+      selectedLiveChatUserId
+    )
+    .order(
+      "created_at",
+      {
+        ascending: true
+      }
+    );
+
+
+  if (error) {
+
+    console.error(
+      "Admin live chat messages error:",
+      error.message
+    );
+
+    box.innerHTML =
+      '<div class="empty">Unable to load chat.</div>';
+
+    return;
+
+  }
+
+
+  if (!data || data.length === 0) {
+
+    box.innerHTML =
+      '<div class="empty">No messages yet.</div>';
+
+    return;
+
+  }
+
+
+  box.innerHTML = "";
+
+
+  data.forEach(
+    item => {
+
+      const row =
+        document.createElement("div");
+
+      row.style.marginBottom =
+        "10px";
+
+      row.style.textAlign =
+        item.sender === "admin"
+          ? "right"
+          : "left";
+
+
+      const bubble =
+        document.createElement("div");
+
+      bubble.textContent =
+        item.message;
+
+      bubble.style.display =
+        "inline-block";
+
+      bubble.style.maxWidth =
+        "85%";
+
+      bubble.style.padding =
+        "9px 12px";
+
+      bubble.style.borderRadius =
+        "12px";
+
+      bubble.style.background =
+        "#0b121c";
+
+
+      row.appendChild(bubble);
+
+      box.appendChild(row);
+
+    }
+  );
+
+
+  box.scrollTop =
+    box.scrollHeight;
+
+}
 
   $("refreshAdminLiveChatBtn")?.addEventListener(
   "click",
