@@ -1524,6 +1524,18 @@ function showScreen(id) {
   
 if (id === "contactScreen") {
 
+  if (!currentUser) {
+
+    $("mySupportList").innerHTML =
+      '<div class="empty">TEST: NO CURRENT USER</div>';
+
+  } else {
+
+    $("mySupportList").innerHTML =
+      '<div class="empty">TEST: USER FOUND</div>';
+
+  }
+
   setTimeout(() => {
 
     loadMySupportMessages();
