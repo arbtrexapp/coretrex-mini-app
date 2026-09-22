@@ -1524,10 +1524,7 @@ function showScreen(id) {
   
 if (id === "contactScreen") {
 
-  $("mySupportList").innerHTML =
-    '<div class="empty">TEST: LOADING NOW...</div>';
-
-  await loadMySupportMessages();
+  loadMySupportMessages();
 
 }
   
