@@ -1258,13 +1258,55 @@
   </div>
 
   <div
-    id="adminSupportList"
+  id="adminSupportList"
+  style="margin-top:10px"
+>
+  <div class="empty">
+    Loading messages...
+  </div>
+</div>
+
+<div
+  id="adminSupportReply"
+  class="hidden"
+  style="margin-top:15px"
+>
+
+  <div class="label">
+    REPLY TO USER
+  </div>
+
+  <textarea
+    id="adminSupportReplyText"
+    placeholder="Write your reply"
+    rows="4"
+  ></textarea>
+
+  <button
+    id="sendSupportReplyBtn"
+    class="btn"
+    type="button"
     style="margin-top:10px"
   >
-    <div class="empty">
-      Loading messages...
-    </div>
-  </div>
+    Send Reply
+  </button>
+
+  <button
+    id="resolveSupportBtn"
+    class="btn secondary"
+    type="button"
+    style="margin-top:9px"
+  >
+    Mark as Resolved
+  </button>
+
+  <p
+    id="adminSupportMessage"
+    class="muted"
+    style="margin-top:10px"
+  ></p>
+
+</div>
 
 </div>
     
