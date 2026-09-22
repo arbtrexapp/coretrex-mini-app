@@ -960,43 +960,120 @@
   <!-- ACCOUNT -->
   <section id="accountScreen" class="screen">
 
-    <h2>Account</h2>
+  <h2>Account</h2>
 
-    <div class="card">
+  <div class="card">
 
-      <div class="label">
-        EMAIL
-      </div>
-
-      <p id="accountEmail"></p>
-
-      <div
-        class="label"
-        style="margin-top:18px"
-      >
-        STATUS
-      </div>
-
-      <p>Active</p>
-
+    <div class="label">
+      EMAIL
     </div>
 
-    <button
-      class="btn secondary hidden"
-      id="adminBtn"
-      style="margin-bottom:9px"
+    <p id="accountEmail"></p>
+
+    <div
+      class="label"
+      style="margin-top:18px"
     >
-      Admin
+      STATUS
+    </div>
+
+    <p>Active</p>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="label">
+      REFERRAL
+    </div>
+
+    <h3>Referral Program</h3>
+
+    <p class="muted">
+      Invite others to join Coretrex and earn referral commissions
+      according to the platform's referral terms.
+    </p>
+
+    <div
+      class="label"
+      style="margin-top:18px"
+    >
+      YOUR REFERRAL CODE
+    </div>
+
+    <p id="referralCode">
+      Loading...
+    </p>
+
+    <div
+      class="label"
+      style="margin-top:18px"
+    >
+      REFERRAL LINK
+    </div>
+
+    <p
+      id="referralLink"
+      class="muted"
+      style="word-break:break-all"
+    >
+      Loading...
+    </p>
+
+    <div
+      class="label"
+      style="margin-top:18px"
+    >
+      REFERRAL COMMISSION
+    </div>
+
+    <p id="referralBalance">
+      $0.00
+    </p>
+
+    <button
+      class="btn secondary"
+      id="copyReferralBtn"
+      type="button"
+    >
+      Copy Referral Link
     </button>
 
     <button
-      class="btn danger"
-      id="logoutBtn"
+      class="btn"
+      id="transferReferralBtn"
+      type="button"
+      style="margin-top:9px"
     >
-      Logout
+      Transfer Commission to Balance
     </button>
 
-  </section>
+    <p
+      id="referralMessage"
+      class="muted"
+      style="margin-top:10px"
+    ></p>
+
+  </div>
+
+
+  <button
+    class="btn secondary hidden"
+    id="adminBtn"
+    style="margin-bottom:9px"
+  >
+    Admin
+  </button>
+
+  <button
+    class="btn danger"
+    id="logoutBtn"
+  >
+    Logout
+  </button>
+
+</section>
 
 
   <!-- ADMIN -->
