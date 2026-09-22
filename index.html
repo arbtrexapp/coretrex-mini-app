@@ -1521,13 +1521,21 @@ function showScreen(id) {
 
   }
 
+  
+if (id === "contactScreen") {
+
+  loadMySupportMessages();
+
+}
 
   if (id === "adminScreen" && isAdmin) {
 
-    loadAdminData();
+  loadAdminData();
 
-  }
+  loadAdminSupportMessages();
 
+}
+  
 }
 
 
