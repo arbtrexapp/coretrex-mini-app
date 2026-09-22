@@ -4897,8 +4897,109 @@ supabaseClient.auth
 
   }
 
-})();
 
+$("copyReferralBtn")?.addEventListener(
+  "click",
+  async () => {
+
+    const link =
+      $("referralLink")?.textContent;
+
+    if (
+      !link ||
+      link === "Loading..." ||
+      link === "Not available"
+    ) {
+      return;
+    }
+
+    try {
+
+      await navigator.clipboard.writeText(link);
+
+      if ($("referralMessage")) {
+        $("referralMessage").textContent =
+          "Referral link copied.";
+      }
+
+    } catch (error) {
+
+      if ($("referralMessage")) {
+        $("referralMessage").textContent =
+          "Unable to copy the link.";
+      }
+
+    }
+
+  }
+);
+
+
+$("transferReferralBtn")?.addEventListener(
+  "click",
+  async () => {
+
+    if (!currentUser) {
+      return;
+    }
+
+    if ($("referralMessage")) {
+      $("referralMessage").textContent =
+        "Checking referral commission...";
+    }
+
+    const {
+      data,
+      error
+    } =
+    await supabaseClient.rpc(
+      "credit_referral_commission"
+    );
+
+    if (error) {
+
+      console.error(
+        "Referral transfer error:",
+        error.message
+      );
+
+      if ($("referralMessage")) {
+        $("referralMessage").textContent =
+          error.message;
+      }
+
+      return;
+    }
+
+
+    if (!data || Number(data) <= 0) {
+
+      if ($("referralMessage")) {
+        $("referralMessage").textContent =
+          "Referral commission must reach $100 before it can be transferred.";
+      }
+
+      return;
+    }
+
+
+    if ($("referralMessage")) {
+      $("referralMessage").textContent =
+        "$" +
+        Number(data).toFixed(2) +
+        " transferred to your available balance.";
+    }
+
+
+    await loadAccount();
+
+    await loadActivity();
+
+  }
+);  
+
+})();
+  
 </script>
 
 </body>
