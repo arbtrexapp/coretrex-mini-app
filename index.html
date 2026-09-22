@@ -5448,6 +5448,15 @@ async function loadMySupportMessages() {
   );
 
 }
+$("refreshMySupportBtn")?.addEventListener(
+  "click",
+  async () => {
+
+    await loadMySupportMessages();
+
+  }
+);
+  
   
 let selectedSupportMessageId = null;
 
