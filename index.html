@@ -1270,7 +1270,13 @@ const supabaseClient =
     SUPABASE_KEY
   );
 
-
+  
+const referralCodeFromUrl =
+  new URLSearchParams(
+    window.location.search
+  ).get("ref");
+  
+   
 const DEPOSIT_ASSETS = {
 
   USDT: {
