@@ -6358,6 +6358,79 @@ async function loadAdminLiveChatUsers() {
 
 }
 
+  $("sendAdminLiveChatBtn")?.addEventListener(
+  "click",
+  async () => {
+
+    if (!isAdmin || !selectedLiveChatUserId) {
+
+      return;
+
+    }
+
+
+    const input =
+      $("adminLiveChatInput");
+
+    const message =
+      input?.value.trim();
+
+
+    if (!message) {
+
+      return;
+
+    }
+
+
+    $("adminLiveChatStatus").textContent =
+      "Sending...";
+
+
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("live_chat_messages")
+      .insert({
+
+        user_id:
+          selectedLiveChatUserId,
+
+        sender:
+          "admin",
+
+        message:
+          message
+
+      });
+
+
+    if (error) {
+
+      console.error(
+        "Admin live chat send error:",
+        error.message
+      );
+
+      $("adminLiveChatStatus").textContent =
+        "Unable to send message.";
+
+      return;
+
+    }
+
+
+    input.value = "";
+
+    $("adminLiveChatStatus").textContent =
+      "Sent.";
+
+    await loadAdminLiveChatMessages();
+
+  }
+);
+
   $("refreshAdminLiveChatBtn")?.addEventListener(
   "click",
   async () => {
