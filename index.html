@@ -5797,6 +5797,79 @@ $("resolveSupportBtn")?.addEventListener(
   }
 );
 
+  $("sendLiveChatBtn")?.addEventListener(
+  "click",
+  async () => {
+
+    if (!currentUser) {
+
+      $("liveChatStatus").textContent =
+        "Please log in to use Live Chat.";
+
+      return;
+
+    }
+
+
+    const input =
+      $("liveChatInput");
+
+    const message =
+      input?.value.trim();
+
+
+    if (!message) {
+
+      return;
+
+    }
+
+
+    $("liveChatStatus").textContent =
+      "Sending...";
+
+
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("live_chat_messages")
+      .insert({
+
+        user_id:
+          currentUser.id,
+
+        sender:
+          "user",
+
+        message:
+          message
+
+      });
+
+
+    if (error) {
+
+      console.error(
+        "Live chat send error:",
+        error.message
+      );
+
+      $("liveChatStatus").textContent =
+        "Unable to send message.";
+
+      return;
+
+    }
+
+
+    input.value = "";
+
+    $("liveChatStatus").textContent =
+      "Sent.";
+
+  }
+);
 
 $("closeLiveChatBtn")?.addEventListener(
   "click",
