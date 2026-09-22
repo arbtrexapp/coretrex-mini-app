@@ -5783,5 +5783,109 @@ $("resolveSupportBtn")?.addEventListener(
 >
   💬 Live Chat
 </button>
+  <div
+  id="liveChatPanel"
+  class="hidden"
+  style="
+    position:fixed;
+    right:18px;
+    bottom:145px;
+    width:calc(100% - 36px);
+    max-width:380px;
+    z-index:9998;
+    background:var(--card, #fff);
+    border:1px solid rgba(0,0,0,.12);
+    border-radius:16px;
+    overflow:hidden;
+  "
+>
+
+  <div
+    style="
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid rgba(0,0,0,.08);
+    "
+  >
+
+    <div>
+      <strong>Live Chat</strong>
+      <div class="muted" style="font-size:12px">
+        Coretrex Support
+      </div>
+    </div>
+
+    <button
+      id="closeLiveChatBtn"
+      type="button"
+      class="btn secondary"
+      style="width:auto;padding:8px 11px"
+    >
+      ✕
+    </button>
+
+  </div>
+
+
+  <div
+    id="liveChatMessages"
+    style="
+      height:300px;
+      overflow-y:auto;
+      padding:12px;
+    "
+  >
+
+    <div class="empty">
+      Loading chat...
+    </div>
+
+  </div>
+
+
+  <div
+    style="
+      padding:10px;
+      border-top:1px solid rgba(0,0,0,.08);
+    "
+  >
+
+    <div
+      style="
+        display:flex;
+        gap:8px;
+        align-items:center;
+      "
+    >
+
+      <input
+        type="text"
+        id="liveChatInput"
+        placeholder="Write a message"
+        style="flex:1"
+      >
+
+      <button
+        id="sendLiveChatBtn"
+        type="button"
+        class="btn"
+        style="width:auto;padding:11px 14px"
+      >
+        Send
+      </button>
+
+    </div>
+
+    <p
+      id="liveChatStatus"
+      class="muted"
+      style="margin:7px 2px 0"
+    ></p>
+
+  </div>
+
+  </div>
 </body>
 </html>
