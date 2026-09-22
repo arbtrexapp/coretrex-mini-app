@@ -1654,7 +1654,7 @@ async function loadAccount() {
   await supabaseClient
     .from("accounts")
     .select(
-      "available_balance, invested_capital, realized_pl"
+      "available_balance, invested_capital, realized_pl, referral_balance"
     )
     .eq(
       "user_id",
@@ -1682,6 +1682,65 @@ async function loadAccount() {
     money(
       data.realized_pl
     );
+
+
+  if ($("referralBalance")) {
+
+    $("referralBalance").textContent =
+      money(
+        data.referral_balance || 0
+      );
+
+  }
+
+
+  const {
+    data:
+      profile,
+    error:
+      profileError
+  } =
+  await supabaseClient
+    .from("profiles")
+    .select(
+      "referral_code"
+    )
+    .eq(
+      "id",
+      currentUser.id
+    )
+    .maybeSingle();
+
+
+  if (
+    profileError ||
+    !profile
+  ) {
+    return;
+  }
+
+
+  if ($("referralCode")) {
+
+    $("referralCode").textContent =
+      profile.referral_code || "Not available";
+
+  }
+
+
+  if ($("referralLink")) {
+
+    $("referralLink").textContent =
+      profile.referral_code
+        ? window.location.origin +
+          window.location.pathname +
+          "?ref=" +
+          encodeURIComponent(
+            profile.referral_code
+          )
+        : "Not available";
+
+  }
 
 }
 
