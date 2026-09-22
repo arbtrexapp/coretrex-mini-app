@@ -6239,6 +6239,19 @@ async function loadAdminLiveChatUsers() {
 
 } 
 
+  $("refreshAdminLiveChatBtn")?.addEventListener(
+  "click",
+  async () => {
+
+    if (!isAdmin) {
+      return;
+    }
+
+    await loadAdminLiveChatUsers();
+
+  }
+);
+
 })();
   
 </script>
