@@ -5881,6 +5881,127 @@ $("closeLiveChatBtn")?.addEventListener(
 
   }
 );
+  async function loadLiveChatMessages() {
+
+  const box =
+    $("liveChatMessages");
+
+  if (!box || !currentUser) return;
+
+
+  box.innerHTML =
+    '<div class="empty">Hello 👋, how can we help you today?</div>';
+
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+    .from("live_chat_messages")
+    .select(
+      "id, sender, message, created_at"
+    )
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .order(
+      "created_at",
+      {
+        ascending: true
+      }
+    );
+
+
+  if (error) {
+
+    console.error(
+      "Live chat load error:",
+      error.message
+    );
+
+    box.innerHTML =
+      '<div class="empty">Unable to load chat.</div>';
+
+    return;
+
+  }
+
+
+  if (!data || data.length === 0) {
+
+    box.innerHTML =
+      '<div class="empty">Start a conversation with Coretrex Support.</div>';
+
+    return;
+
+  }
+
+
+  box.innerHTML = "";
+
+
+  data.forEach(
+    item => {
+
+      const row =
+        document.createElement("div");
+
+      row.style.marginBottom =
+        "10px";
+
+      row.style.textAlign =
+        item.sender === "user"
+          ? "right"
+          : "left";
+
+
+      const bubble =
+        document.createElement("div");
+
+      bubble.textContent =
+        item.message;
+
+      bubble.style.display =
+        "inline-block";
+
+      bubble.style.maxWidth =
+        "85%";
+
+      bubble.style.padding =
+        "9px 12px";
+
+      bubble.style.borderRadius =
+        "12px";
+
+      bubble.style.background =
+        item.sender === "user"
+          ? "rgba(0,128,0,.12)"
+          : "rgba(0,0,0,.06)";
+
+
+      row.appendChild(bubble);
+
+      box.appendChild(row);
+
+    }
+  );
+
+
+  box.scrollTop =
+    box.scrollHeight;
+
+}
+
+  $("liveChatFloatBtn")?.addEventListener(
+  "click",
+  async () => {
+
+    await loadLiveChatMessages();
+
+  }
+);
 
 })();
   
