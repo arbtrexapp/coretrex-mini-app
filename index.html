@@ -5264,6 +5264,311 @@ $("transferReferralBtn")?.addEventListener(
   }
 );
 
+let selectedSupportMessageId = null;
+
+
+async function loadAdminSupportMessages() {
+
+  const list =
+    $("adminSupportList");
+
+  if (!list || !currentUser) return;
+
+
+  list.innerHTML =
+    '<div class="empty">Loading messages...</div>';
+
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+    .from("support_messages")
+    .select(
+      "id, user_id, subject, message, admin_reply, status, created_at"
+    )
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
+    );
+
+
+  if (error) {
+
+    console.error(
+      "Support messages error:",
+      error.message
+    );
+
+    list.innerHTML =
+      '<div class="empty">Unable to load support messages.</div>';
+
+    return;
+
+  }
+
+
+  if (!data || data.length === 0) {
+
+    list.innerHTML =
+      '<div class="empty">No support messages yet.</div>';
+
+    return;
+
+  }
+
+
+  list.innerHTML = "";
+
+
+  data.forEach(
+    (item) => {
+
+      const card =
+        document.createElement("div");
+
+      card.className =
+        "card";
+
+      card.style.marginTop =
+        "10px";
+
+
+      card.innerHTML = `
+
+        <div class="label">
+          ${item.status || "open"}
+        </div>
+
+        <h3 style="margin:6px 0">
+          ${item.subject}
+        </h3>
+
+        <p class="muted">
+          ${item.message}
+        </p>
+
+        ${
+          item.admin_reply
+            ? `
+              <div class="label"
+                   style="margin-top:12px">
+                ADMIN REPLY
+              </div>
+
+              <p>
+                ${item.admin_reply}
+              </p>
+            `
+            : ""
+        }
+
+        <button
+          class="btn secondary supportReplySelect"
+          type="button"
+          style="margin-top:10px"
+        >
+          ${
+            item.admin_reply
+              ? "Reply Again"
+              : "Reply"
+          }
+        </button>
+
+      `;
+
+
+      const replyButton =
+        card.querySelector(
+          ".supportReplySelect"
+        );
+
+
+      replyButton.addEventListener(
+        "click",
+        () => {
+
+          selectedSupportMessageId =
+            item.id;
+
+
+          $("adminSupportReply")
+            ?.classList
+            .remove("hidden");
+
+
+          $("adminSupportReplyText")
+            .value = "";
+
+
+          $("adminSupportMessage")
+            .textContent =
+            "Replying to: " +
+            item.subject;
+
+          $("adminSupportReplyText")
+            ?.focus();
+
+        }
+      );
+
+
+      list.appendChild(card);
+
+    }
+  );
+
+}
+
+
+$("refreshSupportBtn")?.addEventListener(
+  "click",
+  async () => {
+
+    await loadAdminSupportMessages();
+
+  }
+);
+
+
+$("sendSupportReplyBtn")?.addEventListener(
+  "click",
+  async () => {
+
+    if (!selectedSupportMessageId) {
+
+      return;
+
+    }
+
+
+    const reply =
+      $("adminSupportReplyText")
+        ?.value
+        .trim();
+
+
+    if (!reply) {
+
+      $("adminSupportMessage")
+        .textContent =
+        "Please write a reply.";
+
+      return;
+
+    }
+
+
+    $("adminSupportMessage")
+      .textContent =
+      "Sending reply...";
+
+
+    const {
+      error
+    } =
+    await supabaseClient.rpc(
+      "admin_reply_support_message",
+      {
+        p_message_id:
+          selectedSupportMessageId,
+
+        p_reply:
+          reply
+      }
+    );
+
+
+    if (error) {
+
+      console.error(
+        "Admin reply error:",
+        error.message
+      );
+
+      $("adminSupportMessage")
+        .textContent =
+        error.message;
+
+      return;
+
+    }
+
+
+    $("adminSupportMessage")
+      .textContent =
+      "Reply saved successfully.";
+
+
+    $("adminSupportReplyText")
+      .value = "";
+
+
+    await loadAdminSupportMessages();
+
+  }
+);
+
+
+$("resolveSupportBtn")?.addEventListener(
+  "click",
+  async () => {
+
+    if (!selectedSupportMessageId) {
+
+      return;
+
+    }
+
+
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("support_messages")
+      .update({
+        status:
+          "resolved",
+
+        resolved_at:
+          new Date().toISOString()
+
+      })
+      .eq(
+        "id",
+        selectedSupportMessageId
+      );
+
+
+    if (error) {
+
+      console.error(
+        "Resolve support error:",
+        error.message
+      );
+
+      $("adminSupportMessage")
+        .textContent =
+        error.message;
+
+      return;
+
+    }
+
+
+    $("adminSupportMessage")
+      .textContent =
+      "Message marked as resolved.";
+
+
+    await loadAdminSupportMessages();
+
+  }
+);  
+
 })();
   
 </script>
