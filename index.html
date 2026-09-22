@@ -412,32 +412,79 @@
     </div>
   </div>
 
+
   <div class="card">
+
     <div class="label">SUPPORT</div>
+
     <h3>Contact Us</h3>
 
     <p class="muted">
-      If you need assistance with your Coretrex account or have
-      questions about the platform, please contact the support team
-      through the official support channel provided to you.
+      Have a question or need assistance? Send us a message
+      and our support team will review your request.
     </p>
+
   </div>
+
 
   <div class="card">
-    <div class="label">ACCOUNT SUPPORT</div>
-    <h3>Need Help?</h3>
 
-    <p class="muted">
-      When contacting support, include your account email and a clear
-      description of the issue so it can be reviewed properly.
-    </p>
+    <div class="label">SEND A MESSAGE</div>
+
+    <form id="contactForm">
+
+      <div class="label">
+        SUBJECT
+      </div>
+
+      <input
+        type="text"
+        id="contactSubject"
+        placeholder="Enter subject"
+        required
+      >
+
+      <div
+        class="label"
+        style="margin-top:15px"
+      >
+        MESSAGE
+      </div>
+
+      <textarea
+        id="contactMessage"
+        placeholder="Write your message"
+        rows="6"
+        required
+      ></textarea>
+
+      <button
+        type="submit"
+        class="btn"
+        style="margin-top:15px"
+      >
+        Send Message
+      </button>
+
+      <p
+        id="contactFormMessage"
+        class="muted"
+        style="margin-top:10px"
+      ></p>
+
+    </form>
+
   </div>
 
-  <button type="button" data-screen="homeScreen">
+
+  <button
+    type="button"
+    data-screen="homeScreen"
+  >
     Back to Account
   </button>
 
-  </section>
+</section>
 
   <!-- DEPOSIT -->
   <section id="depositScreen" class="screen">
