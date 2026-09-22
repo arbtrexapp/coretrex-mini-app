@@ -1529,36 +1529,76 @@ $("loginBtn").onclick =
 
 
     const {
-      data,
-      error
-    } =
-    await supabaseClient.auth
-      .signInWithPassword({
+  data,
+  error
+} =
+await supabaseClient.auth
+  .signInWithPassword({
 
-        email,
-        password
+    email,
+    password
 
-      });
+  });
 
 
-    if (error) {
+if (error) {
 
-      $("loginMessage").textContent =
-        error.message;
+  $("loginMessage").textContent =
+    error.message;
 
-      return;
+  return;
 
+}
+
+
+currentUser =
+  data.user;
+
+
+/*
+  Register the referral code used
+  during account signup.
+*/
+if (referralCodeFromUrl) {
+
+  const {
+    error:
+      referralError
+  } =
+  await supabaseClient.rpc(
+    "register_referral_by_code",
+    {
+      p_referral_code:
+        referralCodeFromUrl
     }
+  );
 
 
-    currentUser =
-      data.user;
+  /*
+    Ignore duplicate/already-registered
+    referral errors so they do not stop login.
+  */
+  if (
+    referralError &&
+    !referralError.message
+      .toLowerCase()
+      .includes("already been referred")
+  ) {
 
-    await openApp();
+    console.error(
+      "Referral registration:",
+      referralError.message
+    );
+
+  }
+
+}
+
+
+await openApp();
 
   };
-
-
+  
 async function checkAdmin() {
 
   if (!currentUser) {
