@@ -6775,6 +6775,36 @@ async function loadAdminLiveChatUsers() {
 
     await loadNotifications();
 
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("notifications")
+      .update({
+        is_read: true
+      })
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .eq(
+        "is_read",
+        false
+      );
+
+    if (error) {
+
+      console.error(
+        "Notification read error:",
+        error.message
+      );
+
+      return;
+
+    }
+
+    await loadNotificationUnreadCount();
+
   }
 );
 
