@@ -1959,6 +1959,49 @@ if (id === "contactScreen") {
 
 }
 
+  async function createNotification(
+  userId,
+  title,
+  message,
+  type
+) {
+
+  if (!userId) {
+    return;
+  }
+
+  const {
+    error
+  } =
+  await supabaseClient
+    .from("notifications")
+    .insert({
+
+      user_id:
+        userId,
+
+      title:
+        title,
+
+      message:
+        message,
+
+      type:
+        type
+
+    });
+
+  if (error) {
+
+    console.error(
+      "Notification creation error:",
+      error.message
+    );
+
+  }
+
+}
+
 document
   .querySelectorAll("[data-screen]")
   .forEach(btn => {
