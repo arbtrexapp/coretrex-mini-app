@@ -2639,6 +2639,13 @@ $("submitDepositBtn").onclick =
       .className =
         "success";
 
+    await createNotification(
+  currentUser.id,
+  "Deposit Submitted",
+  "Your deposit has been submitted and is now pending review.",
+  "deposit_submitted"
+);
+
 
     $("depositAmount")
       .value = "";
