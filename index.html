@@ -4080,14 +4080,6 @@ $("verifySecurityCodeBtn").onclick =
       .className =
         "success";
 
-    await createNotification(
-  currentUser.id,
-  "Withdrawal Submitted",
-  "Your withdrawal request has been submitted and is now pending processing.",
-  "withdrawal_submitted"
-);
-
-
     await loadActivity();
 
   };
