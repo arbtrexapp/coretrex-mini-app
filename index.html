@@ -1765,6 +1765,133 @@ if (id === "contactScreen") {
   
 }
 
+  async function loadNotifications() {
+
+  const list =
+    $("notificationsList");
+
+  if (!list || !currentUser) {
+    return;
+  }
+
+  list.innerHTML =
+    '<div class="empty">Loading notifications...</div>';
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+    .from("notifications")
+    .select(
+      "id, title, message, type, is_read, created_at"
+    )
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
+    );
+
+  if (error) {
+
+    console.error(
+      "Notifications load error:",
+      error.message
+    );
+
+    list.innerHTML =
+      '<div class="empty">Unable to load notifications.</div>';
+
+    return;
+
+  }
+
+  if (!data || data.length === 0) {
+
+    list.innerHTML =
+      '<div class="empty">No notifications yet.</div>';
+
+    return;
+
+  }
+
+  list.innerHTML = "";
+
+  data.forEach(
+    item => {
+
+      const card =
+        document.createElement("div");
+
+      card.className =
+        "card";
+
+      card.style.marginBottom =
+        "10px";
+
+      const row =
+        document.createElement("div");
+
+      row.className =
+        "row";
+
+      const content =
+        document.createElement("div");
+
+      const title =
+        document.createElement("strong");
+
+      title.textContent =
+        item.title;
+
+      const message =
+        document.createElement("div");
+
+      message.className =
+        "muted";
+
+      message.style.marginTop =
+        "6px";
+
+      message.textContent =
+        item.message;
+
+      const date =
+        document.createElement("div");
+
+      date.className =
+        "muted";
+
+      date.style.marginTop =
+        "8px";
+
+      date.style.fontSize =
+        "11px";
+
+      date.textContent =
+        new Date(
+          item.created_at
+        ).toLocaleDateString();
+
+      content.appendChild(title);
+      content.appendChild(message);
+      content.appendChild(date);
+
+      row.appendChild(content);
+
+      card.appendChild(row);
+
+      list.appendChild(card);
+
+    }
+  );
+
+}
 
 document
   .querySelectorAll("[data-screen]")
