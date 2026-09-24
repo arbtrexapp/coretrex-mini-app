@@ -4452,7 +4452,7 @@ $("adminBtn").onclick =
       "adminScreen"
     );
 
-    alert("ADMIN BUTTON IS WORKING");
+    await loadAdminData();
 
   };
 
@@ -4469,18 +4469,20 @@ async function loadAdminData() {
       "Loading admin data...";
 
 
-  await Promise.all([
-    loadPendingDeposits(),
-    loadPendingWithdrawals(),
-    loadApprovedWithdrawals()
-  ]);
+await Promise.all([
+  loadPendingDeposits(),
+  loadPendingWithdrawals(),
+  loadApprovedWithdrawals(),
+  loadAdminSupportMessages(),
+  loadAdminLiveChatUsers(),
+  loadAdminNotificationUsers()
+]);
 
 
-  $("adminMessage")
+$("adminMessage")
     .textContent = "";
 
 }
-
   async function loadAdminNotificationUsers() {
 
   const select =
