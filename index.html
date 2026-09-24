@@ -4476,15 +4476,9 @@ async function loadAdminNotificationUsers() {
     data,
     error
   } =
-  await supabaseClient
-    .from("accounts")
-    .select("user_id")
-    .order(
-      "created_at",
-      {
-        ascending: true
-      }
-    );
+  await supabaseClient.rpc(
+    "admin_list_notification_users"
+  );
 
   if (error) {
 
@@ -4520,8 +4514,9 @@ async function loadAdminNotificationUsers() {
         user.user_id;
 
       option.textContent =
-        "User — " +
-        user.user_id;
+        user.email
+          ? user.email
+          : "User — " + user.user_id;
 
       select.appendChild(option);
 
@@ -4529,7 +4524,6 @@ async function loadAdminNotificationUsers() {
   );
 
 }
-
 
 async function sendAdminGeneralNotification() {
 
