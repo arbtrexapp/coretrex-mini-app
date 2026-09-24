@@ -2586,6 +2586,114 @@ async function forgotPassword() {
   "click",
   forgotPassword
 );
+
+  $("updatePasswordBtn")?.addEventListener(
+  "click",
+  async () => {
+
+    const newPassword =
+      $("newPassword")?.value;
+
+    const confirmPassword =
+      $("confirmNewPassword")?.value;
+
+    const message =
+      $("resetPasswordMessage");
+
+    if (!newPassword || !confirmPassword) {
+
+      if (message) {
+        message.textContent =
+          "Enter and confirm your new password.";
+        message.className =
+          "error";
+      }
+
+      return;
+    }
+
+    if (newPassword.length < 6) {
+
+      if (message) {
+        message.textContent =
+          "Password must be at least 6 characters.";
+        message.className =
+          "error";
+      }
+
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+
+      if (message) {
+        message.textContent =
+          "Passwords do not match.";
+        message.className =
+          "error";
+      }
+
+      return;
+    }
+
+    const button =
+      $("updatePasswordBtn");
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Updating...";
+    }
+
+    if (message) {
+      message.textContent =
+        "Updating your password...";
+      message.className =
+        "muted";
+    }
+
+    const {
+      error
+    } =
+    await supabaseClient.auth.updateUser({
+      password:
+        newPassword
+    });
+
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Update Password";
+    }
+
+    if (error) {
+
+      console.error(
+        "Password update error:",
+        error.message
+      );
+
+      if (message) {
+        message.textContent =
+          error.message ||
+          "Unable to update password.";
+        message.className =
+          "error";
+      }
+
+      return;
+    }
+
+    $("newPassword").value = "";
+    $("confirmNewPassword").value = "";
+
+    if (message) {
+      message.textContent =
+        "Password updated successfully. You can now log in.";
+      message.className =
+        "success";
+    }
+
+  }
+);
   
   
 async function checkAdmin() {
@@ -6633,6 +6741,25 @@ supabaseClient.auth
           session.user;
 
         await openApp();
+
+      }
+
+            if (event === "PASSWORD_RECOVERY") {
+
+        $("loginForm")
+          .classList.add("hidden");
+
+        $("registerForm")
+          .classList.add("hidden");
+
+        $("resetPasswordForm")
+          .classList.remove("hidden");
+
+        $("authScreen")
+          .classList.remove("hidden");
+
+        $("app")
+          .classList.add("hidden");
 
       }
 
