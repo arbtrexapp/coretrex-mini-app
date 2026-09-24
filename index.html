@@ -2455,6 +2455,89 @@ if (referralCodeFromUrl) {
 await openApp();
 
   };
+
+async function forgotPassword() {
+
+  const email =
+    $("loginEmail")?.value.trim();
+
+  const message =
+    $("loginMessage");
+
+  if (!email) {
+
+    if (message) {
+      message.textContent =
+        "Please enter your registered email address.";
+      message.className =
+        "error";
+    }
+
+    return;
+  }
+
+  const button =
+    $("forgotPasswordBtn");
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Sending...";
+  }
+
+  if (message) {
+    message.textContent =
+      "Sending password reset instructions...";
+    message.className =
+      "muted";
+  }
+
+  const {
+    error
+  } =
+  await supabaseClient.auth.resetPasswordForEmail(
+    email,
+    {
+      redirectTo:
+        "https://arbtrexapp.github.io/coretrex-mini-app/"
+    }
+  );
+
+  if (button) {
+    button.disabled = false;
+    button.textContent = "Forgot Password?";
+  }
+
+  if (error) {
+
+    console.error(
+      "Password reset error:",
+      error.message
+    );
+
+    if (message) {
+      message.textContent =
+        error.message ||
+        "Unable to send password reset email.";
+      message.className =
+        "error";
+    }
+
+    return;
+  }
+
+  if (message) {
+    message.textContent =
+      "Password reset instructions have been sent to your email.";
+    message.className =
+      "success";
+  }
+
+}
+  $("forgotPasswordBtn")?.addEventListener(
+  "click",
+  forgotPassword
+);
+  
   
 async function checkAdmin() {
 
