@@ -1539,6 +1539,115 @@
   </div>
 
 </div>
+
+    <!-- ADMIN NOTIFICATIONS -->
+
+<div class="card">
+
+  <div
+    class="row"
+    style="align-items:center"
+  >
+
+    <div>
+
+      <h3 style="margin:0 0 4px">
+        Admin Notifications
+      </h3>
+
+      <div class="muted">
+        Send notifications to users.
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- SPECIFIC USER -->
+
+  <div style="margin-top:18px">
+
+    <div class="label">
+      NOTIFY SPECIFIC USER
+    </div>
+
+    <select id="adminNotificationUser">
+
+      <option value="">
+        Select user
+      </option>
+
+    </select>
+
+    <input
+      type="text"
+      id="adminNotificationTitle"
+      placeholder="Notification title"
+    >
+
+    <textarea
+      id="adminNotificationMessage"
+      placeholder="Write your notification"
+      rows="4"
+      style="margin-top:7px"
+    ></textarea>
+
+    <button
+      id="sendAdminUserNotificationBtn"
+      class="btn"
+      type="button"
+      style="margin-top:10px"
+    >
+      Send to User
+    </button>
+
+  </div>
+
+  <!-- ALL USERS -->
+
+  <div
+    style="
+      margin-top:24px;
+      padding-top:18px;
+      border-top:1px solid #202b39;
+    "
+  >
+
+    <div class="label">
+      NOTIFY ALL USERS
+    </div>
+
+    <input
+      type="text"
+      id="adminGeneralNotificationTitle"
+      placeholder="Notification title"
+    >
+
+    <textarea
+      id="adminGeneralNotificationMessage"
+      placeholder="Write your notification"
+      rows="4"
+      style="margin-top:7px"
+    ></textarea>
+
+    <button
+      id="sendAdminGeneralNotificationBtn"
+      class="btn"
+      type="button"
+      style="margin-top:10px"
+    >
+      Send to All Users
+    </button>
+
+  </div>
+
+  <p
+    id="adminNotificationStatus"
+    class="muted"
+    style="margin:10px 2px 0"
+  ></p>
+
+</div>
     
 
     <!-- APPROVED WITHDRAWALS -->
