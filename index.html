@@ -4460,131 +4460,73 @@ async function loadAdminData() {
 }
 
 
-async function sendAdminUserNotification() {
+async function loadAdminNotificationUsers() {
 
-  if (!isAdmin) {
+  const select =
+    $("adminNotificationUser");
+
+  if (!select || !isAdmin) {
     return;
   }
 
-  const userId =
-    $("adminNotificationUser")?.value;
-
-  const title =
-    $("adminNotificationTitle")
-      ?.value
-      .trim();
-
-  const message =
-    $("adminNotificationMessage")
-      ?.value
-      .trim();
-
-  const status =
-    $("adminNotificationStatus");
-
-  if (!userId) {
-
-    if (status) {
-      status.textContent =
-        "Please select a user.";
-      status.className =
-        "error";
-    }
-
-    return;
-  }
-
-  if (!title) {
-
-    if (status) {
-      status.textContent =
-        "Please enter a notification title.";
-      status.className =
-        "error";
-    }
-
-    return;
-  }
-
-  if (!message) {
-
-    if (status) {
-      status.textContent =
-        "Please enter a notification message.";
-      status.className =
-        "error";
-    }
-
-    return;
-  }
-
-  const button =
-    $("sendAdminUserNotificationBtn");
-
-  if (button) {
-    button.disabled = true;
-    button.textContent = "Sending...";
-  }
-
-  if (status) {
-    status.textContent =
-      "Sending notification...";
-    status.className =
-      "muted";
-  }
+  select.innerHTML =
+    '<option value="">Loading users...</option>';
 
   const {
+    data,
     error
   } =
-  await supabaseClient.rpc(
-    "admin_send_notification",
-    {
-      p_user_id:
-        userId,
-
-      p_title:
-        title,
-
-      p_message:
-        message,
-
-      p_type:
-        "admin_notification"
-    }
-  );
-
-  if (button) {
-    button.disabled = false;
-    button.textContent = "Send to User";
-  }
+  await supabaseClient
+    .from("accounts")
+    .select("user_id")
+    .order(
+      "created_at",
+      {
+        ascending: true
+      }
+    );
 
   if (error) {
 
     console.error(
-      "Admin user notification error:",
+      "Admin notification users error:",
       error.message
     );
 
-    if (status) {
-      status.textContent =
-        error.message ||
-        "Unable to send notification.";
-      status.className =
-        "error";
-    }
+    select.innerHTML =
+      '<option value="">Unable to load users</option>';
 
     return;
   }
 
-  $("adminNotificationTitle").value = "";
-  $("adminNotificationMessage").value = "";
+  select.innerHTML =
+    '<option value="">Select user</option>';
 
-  if (status) {
-    status.textContent =
-      "Notification sent successfully.";
-    status.className =
-      "success";
+  if (!data || data.length === 0) {
+
+    select.innerHTML =
+      '<option value="">No users found</option>';
+
+    return;
   }
+
+  data.forEach(
+    user => {
+
+      const option =
+        document.createElement("option");
+
+      option.value =
+        user.user_id;
+
+      option.textContent =
+        "User — " +
+        user.user_id;
+
+      select.appendChild(option);
+
+    }
+  );
 
 }
 
