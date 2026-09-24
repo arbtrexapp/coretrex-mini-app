@@ -4394,88 +4394,6 @@ async function loadAdminData() {
     data,
     error
   } =
-  await supabaseClient
-    .from("accounts")
-    .select(
-      "user_id, email, full_name"
-    )
-    .order(
-      "email",
-      {
-        ascending: true
-      }
-    );
-
-  if (error) {
-
-    console.error(
-      "Admin notification users error:",
-      error.message
-    );
-
-    select.innerHTML =
-      '<option value="">Unable to load users</option>';
-
-    return;
-  }
-
-  select.innerHTML =
-    '<option value="">Select user</option>';
-
-  if (!data || data.length === 0) {
-
-    select.innerHTML =
-      '<option value="">No users found</option>';
-
-    return;
-  }
-
-  data.forEach(
-    user => {
-
-      const option =
-        document.createElement("option");
-
-      option.value =
-        user.user_id;
-
-      const name =
-        user.full_name
-          ? user.full_name
-          : "User";
-
-      const email =
-        user.email
-          ? user.email
-          : user.user_id;
-
-      option.textContent =
-        name + " — " + email;
-
-      select.appendChild(option);
-
-    }
-  );
-
-}
-
-
-async function loadAdminNotificationUsers() {
-
-  const select =
-    $("adminNotificationUser");
-
-  if (!select || !isAdmin) {
-    return;
-  }
-
-  select.innerHTML =
-    '<option value="">Loading users...</option>';
-
-  const {
-    data,
-    error
-  } =
   await supabaseClient.rpc(
     "admin_list_notification_users"
   );
@@ -4522,6 +4440,134 @@ async function loadAdminNotificationUsers() {
 
     }
   );
+
+}
+
+  async function sendAdminUserNotification() {
+
+  if (!isAdmin) {
+    return;
+  }
+
+  const userId =
+    $("adminNotificationUser")?.value;
+
+  const title =
+    $("adminNotificationTitle")
+      ?.value
+      .trim();
+
+  const message =
+    $("adminNotificationMessage")
+      ?.value
+      .trim();
+
+  const status =
+    $("adminNotificationStatus");
+
+  if (!userId) {
+
+    if (status) {
+      status.textContent =
+        "Please select a user.";
+      status.className =
+        "error";
+    }
+
+    return;
+  }
+
+  if (!title) {
+
+    if (status) {
+      status.textContent =
+        "Please enter a notification title.";
+      status.className =
+        "error";
+    }
+
+    return;
+  }
+
+  if (!message) {
+
+    if (status) {
+      status.textContent =
+        "Please enter a notification message.";
+      status.className =
+        "error";
+    }
+
+    return;
+  }
+
+  const button =
+    $("sendAdminUserNotificationBtn");
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Sending...";
+  }
+
+  if (status) {
+    status.textContent =
+      "Sending notification...";
+    status.className =
+      "muted";
+  }
+
+  const {
+    error
+  } =
+  await supabaseClient.rpc(
+    "admin_send_notification",
+    {
+      p_user_id:
+        userId,
+
+      p_title:
+        title,
+
+      p_message:
+        message,
+
+      p_type:
+        "admin_notification"
+    }
+  );
+
+  if (button) {
+    button.disabled = false;
+    button.textContent = "Send to User";
+  }
+
+  if (error) {
+
+    console.error(
+      "Admin user notification error:",
+      error.message
+    );
+
+    if (status) {
+      status.textContent =
+        error.message ||
+        "Unable to send notification.";
+      status.className =
+        "error";
+    }
+
+    return;
+  }
+
+  $("adminNotificationTitle").value = "";
+  $("adminNotificationMessage").value = "";
+
+  if (status) {
+    status.textContent =
+      "Notification sent successfully.";
+    status.className =
+      "success";
+  }
 
 }
 
