@@ -1571,13 +1571,21 @@
       NOTIFY SPECIFIC USER
     </div>
 
-    <select id="adminNotificationUser">
+    <div
+      id="adminNotificationUserList"
+      style="margin-top:7px"
+    >
 
-      <option value="">
-        Select user
-      </option>
+      <div class="muted">
+        Loading users...
+      </div>
 
-    </select>
+    </div>
+
+    <input
+      type="hidden"
+      id="adminNotificationUser"
+    >
 
     <input
       type="text"
@@ -1622,7 +1630,7 @@
       placeholder="Notification title"
     >
 
-    <input
+    <input 
       type="text"
       id="adminGeneralNotificationMessage"
       placeholder="Write your notification"
@@ -1922,17 +1930,9 @@ if (id === "contactScreen") {
 
 }
   
-  if (id === "adminScreen" && isAdmin) {
+    if (id === "adminScreen" && isAdmin) {
 
   loadAdminData();
-
-  loadAdminSupportMessages();
-
-}
-
-  if (id === "adminScreen" && isAdmin) {
-
-  loadAdminLiveChatUsers();
 
 }
   
@@ -4473,6 +4473,8 @@ await Promise.all([
   loadPendingDeposits(),
   loadPendingWithdrawals(),
   loadApprovedWithdrawals(),
+  loadAdminSupportMessages(),
+  loadAdminLiveChatUsers(),
   loadAdminNotificationUsers()
 ]);
 
@@ -4484,68 +4486,166 @@ $("adminMessage")
   
   async function loadAdminNotificationUsers() {
 
-  const select =
-    $("adminNotificationUser");
+  const list =
+    $("adminNotificationUserList");
 
-  if (!select || !isAdmin) {
+  const status =
+    $("adminNotificationStatus");
+
+  if (!list || !isAdmin) {
     return;
   }
 
-  select.innerHTML =
-    '<option value="">Loading users...</option>';
+  list.innerHTML =
+    '<div class="muted">Loading users...</div>';
 
-  const {
-    data,
-    error
-  } =
-  await supabaseClient.rpc(
-    "admin_list_notification_users"
-  );
+  try {
 
-  if (error) {
-
-    console.error(
-      "Admin notification users error:",
-      error.message
+    const {
+      data,
+      error
+    } =
+    await supabaseClient.rpc(
+      "admin_list_notification_users"
     );
 
-    select.innerHTML =
-      '<option value="">Unable to load users</option>';
+    if (error) {
 
-    return;
-  }
+      console.error(
+        "Admin notification users error:",
+        error.message
+      );
 
-  select.innerHTML =
-    '<option value="">Select user</option>';
+      list.innerHTML =
+        '<div class="error">' +
+        "Unable to load users." +
+        "</div>";
 
-  if (!data || data.length === 0) {
-
-    select.innerHTML =
-      '<option value="">No users found</option>';
-
-    return;
-  }
-
-  data.forEach(
-    user => {
-
-      const option =
-        document.createElement("option");
-
-      option.value =
-        user.user_id;
-
-      option.textContent =
-        user.email
-          ? user.email
-          : "User — " + user.user_id;
-
-      select.appendChild(option);
-
+      return;
     }
-  );
+
+    if (!data || data.length === 0) {
+
+      list.innerHTML =
+        '<div class="empty">' +
+        "No users found." +
+        "</div>";
+
+      return;
+    }
+
+    list.innerHTML = "";
+
+    data.forEach(
+      user => {
+
+        const item =
+          document.createElement("div");
+
+        item.style.cssText =
+          `
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:10px;
+          padding:12px 0;
+          border-bottom:1px solid #202b39;
+          `;
+
+        const name =
+          document.createElement("div");
+
+        name.style.cssText =
+          `
+          min-width:0;
+          word-break:break-word;
+          color:#dbe5f1;
+          font-size:13px;
+          `;
+
+        name.textContent =
+          user.email ||
+          "User — " + user.user_id;
+
+        const button =
+          document.createElement("button");
+
+        button.type =
+          "button";
+
+        button.textContent =
+          "Select";
+
+        button.className =
+          "btn secondary";
+
+        button.style.cssText =
+          `
+          width:auto;
+          padding:8px 12px;
+          flex-shrink:0;
+          `;
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            $("adminNotificationUser").value =
+              user.user_id;
+
+            list
+              .querySelectorAll("button")
+              .forEach(
+                btn => {
+                  btn.textContent =
+                    "Select";
+                }
+              );
+
+            button.textContent =
+              "Selected";
+
+            if (status) {
+
+              status.textContent =
+                "Selected: " +
+                (
+                  user.email ||
+                  user.user_id
+                );
+
+              status.className =
+                "muted";
+
+            }
+
+          }
+        );
+
+        item.appendChild(name);
+        item.appendChild(button);
+
+        list.appendChild(item);
+
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Admin notification users exception:",
+      error
+    );
+
+    list.innerHTML =
+      '<div class="error">' +
+      "Unable to load users." +
+      "</div>";
+
+  }
 
 }
+  
   async function sendAdminUserNotification() {
 
   if (!isAdmin) {
@@ -4571,10 +4671,13 @@ $("adminMessage")
   if (!userId) {
 
     if (status) {
+
       status.textContent =
         "Please select a user.";
+
       status.className =
         "error";
+
     }
 
     return;
@@ -4583,10 +4686,13 @@ $("adminMessage")
   if (!title) {
 
     if (status) {
+
       status.textContent =
         "Please enter a notification title.";
+
       status.className =
         "error";
+
     }
 
     return;
@@ -4595,10 +4701,13 @@ $("adminMessage")
   if (!message) {
 
     if (status) {
+
       status.textContent =
         "Please enter a notification message.";
+
       status.className =
         "error";
+
     }
 
     return;
@@ -4608,15 +4717,23 @@ $("adminMessage")
     $("sendAdminUserNotificationBtn");
 
   if (button) {
-    button.disabled = true;
-    button.textContent = "Sending...";
+
+    button.disabled =
+      true;
+
+    button.textContent =
+      "Sending...";
+
   }
 
   if (status) {
+
     status.textContent =
       "Sending notification...";
+
     status.className =
       "muted";
+
   }
 
   const {
@@ -4640,8 +4757,13 @@ $("adminMessage")
   );
 
   if (button) {
-    button.disabled = false;
-    button.textContent = "Send to User";
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      "Send to User";
+
   }
 
   if (error) {
@@ -4652,24 +4774,33 @@ $("adminMessage")
     );
 
     if (status) {
+
       status.textContent =
         error.message ||
         "Unable to send notification.";
+
       status.className =
         "error";
+
     }
 
     return;
   }
 
-  $("adminNotificationTitle").value = "";
-  $("adminNotificationMessage").value = "";
+  $("adminNotificationTitle").value =
+    "";
+
+  $("adminNotificationMessage").value =
+    "";
 
   if (status) {
+
     status.textContent =
       "Notification sent successfully.";
+
     status.className =
       "success";
+
   }
 
 }
