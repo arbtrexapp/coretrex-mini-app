@@ -4526,9 +4526,10 @@ $("adminMessage")
       );
 
       list.innerHTML =
-        '<div class="error">' +
-        "Unable to load users." +
-        "</div>";
+  '<div class="error">' +
+  "User loading error: " +
+  error.message +
+  "</div>";
 
       return;
     }
