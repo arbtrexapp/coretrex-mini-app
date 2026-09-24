@@ -4507,6 +4507,13 @@ async function loadAdminData() {
     "admin_list_notification_users"
   );
 
+    alert(
+  "Users returned: " +
+  (data ? data.length : 0) +
+  "\nError: " +
+  (error ? error.message : "none")
+);
+
   if (error) {
 
     console.error(
