@@ -1540,6 +1540,51 @@
 
 </div>
 
+    <!-- ADMIN USER OVERVIEW -->
+
+<div class="card">
+
+  <div
+    class="row"
+    style="align-items:center"
+  >
+
+    <div>
+
+      <h3 style="margin:0 0 4px">
+        User Overview
+      </h3>
+
+      <div class="muted">
+        View users, balances and referrals.
+      </div>
+
+    </div>
+
+  </div>
+
+  <div
+    id="adminUserOverviewList"
+    style="margin-top:12px"
+  >
+
+    <div class="muted">
+      Loading users...
+    </div>
+
+  </div>
+
+  <button
+    id="refreshAdminUserOverviewBtn"
+    class="btn secondary"
+    type="button"
+    style="margin-top:10px"
+  >
+    ↻ Refresh Users
+  </button>
+
+</div>
+
     <!-- ADMIN NOTIFICATIONS -->
 
 <div class="card">
@@ -4484,7 +4529,8 @@ await Promise.all([
   loadApprovedWithdrawals(),
   loadAdminSupportMessages(),
   loadAdminLiveChatUsers(),
-  loadAdminNotificationUsers()
+  loadAdminNotificationUsers(),
+  loadAdminUserOverview()
 ]);
 
 
@@ -4687,7 +4733,270 @@ $("refreshAdminNotificationUsersBtn")?.addEventListener(
 
   }
 );
+
+async function loadAdminUserOverview() {
+
+  const list =
+    $("adminUserOverviewList");
+
+  if (!list || !isAdmin) {
+    return;
+  }
+
+  list.innerHTML =
+    '<div class="muted">Loading users...</div>';
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+    await supabaseClient.rpc(
+      "admin_get_user_overview"
+    );
+
+    if (error) {
+
+      console.error(
+        "Admin user overview error:",
+        error.message
+      );
+
+      list.innerHTML =
+        '<div class="error">' +
+        "Unable to load users: " +
+        error.message +
+        "</div>";
+
+      return;
+    }
+
+    if (!data || data.length === 0) {
+
+      list.innerHTML =
+        '<div class="empty">' +
+        "No users found." +
+        "</div>";
+
+      return;
+    }
+
+    const users = {};
+
+    data.forEach(
+      row => {
+
+        if (!users[row.user_id]) {
+
+          users[row.user_id] = {
+            email:
+              row.email ||
+              "User",
+
+            balance:
+              Number(
+                row.available_balance || 0
+              ),
+
+            referralCount:
+              Number(
+                row.referral_count || 0
+              ),
+
+            referrals: []
+
+          };
+
+        }
+
+        if (
+          row.referred_user_id &&
+          row.referred_email
+        ) {
+
+          users[row.user_id]
+            .referrals
+            .push(
+              row.referred_email
+            );
+
+        }
+
+      }
+    );
+
+    list.innerHTML = "";
+
+    Object.values(users)
+      .forEach(
+        user => {
+
+          const card =
+            document.createElement("div");
+
+          card.style.cssText =
+            `
+            padding:14px 0;
+            border-bottom:1px solid #202b39;
+            `;
+
+          const header =
+            document.createElement("div");
+
+          header.style.cssText =
+            `
+            font-weight:700;
+            color:#e8eef7;
+            word-break:break-word;
+            `;
+
+          header.textContent =
+            user.email;
+
+          const balance =
+            document.createElement("div");
+
+          balance.className =
+            "muted";
+
+          balance.style.marginTop =
+            "5px";
+
+          balance.textContent =
+            "Balance: $" +
+            user.balance.toFixed(2);
+
+          const count =
+            document.createElement("div");
+
+          count.className =
+            "muted";
+
+          count.style.marginTop =
+            "3px";
+
+          count.textContent =
+            "Referrals: " +
+            user.referralCount;
+
+          card.appendChild(header);
+          card.appendChild(balance);
+          card.appendChild(count);
+
+          if (
+            user.referrals.length > 0
+          ) {
+
+            const referrals =
+              document.createElement("div");
+
+            referrals.style.cssText =
+              `
+              margin-top:9px;
+              padding-left:12px;
+              color:#b9c7d8;
+              font-size:13px;
+              `;
+
+            user.referrals.forEach(
+              (
+                referral,
+                index
+              ) => {
+
+                const item =
+                  document.createElement("div");
+
+                item.textContent =
+                  "├─ " +
+                  referral;
+
+                referrals.appendChild(
+                  item
+                );
+
+              }
+            );
+
+            card.appendChild(
+              referrals
+            );
+
+          } else {
+
+            const empty =
+              document.createElement("div");
+
+            empty.className =
+              "muted";
+
+            empty.style.marginTop =
+              "9px";
+
+            empty.textContent =
+              "No referrals";
+
+            card.appendChild(
+              empty
+            );
+
+          }
+
+          list.appendChild(card);
+
+        }
+      );
+
+  } catch (error) {
+
+    console.error(
+      "Admin user overview exception:",
+      error
+    );
+
+    list.innerHTML =
+      '<div class="error">' +
+      "Unable to load users: " +
+      error.message +
+      "</div>";
+
+  }
+
+}
+
   
+  $("refreshAdminUserOverviewBtn")?.addEventListener(
+  "click",
+  async () => {
+
+    const button =
+      $("refreshAdminUserOverviewBtn");
+
+    if (button) {
+
+      button.disabled =
+        true;
+
+      button.textContent =
+        "Refreshing...";
+
+    }
+
+    await loadAdminUserOverview();
+
+    if (button) {
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        "↻ Refresh Users";
+
+    }
+
+  }
+);
   
   async function sendAdminUserNotification() {
 
