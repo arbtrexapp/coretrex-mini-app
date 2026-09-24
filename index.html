@@ -2694,6 +2694,25 @@ async function forgotPassword() {
 
   }
 );
+
+  $("backResetLoginBtn")?.addEventListener(
+  "click",
+  () => {
+
+    $("resetPasswordForm")
+      .classList.add("hidden");
+
+    $("registerForm")
+      .classList.add("hidden");
+
+    $("loginForm")
+      .classList.remove("hidden");
+
+    $("resetPasswordMessage").textContent =
+      "";
+
+  }
+);
   
   
 async function checkAdmin() {
