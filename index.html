@@ -4464,7 +4464,7 @@ async function loadAdminData() {
   }
 
 
-  $("adminMessage")
+$("adminMessage")
     .textContent =
       "Loading admin data...";
 
@@ -4473,8 +4473,6 @@ await Promise.all([
   loadPendingDeposits(),
   loadPendingWithdrawals(),
   loadApprovedWithdrawals(),
-  loadAdminSupportMessages(),
-  loadAdminLiveChatUsers(),
   loadAdminNotificationUsers()
 ]);
 
@@ -4483,6 +4481,7 @@ $("adminMessage")
     .textContent = "";
 
 }
+  
   async function loadAdminNotificationUsers() {
 
   const select =
