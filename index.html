@@ -1582,6 +1582,15 @@
 
     </div>
 
+    <button
+  id="refreshAdminNotificationUsersBtn"
+  class="btn secondary"
+  type="button"
+  style="margin-top:10px"
+>
+  Refresh
+    </button>
+
     <input
       type="hidden"
       id="adminNotificationUser"
@@ -4645,6 +4654,39 @@ $("adminMessage")
   }
 
 }
+
+$("refreshAdminNotificationUsersBtn")?.addEventListener(
+  "click",
+  async () => {
+
+    const button =
+      $("refreshAdminNotificationUsersBtn");
+
+    if (button) {
+
+      button.disabled =
+        true;
+
+      button.textContent =
+        "Refreshing...";
+
+    }
+
+    await loadAdminNotificationUsers();
+
+    if (button) {
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        "↻ Refresh Users";
+
+    }
+
+  }
+);
+  
   
   async function sendAdminUserNotification() {
 
