@@ -4483,10 +4483,13 @@ async function loadAdminData() {
 
 }
 
-  async function loadAdminNotificationUsers() {  
+  async function loadAdminNotificationUsers() {
 
   const select =
     $("adminNotificationUser");
+
+  const status =
+    $("adminNotificationStatus");
 
   if (!select || !isAdmin) {
     return;
@@ -4495,63 +4498,108 @@ async function loadAdminData() {
   select.innerHTML =
     '<option value="">Loading users...</option>';
 
-  const {
-    data,
-    error
-  } =
-  await supabaseClient.rpc(
-    "admin_list_notification_users"
-  );
+  if (status) {
+    status.textContent =
+      "Loading users...";
+    status.className =
+      "muted";
+  }
 
-    alert(
-  "Users returned: " +
-  (data ? data.length : 0) +
-  "\nError: " +
-  (error ? error.message : "none")
-);
+  try {
 
-  if (error) {
+    const {
+      data,
+      error
+    } =
+    await supabaseClient.rpc(
+      "admin_list_notification_users"
+    );
+
+    if (error) {
+
+      console.error(
+        "Admin notification users error:",
+        error.message
+      );
+
+      select.innerHTML =
+        '<option value="">Unable to load users</option>';
+
+      if (status) {
+        status.textContent =
+          "User list error: " +
+          error.message;
+        status.className =
+          "error";
+      }
+
+      return;
+    }
+
+    if (!data || data.length === 0) {
+
+      select.innerHTML =
+        '<option value="">No users found</option>';
+
+      if (status) {
+        status.textContent =
+          "Supabase returned 0 users.";
+        status.className =
+          "error";
+      }
+
+      return;
+    }
+
+    select.innerHTML =
+      '<option value="">Select user</option>';
+
+    data.forEach(
+      user => {
+
+        const option =
+          document.createElement("option");
+
+        option.value =
+          user.user_id;
+
+        option.textContent =
+          user.email ||
+          "User — " +
+          user.user_id;
+
+        select.appendChild(option);
+
+      }
+    );
+
+    if (status) {
+      status.textContent =
+        data.length +
+        " user(s) loaded.";
+      status.className =
+        "success";
+    }
+
+  } catch (error) {
 
     console.error(
-      "Admin notification users error:",
-      error.message
+      "Admin notification users exception:",
+      error
     );
 
     select.innerHTML =
       '<option value="">Unable to load users</option>';
 
-    return;
-  }
-
-  select.innerHTML =
-    '<option value="">Select user</option>';
-
-  if (!data || data.length === 0) {
-
-    select.innerHTML =
-      '<option value="">No users found</option>';
-
-    return;
-  }
-
-  data.forEach(
-    user => {
-
-      const option =
-        document.createElement("option");
-
-      option.value =
-        user.user_id;
-
-      option.textContent =
-        user.email
-          ? user.email
-          : "User — " + user.user_id;
-
-      select.appendChild(option);
-
+    if (status) {
+      status.textContent =
+        "User list error: " +
+        error.message;
+      status.className =
+        "error";
     }
-  );
+
+  }
 
 }
 
