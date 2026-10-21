@@ -4874,13 +4874,17 @@ $("adminMessage")
 }
 
   
-async function loadAdminInvestments() {
 
+async function loadAdminInvestments() {
   const container = $("adminInvestmentsList");
 
-  if (!container || !isAdmin) {
-    return;
-  }
+  if (!container || !isAdmin) return;
+
+  container.innerHTML =
+    '<div class="empty">Loading investments...</div>';
+
+  const { data, error } = await supabaseClient
+    .rpc("admin_get_investments");
 
   container.innerHTML = "";
 
@@ -4892,42 +4896,22 @@ async function loadAdminInvestments() {
     "border-radius:8px;background:#0c8f62;color:white;" +
     "font-weight:bold;cursor:pointer;";
 
-  refreshButton.onclick = async () => {
-    refreshButton.disabled = true;
-    refreshButton.textContent = "Refreshing...";
-
-    await loadAdminInvestments();
-  };
-
+  refreshButton.onclick = loadAdminInvestments;
   container.appendChild(refreshButton);
 
   const list = document.createElement("div");
   container.appendChild(list);
 
-  list.innerHTML =
-    '<div class="empty">Loading investments...</div>';
-
-  const { data, error } = await supabaseClient
-    .rpc("admin_get_investments");
-
   if (error) {
     console.error("Admin investments error:", error.message);
-    list.innerHTML =
-      '<div class="empty">Unable to load investments.</div>';
-    refreshButton.disabled = false;
-    refreshButton.textContent = "↻ Refresh Investments";
+    list.textContent = "Unable to load investments.";
     return;
   }
 
   if (!data || data.length === 0) {
-    list.innerHTML =
-      '<div class="empty">No investment records found.</div>';
-    refreshButton.disabled = false;
-    refreshButton.textContent = "↻ Refresh Investments";
+    list.textContent = "No investment records found.";
     return;
   }
-
-  list.innerHTML = "";
 
   data.forEach(investment => {
     const card = document.createElement("div");
@@ -4948,12 +4932,58 @@ async function loadAdminInvestments() {
     idText.textContent = "Investment ID: " + investment.id;
 
     card.append(heading, details, idText);
+
+    const actions = document.createElement("div");
+    actions.style.cssText =
+      "display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;";
+
+    function makeAction(label, frozen) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.style.cssText =
+        "padding:9px 12px;border:0;border-radius:7px;" +
+        "background:#0c8f62;color:white;font-weight:bold;";
+
+      button.onclick = async () => {
+        button.disabled = true;
+        button.textContent = "Please wait...";
+
+        const { error: actionError } = await supabaseClient.rpc(
+          "admin_set_investment_freeze",
+          {
+            p_investment_id: investment.id,
+            p_freeze: frozen
+          }
+        );
+
+        if (actionError) {
+          alert("Action failed: " + actionError.message);
+          button.disabled = false;
+          button.textContent = label;
+          return;
+        }
+
+        alert(frozen ? "Investment frozen." : "Investment unfrozen.");
+        await loadAdminInvestments();
+      };
+
+      return button;
+    }
+
+    if (investment.status === "active") {
+      actions.appendChild(makeAction("Freeze", true));
+    }
+
+    if (investment.status === "frozen") {
+      actions.appendChild(makeAction("Unfreeze", false));
+    }
+
+    card.appendChild(actions);
     list.appendChild(card);
   });
-
-  refreshButton.disabled = false;
-  refreshButton.textContent = "↻ Refresh Investments";
 }
+
 
   
   async function loadAdminNotificationUsers() {
