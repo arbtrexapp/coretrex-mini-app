@@ -4855,7 +4855,8 @@ await Promise.all([
   loadAdminSupportMessages(),
   loadAdminLiveChatUsers(),
   loadAdminNotificationUsers(),
-  loadAdminUserOverview()
+  loadAdminUserOverview(),
+  loadAdminInvestments()
 ]);
 
 
@@ -4863,6 +4864,89 @@ $("adminMessage")
     .textContent = "";
 
 }
+
+  
+async function loadAdminInvestments() {
+
+  const container = $("adminInvestmentsList");
+
+  if (!container || !isAdmin) {
+    return;
+  }
+
+  container.innerHTML = "";
+
+  const refreshButton = document.createElement("button");
+  refreshButton.type = "button";
+  refreshButton.textContent = "↻ Refresh Investments";
+  refreshButton.style.cssText =
+    "padding:10px 16px;margin-bottom:12px;border:0;" +
+    "border-radius:8px;background:#0c8f62;color:white;" +
+    "font-weight:bold;cursor:pointer;";
+
+  refreshButton.onclick = async () => {
+    refreshButton.disabled = true;
+    refreshButton.textContent = "Refreshing...";
+
+    await loadAdminInvestments();
+  };
+
+  container.appendChild(refreshButton);
+
+  const list = document.createElement("div");
+  container.appendChild(list);
+
+  list.innerHTML =
+    '<div class="empty">Loading investments...</div>';
+
+  const { data, error } = await supabaseClient
+    .rpc("admin_get_investments");
+
+  if (error) {
+    console.error("Admin investments error:", error.message);
+    list.innerHTML =
+      '<div class="empty">Unable to load investments.</div>';
+    refreshButton.disabled = false;
+    refreshButton.textContent = "↻ Refresh Investments";
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    list.innerHTML =
+      '<div class="empty">No investment records found.</div>';
+    refreshButton.disabled = false;
+    refreshButton.textContent = "↻ Refresh Investments";
+    return;
+  }
+
+  list.innerHTML = "";
+
+  data.forEach(investment => {
+    const card = document.createElement("div");
+    card.className = "admin-card";
+
+    const heading = document.createElement("h3");
+    heading.textContent =
+      (investment.plan_name || "Investment") +
+      " — $" +
+      Number(investment.amount || 0).toLocaleString();
+
+    const details = document.createElement("p");
+    details.textContent =
+      "User: " + (investment.user_email || "Unknown") +
+      " | Status: " + (investment.status || "Unknown");
+
+    const idText = document.createElement("p");
+    idText.textContent = "Investment ID: " + investment.id;
+
+    card.append(heading, details, idText);
+    list.appendChild(card);
+  });
+
+  refreshButton.disabled = false;
+  refreshButton.textContent = "↻ Refresh Investments";
+}
+
   
   async function loadAdminNotificationUsers() {
 
