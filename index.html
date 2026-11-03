@@ -2360,6 +2360,8 @@ $("telegramBtn").onclick =
   };
 
 
+
+
 $("registerBtn").onclick =
   async () => {
 
@@ -2387,9 +2389,9 @@ $("registerBtn").onclick =
     }
 
 
-    
     $("registerMessage").textContent =
       "Creating account...";
+
 
     const { data, error } =
       await supabaseClient.auth.signUp({
@@ -2398,13 +2400,14 @@ $("registerBtn").onclick =
         password,
 
         options: {
-  data: {
-    full_name: name,
-    referral_code: referralCodeFromUrl || null
-  }
-}
+          data: {
+            full_name: name,
+            referral_code: referralCodeFromUrl || null
+          }
+        }
 
       });
+
 
     if (error) {
 
@@ -2415,33 +2418,10 @@ $("registerBtn").onclick =
 
     }
 
-    /*
-      Register referral immediately after signup
-      when a referral code is present in the URL.
-    */
-    if (referralCodeFromUrl && data.user) {
-
-      const { error: referralError } =
-        await supabaseClient.rpc(
-          "register_referral_by_code",
-          {
-            p_referral_code: referralCodeFromUrl
-          }
-        );
-
-      if (referralError) {
-
-        console.error(
-          "Referral registration:",
-          referralError.message
-        );
-
-      }
-
-    }
 
     $("registerMessage").textContent =
       "Account created. You can now log in.";
+
 
     setTimeout(
       () => {
