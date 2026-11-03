@@ -2460,6 +2460,7 @@ $("registerBtn").onclick =
 
 
 
+
 $("loginBtn").onclick =
   async () => {
 
@@ -2485,75 +2486,36 @@ $("loginBtn").onclick =
 
 
     const {
-  data,
-  error
-} =
-await supabaseClient.auth
-  .signInWithPassword({
+      data,
+      error
+    } =
+    await supabaseClient.auth
+      .signInWithPassword({
 
-    email,
-    password
+        email,
+        password
 
-  });
-
-
-if (error) {
-
-  $("loginMessage").textContent =
-    error.message;
-
-  return;
-
-}
+      });
 
 
-currentUser =
-  data.user;
+    if (error) {
 
+      $("loginMessage").textContent =
+        error.message;
 
-/*
-  Register the referral code used
-  during account signup.
-*/
-if (referralCodeFromUrl) {
+      return;
 
-  const {
-    error:
-      referralError
-  } =
-  await supabaseClient.rpc(
-    "register_referral_by_code",
-    {
-      p_referral_code:
-        referralCodeFromUrl
     }
-  );
 
 
-  /*
-    Ignore duplicate/already-registered
-    referral errors so they do not stop login.
-  */
-  if (
-    referralError &&
-    !referralError.message
-      .toLowerCase()
-      .includes("already been referred")
-  ) {
-
-    console.error(
-      "Referral registration:",
-      referralError.message
-    );
-
-  }
-
-}
+    currentUser =
+      data.user;
 
 
-await openApp();
+    await openApp();
 
   };
+
 
 async function forgotPassword() {
 
