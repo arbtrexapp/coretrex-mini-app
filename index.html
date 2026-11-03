@@ -2398,10 +2398,11 @@ $("registerBtn").onclick =
         password,
 
         options: {
-          data: {
-            full_name: name
-          }
-        }
+  data: {
+    full_name: name,
+    referral_code: referralCodeFromUrl || null
+  }
+}
 
       });
 
