@@ -8624,14 +8624,6 @@ $("refreshPromoDeposits")?.addEventListener(
 );
 
 
-/* Load promotional admin data when Admin opens */
-const originalLoadPromoAdmin = async () => {
-  if (!isAdmin) return;
-  await loadPromoRecipients();
-  await loadPromoDeposits();
-}; 
-$("adminBtn")?.addEventListener("click", originalLoadPromoAdmin);
-
 /* PROMOTIONAL OFFER USER FUNCTIONS */
 
 const promoToken =
