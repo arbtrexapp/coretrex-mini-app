@@ -1833,7 +1833,7 @@ Only official Coretrex communication channels should be trusted
   <input id="promoTitle" type="text" placeholder="Enter promotion title">
 
   <label>Description</label>
-  <textarea id="promoDescription" placeholder="Describe this promotion"></textarea>
+  <input id="promoDescription" placeholder="Describe this promotion">
 
   <label>Required Deposit (USDT)</label>
   <input id="promoAmount" type="number" min="1" placeholder="e.g. 100">
@@ -1845,17 +1845,31 @@ Only official Coretrex communication channels should be trusted
   <input id="promoDuration" type="number" min="1" placeholder="e.g. 30">
 
   <h3>Select Recipients</h3>
+  <button
+  id="refreshPromoRecipients"
+  type="button"
+  class="btn secondary"
+>
+  ↻ Refresh Recipients
+  </button>
   <div id="promoRecipients">
     <p>Loading users...</p>
   </div>
 
-  <button id="createPromoBtn" type="button">
+  <button id="createPromoBtn" class="btn" type="button">
     Create Promotion and Send Private Links
   </button>
 
   <hr>
 
   <h3>Pending Promotional Deposits</h3>
+  <button
+  id="refreshPromoDeposits"
+  type="button"
+  class="btn secondary"
+>
+  ↻ Refresh Promotional Deposits
+  </button>
   <div id="promoPendingDeposits">
     <p>Loading promotional deposits...</p>
   </div>
@@ -8450,6 +8464,13 @@ async function reviewPromoDeposit(
 
 $("createPromoBtn")?.addEventListener(
   "click", createPromoCampaign
+);
+  $("refreshPromoRecipients")?.addEventListener(
+  "click", loadPromoRecipients
+);
+
+$("refreshPromoDeposits")?.addEventListener(
+  "click", loadPromoDeposits
 );
 
 
