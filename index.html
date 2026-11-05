@@ -2358,9 +2358,22 @@ if (id === "contactScreen") {
       message.style.marginTop =
         "6px";
 
-      message.textContent =
-        item.message;
+      const parts = item.message.split(/(https?:\/\/[^\s]+)/g);
 
+parts.forEach(part => {
+  if (/^https?:\/\//i.test(part)) {
+    const link = document.createElement("a");
+    link.href = part;
+    link.textContent = "Open promotional offer";
+    link.rel = "noopener noreferrer";
+    link.style.color = "#0c8f62";
+    link.style.display = "block";
+    link.style.marginTop = "8px";
+    message.appendChild(link);
+  } else {
+    message.appendChild(document.createTextNode(part));
+  }
+});
       const date =
         document.createElement("div");
 
