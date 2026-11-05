@@ -273,6 +273,105 @@
 </div>
 
 <div id="app" class="app hidden">
+  <!-- PROMOTIONAL OFFER SCREEN -->
+<section id="promoOfferScreen" class="screen">
+
+  <div class="top">
+    <div class="logo">C</div>
+    <div>
+      <div class="brand">Coretrex</div>
+      <div class="eyebrow">PRIVATE PROMOTIONAL OFFER</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 id="promoOfferTitle">Promotional Investment</h2>
+    <p id="promoOfferDescription" class="muted">
+      Loading your private offer...
+    </p>
+
+    <div class="field">
+      <label class="label">Required Deposit</label>
+      <h2 id="promoOfferAmount">$0.00 USDT</h2>
+    </div>
+
+    <div class="field">
+      <label class="label">Profit Rate</label>
+      <h3 id="promoOfferRate">0%</h3>
+    </div>
+
+    <div class="field">
+      <label class="label">Duration</label>
+      <h3 id="promoOfferDuration">0 days</h3>
+    </div>
+
+    <div id="promoActivationArea">
+      <hr>
+      <h3>Activate Your Offer</h3>
+      <p class="muted">
+        Enter the TRON wallet address where you want to receive any approved payout.
+      </p>
+
+      <label class="label">Your TRON (TRC20) Wallet</label>
+      <input
+        id="promoPayoutAddress"
+        type="text"
+        placeholder="Enter your TRON wallet address"
+      >
+
+      <button id="activatePromoOfferBtn" class="btn" type="button">
+        Activate Offer
+      </button>
+    </div>
+
+    <div id="promoDepositArea" class="hidden">
+      <hr>
+      <h3>Make Your Promotional Deposit</h3>
+      <p class="muted">
+        Send the exact required amount using USDT TRC20 only.
+      </p>
+
+      <label class="label">Receiving Wallet</label>
+      <p id="promoReceivingAddress" style="word-break:break-all;">
+        TLFM28HbiGBgMVdqug2M7pJRW4pDLfzUMH
+      </p>
+
+      <button id="copyPromoAddressBtn" class="btn secondary" type="button">
+        Copy Receiving Wallet
+      </button>
+
+      <label class="label">Transaction ID (TXID)</label>
+      <input
+        id="promoTransactionHash"
+        type="text"
+        placeholder="Paste your transaction ID"
+      >
+
+      <button id="submitPromoDepositBtn" class="btn" type="button">
+        Submit Transaction
+      </button>
+    </div>
+
+    <div id="promoTrackingArea" class="hidden">
+      <hr>
+      <h3>Promotion Status</h3>
+      <p id="promoTrackingStatus" class="muted">Loading...</p>
+      <p id="promoMaturityDate" class="muted"></p>
+
+      <button
+        id="requestPromoPayoutBtn"
+        class="btn hidden"
+        type="button"
+      >
+        Request Payout
+      </button>
+    </div>
+
+    <p id="promoOfferMessage" class="muted"></p>
+  </div>
+
+</section>
+<!-- END PROMOTIONAL OFFER SCREEN -->
 
   <!-- HOME -->
   <section id="homeScreen" class="screen active">
@@ -2842,6 +2941,13 @@ async function openApp() {
   await loadAccount();
 
   await loadActivity();
+    if (promoToken) {
+
+    showScreen("promoOfferScreen");
+
+    await loadPromoOffer();
+
+    }
 
 }
 
@@ -8481,6 +8587,223 @@ const originalLoadPromoAdmin = async () => {
   await loadPromoDeposits();
 }; 
 $("adminBtn")?.addEventListener("click", originalLoadPromoAdmin);
+
+/* PROMOTIONAL OFFER USER FUNCTIONS */
+
+const promoToken =
+  new URLSearchParams(window.location.search)
+    .get("promo_token");
+
+let currentPromoData = null;
+
+
+async function loadPromoOffer() {
+
+  const message = $("promoOfferMessage");
+
+  if (!promoToken || !currentUser) return;
+
+  message.textContent = "Loading your private offer...";
+
+  const { data, error } =
+    await supabaseClient.rpc(
+      "get_promo_offer",
+      { p_token: promoToken }
+    );
+
+  if (error) {
+    message.textContent = error.message;
+    return;
+  }
+
+  currentPromoData = data;
+
+  const offer = data.offer;
+  const campaign = data.campaign;
+  const deposit = data.deposit;
+  const investment = data.investment;
+
+  $("promoOfferTitle").textContent =
+    campaign.title || "Promotional Investment";
+
+  $("promoOfferDescription").textContent =
+    campaign.description || "";
+
+  $("promoOfferAmount").textContent =
+    Number(campaign.investment_amount).toFixed(2) + " USDT";
+
+  $("promoOfferRate").textContent =
+    campaign.profit_rate + "%";
+
+  $("promoOfferDuration").textContent =
+    campaign.duration_days + " days";
+
+  $("promoActivationArea").classList.add("hidden");
+  $("promoDepositArea").classList.add("hidden");
+  $("promoTrackingArea").classList.add("hidden");
+  $("requestPromoPayoutBtn").classList.add("hidden");
+
+  if (offer.status === "invited") {
+    $("promoActivationArea").classList.remove("hidden");
+  }
+
+  else if (offer.status === "activated") {
+    $("promoDepositArea").classList.remove("hidden");
+  }
+
+  else if (
+    offer.status === "awaiting_review" ||
+    offer.status === "approved" ||
+    offer.status === "rejected" ||
+    offer.status === "expired"
+  ) {
+    $("promoTrackingArea").classList.remove("hidden");
+
+    $("promoTrackingStatus").textContent =
+      "Offer status: " + offer.status;
+
+    if (deposit) {
+      $("promoTrackingStatus").textContent +=
+        " | Deposit: " + deposit.status;
+    }
+  }
+
+  if (investment) {
+
+    $("promoTrackingArea").classList.remove("hidden");
+
+    $("promoTrackingStatus").textContent =
+      "Investment status: " + investment.status;
+
+    $("promoMaturityDate").textContent =
+      "Maturity: " +
+      new Date(investment.maturity_at).toLocaleString();
+
+    if (investment.status === "matured") {
+      $("requestPromoPayoutBtn").classList.remove("hidden");
+    }
+
+    if (investment.status === "claim_requested") {
+      $("promoTrackingStatus").textContent =
+        "Payout request submitted. Awaiting admin processing.";
+    }
+
+    if (investment.status === "paid") {
+      $("promoTrackingStatus").textContent =
+        "Payout marked as paid. TXID: " +
+        (investment.payout_txid || "Not available");
+    }
+  }
+
+  message.textContent = "";
+}
+
+
+async function activatePromoOffer() {
+
+  const address =
+    $("promoPayoutAddress").value.trim();
+
+  if (!address) {
+    alert("Enter your TRON wallet address.");
+    return;
+  }
+
+  const { error } =
+    await supabaseClient.rpc(
+      "activate_promo_offer",
+      {
+        p_token: promoToken,
+        p_payout_address: address
+      }
+    );
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  alert("Offer activated successfully.");
+  await loadPromoOffer();
+}
+
+
+async function submitPromoDeposit() {
+
+  const txid =
+    $("promoTransactionHash").value.trim();
+
+  if (!txid) {
+    alert("Enter your transaction ID.");
+    return;
+  }
+
+  const { error } =
+    await supabaseClient.rpc(
+      "submit_promo_deposit",
+      {
+        p_token: promoToken,
+        p_transaction_hash: txid
+      }
+    );
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  alert("Transaction submitted for manual verification.");
+  $("promoTransactionHash").value = "";
+  await loadPromoOffer();
+}
+
+
+async function requestPromoPayout() {
+
+  if (!confirm("Submit your promotional payout request?")) {
+    return;
+  }
+
+  const { error } =
+    await supabaseClient.rpc(
+      "request_promo_payout",
+      { p_token: promoToken }
+    );
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  alert("Payout request submitted.");
+  await loadPromoOffer();
+}
+
+
+$("activatePromoOfferBtn")?.addEventListener(
+  "click",
+  activatePromoOffer
+);
+
+$("submitPromoDepositBtn")?.addEventListener(
+  "click",
+  submitPromoDeposit
+);
+
+$("requestPromoPayoutBtn")?.addEventListener(
+  "click",
+  requestPromoPayout
+);
+
+$("copyPromoAddressBtn")?.addEventListener(
+  "click",
+  async () => {
+    await navigator.clipboard.writeText(
+      $("promoReceivingAddress").textContent.trim()
+    );
+    alert("Receiving wallet copied.");
+  }
+);  
   
 })();
   
