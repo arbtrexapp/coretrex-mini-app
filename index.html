@@ -1824,7 +1824,44 @@ Only official Coretrex communication channels should be trusted
 
 </div>
     
+<!-- PROMOTIONAL INVESTMENT ADMIN -->
+<section id="promoAdminSection" class="card">
+  <h2>Promotional Investments</h2>
+  <p>Create private promotional investment offers for selected users.</p>
 
+  <label>Promotion Title</label>
+  <input id="promoTitle" type="text" placeholder="Enter promotion title">
+
+  <label>Description</label>
+  <textarea id="promoDescription" placeholder="Describe this promotion"></textarea>
+
+  <label>Required Deposit (USDT)</label>
+  <input id="promoAmount" type="number" min="1" placeholder="e.g. 100">
+
+  <label>Profit Rate (%)</label>
+  <input id="promoProfitRate" type="number" min="0" step="0.01" placeholder="e.g. 10">
+
+  <label>Duration (days)</label>
+  <input id="promoDuration" type="number" min="1" placeholder="e.g. 30">
+
+  <h3>Select Recipients</h3>
+  <div id="promoRecipients">
+    <p>Loading users...</p>
+  </div>
+
+  <button id="createPromoBtn" type="button">
+    Create Promotion and Send Private Links
+  </button>
+
+  <hr>
+
+  <h3>Pending Promotional Deposits</h3>
+  <div id="promoPendingDeposits">
+    <p>Loading promotional deposits...</p>
+  </div>
+</section>
+<!-- END PROMOTIONAL INVESTMENT ADMIN -->
+    
     <!-- APPROVED WITHDRAWALS -->
 
     <div class="card">
