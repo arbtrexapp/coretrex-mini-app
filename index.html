@@ -8192,7 +8192,273 @@ async function loadAdminLiveChatUsers() {
 
   }
 );
+ /* =========================
+   PROMOTIONAL INVESTMENTS
+========================= */
 
+async function loadPromoRecipients() {
+  const list = $("promoRecipients");
+  if (!list || !isAdmin) return;
+
+  list.textContent = "Loading users...";
+
+  const { data, error } = await supabaseClient.rpc(
+    "admin_list_notification_users"
+  );
+
+  if (error) {
+    list.textContent = "Unable to load users: " + error.message;
+    return;
+  }
+
+  list.innerHTML = "";
+
+  if (!data || !data.length) {
+    list.textContent = "No users found.";
+    return;
+  }
+
+  data.forEach(user => {
+    const label = document.createElement("label");
+    label.style.cssText =
+      "display:flex;gap:10px;align-items:center;padding:9px 0;";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = user.user_id;
+    checkbox.className = "promoRecipientCheck";
+
+    const name = document.createElement("span");
+    name.textContent = user.email || user.user_id;
+
+    label.append(checkbox, name);
+    list.appendChild(label);
+  });
+
+  const selectAll = document.createElement("button");
+  selectAll.type = "button";
+  selectAll.textContent = "Select All Users";
+  selectAll.className = "btn secondary";
+  selectAll.onclick = () => {
+    list.querySelectorAll(".promoRecipientCheck")
+      .forEach(box => box.checked = true);
+  };
+
+  list.prepend(selectAll);
+}
+
+
+async function createPromoCampaign() {
+  if (!isAdmin) return;
+
+  const title = $("promoTitle").value.trim();
+  const description = $("promoDescription").value.trim();
+  const amount = Number($("promoAmount").value);
+  const rate = Number($("promoProfitRate").value);
+  const duration = Number($("promoDuration").value);
+
+  const userIds = Array.from(
+    document.querySelectorAll(".promoRecipientCheck:checked")
+  ).map(box => box.value);
+
+  if (!title || !amount || amount <= 0 ||
+      !Number.isFinite(rate) || rate < 0 ||
+      !Number.isInteger(duration) || duration < 1 ||
+      userIds.length === 0) {
+    alert("Enter valid promotion details and select at least one user.");
+    return;
+  }
+
+  const button = $("createPromoBtn");
+  button.disabled = true;
+  button.textContent = "Creating promotion...";
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      "admin_create_promo_campaign",
+      {
+        p_title: title,
+        p_description: description,
+        p_amount: amount,
+        p_profit_rate: rate,
+        p_duration_days: duration,
+        p_user_ids: userIds
+      }
+    );
+
+    if (error) throw error;
+
+    alert(
+      "Promotion created successfully.\n" +
+      "Selected recipients: " + userIds.length
+    );
+
+    $("promoTitle").value = "";
+    $("promoDescription").value = "";
+    $("promoAmount").value = "";
+    $("promoProfitRate").value = "";
+    $("promoDuration").value = "";
+
+    await loadPromoRecipients();
+    await loadPromoDeposits();
+
+  } catch (error) {
+    console.error("Promotion creation error:", error);
+    alert("Could not create promotion: " + error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Create Promotion and Send Private Links";
+  }
+}
+
+
+async function loadPromoDeposits() {
+  const list = $("promoPendingDeposits");
+  if (!list || !isAdmin) return;
+
+  list.textContent = "Loading promotional deposits...";
+
+  const { data, error } = await supabaseClient.rpc(
+    "admin_list_promo_deposits"
+  );
+
+  if (error) {
+    list.textContent = "Unable to load deposits: " + error.message;
+    return;
+  }
+
+  list.innerHTML = "";
+
+  const pending = (data || []).filter(
+    item => item.deposit_status === "pending"
+  );
+
+  if (!pending.length) {
+    list.textContent = "No pending promotional deposits.";
+    return;
+  }
+
+  pending.forEach(item => {
+    const card = document.createElement("div");
+    card.style.cssText =
+      "padding:14px;margin:12px 0;background:#0b1019;" +
+      "border:1px solid #26364b;border-radius:12px;";
+
+    const heading = document.createElement("strong");
+    heading.textContent = item.campaign_title || "Promotion";
+
+    const details = document.createElement("p");
+    details.style.cssText = "font-size:13px;word-break:break-word;";
+    details.textContent =
+      "User: " + (item.user_email || item.user_id) +
+      "\nAmount: " + item.deposit_amount + " USDT" +
+      "\nTXID: " + item.transaction_hash +
+      "\nPayout wallet: " + (item.payout_address || "Not supplied");
+
+    const explorer = document.createElement("a");
+    explorer.href =
+      "https://tronscan.org/#/transaction/" +
+      encodeURIComponent(item.transaction_hash);
+    explorer.target = "_blank";
+    explorer.rel = "noopener noreferrer";
+    explorer.textContent = "Open TXID in TRONSCAN";
+    explorer.style.cssText =
+      "display:block;color:#35c995;margin:10px 0;";
+
+    const verifyLabel = document.createElement("label");
+    verifyLabel.style.cssText =
+      "display:flex;gap:8px;align-items:flex-start;margin:12px 0;";
+
+    const verify = document.createElement("input");
+    verify.type = "checkbox";
+
+    const verifyText = document.createElement("span");
+    verifyText.textContent =
+      "I manually verified the successful USDT TRC20 transaction, " +
+      "correct token contract, exact amount and receiving wallet.";
+
+    verifyLabel.append(verify, verifyText);
+
+    const note = document.createElement("input");
+    note.type = "text";
+    note.placeholder = "Admin note (optional)";
+    note.style.width = "100%";
+
+    const approve = document.createElement("button");
+    approve.type = "button";
+    approve.textContent = "Approve";
+    approve.className = "btn";
+    approve.style.marginRight = "8px";
+
+    approve.onclick = async () => {
+      if (!verify.checked) {
+        alert("Please complete the manual transaction verification first.");
+        return;
+      }
+
+      if (!confirm(
+        "Confirm that you personally verified this transaction on TRONSCAN?"
+      )) return;
+
+      await reviewPromoDeposit(item.deposit_id, true, true, note.value);
+    };
+
+    const reject = document.createElement("button");
+    reject.type = "button";
+    reject.textContent = "Reject";
+    reject.className = "btn secondary";
+
+    reject.onclick = async () => {
+      if (!confirm("Reject this promotional deposit?")) return;
+      await reviewPromoDeposit(item.deposit_id, false, false, note.value);
+    };
+
+    card.append(
+      heading, details, explorer, verifyLabel, note,
+      document.createElement("br"), approve, reject
+    );
+
+    list.appendChild(card);
+  });
+}
+
+
+async function reviewPromoDeposit(
+  depositId, approve, verified, adminNote
+) {
+  const { error } = await supabaseClient.rpc(
+    "admin_review_promo_deposit",
+    {
+      p_deposit_id: depositId,
+      p_approve: approve,
+      p_manual_verification_confirmed: verified,
+      p_admin_note: adminNote || null
+    }
+  );
+
+  if (error) {
+    alert("Review failed: " + error.message);
+    return;
+  }
+
+  alert(approve ? "Deposit approved." : "Deposit rejected.");
+  await loadPromoDeposits();
+}
+
+
+$("createPromoBtn")?.addEventListener(
+  "click", createPromoCampaign
+);
+
+
+/* Load promotional admin data when Admin opens */
+const originalLoadPromoAdmin = async () => {
+  if (!isAdmin) return;
+  await loadPromoRecipients();
+  await loadPromoDeposits();
+}; 
+$("adminBtn")?.addEventListener("click", originalLoadPromoAdmin);
+  
 })();
   
 </script>
