@@ -8572,11 +8572,57 @@ $("createPromoBtn")?.addEventListener(
   "click", createPromoCampaign
 );
   $("refreshPromoRecipients")?.addEventListener(
-  "click", loadPromoRecipients
+  "click",
+  async () => {
+    const list = $("promoRecipients");
+
+    try {
+      if (list) list.textContent = "Checking admin access...";
+
+      const allowed = await checkAdmin();
+
+      if (!allowed) {
+        if (list) {
+          list.textContent = "Admin access check failed. Please sign in again.";
+        }
+        return;
+      }
+
+      await loadPromoRecipients();
+
+    } catch (error) {
+      if (list) {
+        list.textContent = "Refresh failed: " + error.message;
+      }
+    }
+  }
 );
 
 $("refreshPromoDeposits")?.addEventListener(
-  "click", loadPromoDeposits
+  "click",
+  async () => {
+    const list = $("promoPendingDeposits");
+
+    try {
+      if (list) list.textContent = "Checking admin access...";
+
+      const allowed = await checkAdmin();
+
+      if (!allowed) {
+        if (list) {
+          list.textContent = "Admin access check failed. Please sign in again.";
+        }
+        return;
+      }
+
+      await loadPromoDeposits();
+
+    } catch (error) {
+      if (list) {
+        list.textContent = "Refresh failed: " + error.message;
+      }
+    }
+  }
 );
 
 
