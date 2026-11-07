@@ -5751,6 +5751,7 @@ async function loadAdminUserOverview() {
 
           users[row.user_id] = {
           userId: row.user_id,
+            isBanned: row.is_banned === true,
             
             email:
               row.email ||
