@@ -9223,6 +9223,11 @@ status,
         " | Date of birth: " + item.date_of_birth +
         " | Document: " + item.document_type;
       card.appendChild(details);
+      const kycStatus = document.createElement("p");
+kycStatus.className = "muted";
+kycStatus.textContent = "KYC Status: " + item.status.toUpperCase();
+card.appendChild(kycStatus);
+      
       const paymentDetails = document.createElement("p");
 paymentDetails.className = "muted";
 paymentDetails.style.marginTop = "10px";
