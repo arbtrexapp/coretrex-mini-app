@@ -9006,7 +9006,178 @@ $("submitKycBtn")?.addEventListener("click", async () => {
     btn.textContent = "Submit KYC Application";
   }
 });
+  
+// ADMIN KYC REVIEW
+async function loadAdminKyc() {
+  const list = $("adminKycList");
 
+  if (!list || !isAdmin) return;
+
+  list.innerHTML = '<div class="empty">Loading KYC applications...</div>';
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("kyc_submissions")
+      .select(`
+        id,
+        user_id,
+        full_name,
+        country,
+        date_of_birth,
+        document_type,
+        document_front_path,
+        document_back_path,
+        selfie_path,
+        created_at
+      `)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    list.innerHTML = "";
+
+    if (!data || data.length === 0) {
+      list.innerHTML = '<div class="empty">No pending KYC applications.</div>';
+      return;
+    }
+
+    for (const item of data) {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.style.marginTop = "12px";
+
+      const heading = document.createElement("h3");
+      heading.textContent = item.full_name;
+      card.appendChild(heading);
+
+      const details = document.createElement("p");
+      details.className = "muted";
+      details.textContent =
+        "Country: " + item.country +
+        " | Date of birth: " + item.date_of_birth +
+        " | Document: " + item.document_type;
+      card.appendChild(details);
+
+      const userId = document.createElement("p");
+      userId.className = "muted";
+      userId.textContent = "User ID: " + item.user_id;
+      card.appendChild(userId);
+
+      const addDocumentLink = async (path, label) => {
+        if (!path) return;
+
+        const { data: fileData, error: fileError } =
+          await supabaseClient
+            .storage
+            .from("kyc-documents")
+            .createSignedUrl(path, 300);
+
+        const link = document.createElement("a");
+        link.textContent = fileError
+          ? label + " — Unable to create link"
+          : "View " + label;
+
+        if (!fileError && fileData?.signedUrl) {
+          link.href = fileData.signedUrl;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+        }
+
+        link.style.display = "block";
+        link.style.marginTop = "10px";
+        card.appendChild(link);
+      };
+
+      await addDocumentLink(
+        item.document_front_path,
+        "Front of ID"
+      );
+
+      await addDocumentLink(
+        item.document_back_path,
+        "Back of ID"
+      );
+
+      await addDocumentLink(
+        item.selfie_path,
+        "Selfie"
+      );
+
+      const note = document.createElement("textarea");
+      note.placeholder = "Admin note (optional)";
+      note.rows = 2;
+      note.style.width = "100%";
+      note.style.marginTop = "14px";
+      card.appendChild(note);
+
+      const actions = document.createElement("div");
+      actions.style.display = "flex";
+      actions.style.gap = "10px";
+      actions.style.marginTop = "12px";
+
+      const approve = document.createElement("button");
+      approve.className = "btn";
+      approve.type = "button";
+      approve.textContent = "Approve";
+
+      const reject = document.createElement("button");
+      reject.className = "btn secondary";
+      reject.type = "button";
+      reject.textContent = "Decline";
+
+      const review = async (decision, button) => {
+        if (!confirm(
+          "Are you sure you want to " + decision + " this KYC application?"
+        )) return;
+
+        approve.disabled = true;
+        reject.disabled = true;
+
+        const { error: reviewError } = await supabaseClient.rpc(
+          "admin_review_kyc",
+          {
+            p_submission_id: item.id,
+            p_decision: decision,
+            p_admin_note: note.value.trim() || null
+          }
+        );
+
+        if (reviewError) {
+          alert("KYC review failed: " + reviewError.message);
+          approve.disabled = false;
+          reject.disabled = false;
+          return;
+        }
+
+        alert("KYC application " + decision + " successfully.");
+        await loadAdminKyc();
+      };
+
+      approve.addEventListener("click", () => {
+        review("approved", approve);
+      });
+
+      reject.addEventListener("click", () => {
+        review("rejected", reject);
+      });
+
+      actions.appendChild(approve);
+      actions.appendChild(reject);
+      card.appendChild(actions);
+      list.appendChild(card);
+    }
+
+  } catch (error) {
+    console.error("Admin KYC loading error:", error);
+    list.innerHTML =
+      '<div class="empty">Unable to load KYC applications: ' +
+      error.message +
+      '</div>';
+  }
+}
+
+$("refreshAdminKycBtn")?.addEventListener("click", loadAdminKyc);
   
 })();
   
