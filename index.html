@@ -5763,6 +5763,14 @@ async function loadAdminUserOverview() {
               Number(
                 row.referral_count || 0
               ),
+                        investedCapital:
+              Number(row.invested_capital || 0),
+
+            realizedPL:
+              Number(row.realized_pl || 0),
+
+            referralBalance:
+              Number(row.referral_balance || 0),
 
             referrals: []
 
@@ -5842,6 +5850,27 @@ async function loadAdminUserOverview() {
 
           card.appendChild(header);
           card.appendChild(balance);
+                    const invested = document.createElement("div");
+          invested.className = "muted";
+          invested.textContent =
+            "Invested Capital: $" +
+            user.investedCapital.toFixed(2);
+
+          const profit = document.createElement("div");
+          profit.className = "muted";
+          profit.textContent =
+            "Realized P/L: $" +
+            user.realizedPL.toFixed(2);
+
+          const referralFunds = document.createElement("div");
+          referralFunds.className = "muted";
+          referralFunds.textContent =
+            "Referral Balance: $" +
+            user.referralBalance.toFixed(2);
+
+          card.appendChild(invested);
+          card.appendChild(profit);
+          card.appendChild(referralFunds);
           card.appendChild(count);
 
           if (
