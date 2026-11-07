@@ -3233,6 +3233,9 @@ async function openApp() {
 
   $("accountEmail").textContent =
     currentUser.email || "";
+    loadMyKycStatus().catch(error => {
+    console.error("KYC status loading failed:", error);
+  });
 
 
   $("homeEmail").textContent =
