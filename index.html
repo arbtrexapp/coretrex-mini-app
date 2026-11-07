@@ -9084,6 +9084,7 @@ $("submitKycBtn")?.addEventListener("click", async () => {
     );
 
     btn.textContent = "Application Submitted";
+    showScreen("kycDepositScreen");
 
   } catch (error) {
     console.error("KYC submission error:", error);
