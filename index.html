@@ -9238,6 +9238,36 @@ paymentDetails.textContent =
   " | TXID: " + (item.payment_txid || "Not submitted") +
   " | Refund wallet: " + (item.refund_wallet_address || "Not submitted");
 card.appendChild(paymentDetails);
+      if (item.deposit_status === "submitted") {
+  const verifyDepositBtn = document.createElement("button");
+  verifyDepositBtn.className = "btn secondary";
+  verifyDepositBtn.type = "button";
+  verifyDepositBtn.textContent = "Verify $500 Deposit";
+
+  verifyDepositBtn.addEventListener("click", async () => {
+    if (!confirm("Have you independently confirmed this $500 USDT TRC20 payment?")) return;
+
+    verifyDepositBtn.disabled = true;
+    verifyDepositBtn.textContent = "Verifying...";
+
+    const { error } = await supabaseClient.rpc(
+      "admin_verify_kyc_deposit",
+      { p_submission_id: item.id }
+    );
+
+    if (error) {
+      alert("Verification failed: " + error.message);
+      verifyDepositBtn.disabled = false;
+      verifyDepositBtn.textContent = "Verify $500 Deposit";
+      return;
+    }
+
+    alert("Deposit marked as verified.");
+    await loadAdminKyc();
+  });
+
+  card.appendChild(verifyDepositBtn);
+}
       const refundDetails = document.createElement("p");
 refundDetails.className = "muted";
 refundDetails.textContent =
