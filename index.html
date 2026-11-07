@@ -4484,7 +4484,31 @@ $("requestWithdrawalBtn").onclick =
 
     }
 
+// KYC REQUIRED FOR WITHDRAWALS OF $1,000 OR MORE
+if (amount >= 1000) {
+  const { data: kycRecord, error: kycError } =
+    await supabaseClient
+      .from("kyc_submissions")
+      .select("id")
+      .eq("user_id", currentUser.id)
+      .eq("status", "approved")
+      .limit(1)
+      .maybeSingle();
 
+  if (kycError) {
+    $("withdrawMessage").textContent =
+      "Unable to check your KYC status. Please try again.";
+    $("withdrawMessage").className = "error";
+    return;
+  }
+
+  if (!kycRecord) {
+    $("withdrawMessage").textContent =
+      "KYC verification is required for withdrawals of $1,000 or more. Please complete KYC from your Account before continuing.";
+    $("withdrawMessage").className = "error";
+    return;
+  }
+}
     const fee =
       Math.round(
         amount *
