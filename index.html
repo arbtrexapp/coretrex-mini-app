@@ -8814,6 +8814,172 @@ $("refreshPromoDeposits")?.addEventListener(
     }
   }
 );
+
+$("submitKycBtn")?.addEventListener("click", async () => {
+  const btn = $("submitKycBtn");
+  const message = $("kycFormMessage");
+
+  const fullName = $("kycFullName").value.trim();
+  const country = $("kycCountry").value.trim();
+  const dob = $("kycDateOfBirth").value;
+  const documentType = $("kycDocumentType").value;
+
+  const front = $("kycDocumentFront").files[0];
+  const back = $("kycDocumentBack").files[0];
+  const selfie = $("kycSelfie").files[0];
+
+  const maxSize = 2 * 1024 * 1024;
+  const documentTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "application/pdf"
+  ];
+  const imageTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+  ];
+
+  const showMessage = (text, color) => {
+    message.textContent = text;
+    message.style.color = color || "";
+  };
+
+  if (!currentUser) {
+    showMessage("Please log in first.", "red");
+    return;
+  }
+
+  if (!fullName || !country || !dob || !documentType || !front || !selfie) {
+    showMessage("Please complete all required fields.", "red");
+    return;
+  }
+
+  if (new Date(dob) >= new Date()) {
+    showMessage("Please enter a valid date of birth.", "red");
+    return;
+  }
+
+  const files = [front, selfie];
+  if (back) files.push(back);
+
+  if (files.some(file => file.size > maxSize)) {
+    showMessage("Each file must be 2 MB or smaller.", "red");
+    return;
+  }
+
+  if (!documentTypes.includes(front.type) ||
+      (back && !documentTypes.includes(back.type))) {
+    showMessage("Your ID documents must be JPG, PNG, WEBP or PDF.", "red");
+    return;
+  }
+
+  if (!imageTypes.includes(selfie.type)) {
+    showMessage("Your selfie must be JPG, PNG or WEBP.", "red");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Submitting...";
+  showMessage("Checking your application...");
+
+  try {
+    const { data: previous, error: checkError } =
+      await supabaseClient
+        .from("kyc_submissions")
+        .select("status")
+        .eq("user_id", currentUser.id)
+        .in("status", ["pending", "approved"])
+        .limit(1);
+
+    if (checkError) throw checkError;
+
+    if (previous && previous.length > 0) {
+      showMessage(
+        previous[0].status === "approved"
+          ? "Your KYC is already approved."
+          : "Your KYC application is already awaiting review.",
+        "orange"
+      );
+      return;
+    }
+
+    const uploadFile = async (file, label) => {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const path =
+        currentUser.id + "/" +
+        Date.now() + "_" +
+        label + "_" +
+        safeName;
+
+      const { error } = await supabaseClient
+        .storage
+        .from("kyc-documents")
+        .upload(path, file, {
+          contentType: file.type,
+          upsert: false
+        });
+
+      if (error) throw error;
+      return path;
+    };
+
+    showMessage("Uploading your documents...");
+
+    const frontPath = await uploadFile(front, "front");
+    const backPath = back
+      ? await uploadFile(back, "back")
+      : null;
+    const selfiePath = await uploadFile(selfie, "selfie");
+
+    showMessage("Saving your KYC application...");
+
+    const { error: saveError } = await supabaseClient
+      .from("kyc_submissions")
+      .insert({
+        user_id: currentUser.id,
+        full_name: fullName,
+        country: country,
+        date_of_birth: dob,
+        document_type: documentType,
+        document_front_path: frontPath,
+        document_back_path: backPath,
+        selfie_path: selfiePath
+      });
+
+    if (saveError) throw saveError;
+
+    await createNotification(
+      currentUser.id,
+      "KYC Application Submitted",
+      "Your KYC application has been submitted successfully and is awaiting admin review.",
+      "kyc"
+    );
+
+    const accountStatus = $("kycAccountStatus");
+    if (accountStatus) {
+      accountStatus.textContent = "Pending review";
+    }
+
+    showMessage(
+      "Your KYC application was submitted successfully!",
+      "green"
+    );
+
+    btn.textContent = "Application Submitted";
+
+  } catch (error) {
+    console.error("KYC submission error:", error);
+    showMessage(
+      "Submission failed: " + error.message,
+      "red"
+    );
+    btn.disabled = false;
+    btn.textContent = "Submit KYC Application";
+  }
+});
+
   
 })();
   
