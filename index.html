@@ -8666,6 +8666,33 @@ $("refreshPromoDeposits")?.addEventListener(
 );
 })();
   
+  $("refreshPromoInvestments")?.addEventListener(
+  "click",
+  async () => {
+    const list = $("promoInvestmentRecords");
+
+    try {
+      if (list) list.textContent = "Checking admin access...";
+
+      const allowed = await checkAdmin();
+
+      if (!allowed) {
+        if (list) {
+          list.textContent = "Admin access check failed. Please sign in again.";
+        }
+        return;
+      }
+
+      await loadAdminPromoInvestments();
+
+    } catch (error) {
+      if (list) {
+        list.textContent = "Refresh failed: " + error.message;
+      }
+    }
+  }
+);
+  
 $("notificationInboxBtn")?.addEventListener("click", async () => {
   if (!currentUser) return;
 
