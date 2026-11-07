@@ -9381,16 +9381,18 @@ async function loadMyKycStatus() {
 
   if (!statusElement) return;
 
-  statusElement.textContent = "Loading KYC status...";
+statusElement.textContent = "Loading KYC status...";
 
-  const { data: authData, error: authError } =
-    await supabaseClient.auth.getUser();
+const { data: authData, error: authError } =
+  await supabaseClient.auth.getUser();
 
-  if (authError || !authData?.user) {
-    console.error("KYC authentication error:", authError);
-    statusElement.textContent = "Unable to load KYC status";
-    return;
-  }
+if (authError || !authData?.user) {
+  console.error("KYC authentication error:", authError);
+  statusElement.textContent = "Unable to load KYC status";
+  return;
+}
+
+alert("Your account ID: " + authData.user.id);
 
   const { data, error } = await supabaseClient
     .from("kyc_submissions")
