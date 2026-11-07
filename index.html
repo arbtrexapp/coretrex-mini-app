@@ -1347,6 +1347,7 @@ Only official Coretrex communication channels should be trusted
     Not submitted
   </p>
   <button
+    id="openKycButton"
     class="btn"
     type="button"
     data-screen="kycScreen"
@@ -9418,6 +9419,12 @@ async function loadMyKycStatus() {
   statusElement.textContent = labels[status] || status;
   statusElement.className =
     "status " + (status === "approved" ? "success" : "pending");
+    const kycButton = $("openKycButton");
+
+  if (kycButton) {
+    kycButton.style.display =
+      status === "approved" ? "none" : "";
+  }
 }
 
   
