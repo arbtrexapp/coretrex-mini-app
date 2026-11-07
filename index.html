@@ -9274,7 +9274,40 @@ refundDetails.textContent =
   "Refund Status: " + item.refund_status +
   " | Refund TXID: " + (item.refund_txid || "Not recorded");
 card.appendChild(refundDetails);
+if (
+  item.status === "approved" &&
+  item.deposit_status === "verified" &&
+  item.balance_credit_status === "not_credited"
+) {
+  const creditBtn = document.createElement("button");
+  creditBtn.className = "btn";
+  creditBtn.type = "button";
+  creditBtn.textContent = "Credit $500 to User Balance";
 
+  creditBtn.addEventListener("click", async () => {
+    if (!confirm("Confirm that you want to credit $500 to this user's Coretrex balance?")) return;
+
+    creditBtn.disabled = true;
+    creditBtn.textContent = "Processing...";
+
+    const { error } = await supabaseClient.rpc(
+      "admin_credit_kyc_deposit",
+      { p_submission_id: item.id }
+    );
+
+    if (error) {
+      alert("Credit failed: " + error.message);
+      creditBtn.disabled = false;
+      creditBtn.textContent = "Credit $500 to User Balance";
+      return;
+    }
+
+    alert("$500 successfully credited to the user's balance.");
+    await loadAdminKyc();
+  });
+
+  card.appendChild(creditBtn);
+}
       const userId = document.createElement("p");
       userId.className = "muted";
       userId.textContent = "User ID: " + item.user_id;
