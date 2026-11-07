@@ -9308,6 +9308,56 @@ if (
 
   card.appendChild(creditBtn);
 }
+      if (
+  ["rejected", "cancelled"].includes(item.status) &&
+  item.deposit_status === "verified" &&
+  item.refund_status === "not_refunded"
+) {
+  const refundTxidInput = document.createElement("input");
+  refundTxidInput.type = "text";
+  refundTxidInput.placeholder = "Enter refund transaction ID";
+  refundTxidInput.style.marginTop = "12px";
+  card.appendChild(refundTxidInput);
+
+  const refundBtn = document.createElement("button");
+  refundBtn.className = "btn secondary";
+  refundBtn.type = "button";
+  refundBtn.textContent = "Record $500 Refund";
+
+  refundBtn.addEventListener("click", async () => {
+    const refundTxid = refundTxidInput.value.trim();
+
+    if (!refundTxid) {
+      alert("Enter the refund transaction ID first.");
+      return;
+    }
+
+    if (!confirm("Have you manually sent the $500 refund to the user's nominated wallet?")) return;
+
+    refundBtn.disabled = true;
+    refundBtn.textContent = "Recording...";
+
+    const { error } = await supabaseClient.rpc(
+      "admin_record_kyc_refund",
+      {
+        p_submission_id: item.id,
+        p_refund_txid: refundTxid
+      }
+    );
+
+    if (error) {
+      alert("Refund recording failed: " + error.message);
+      refundBtn.disabled = false;
+      refundBtn.textContent = "Record $500 Refund";
+      return;
+    }
+
+    alert("Refund successfully recorded.");
+    await loadAdminKyc();
+  });
+
+  card.appendChild(refundBtn);
+}
       const userId = document.createElement("p");
       userId.className = "muted";
       userId.textContent = "User ID: " + item.user_id;
