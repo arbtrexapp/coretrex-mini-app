@@ -9380,23 +9380,30 @@ async function loadMyKycStatus() {
   const statusElement = $("kycAccountStatus");
   const kycButton = $("openKycButton");
 
-  if (!statusElement || !currentUser) return;
+  if (!statusElement) return;
 
   statusElement.textContent = "Loading KYC status...";
 
   try {
+    const { data: authData, error: authError } =
+      await supabaseClient.auth.getUser();
+
+    if (authError || !authData?.user) {
+      throw authError || new Error("User not logged in");
+    }
+
     const { data, error } = await supabaseClient
       .from("kyc_submissions")
-      .select("status, created_at")
-      .eq("user_id", currentUser.id)
-      .eq("status", "approved")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .select("status")
+      .eq("user_id", authData.user.id);
 
     if (error) throw error;
 
-    if (data) {
+    const approved = data?.some(
+      row => row.status === "approved"
+    );
+
+    if (approved) {
       statusElement.textContent = "Verified";
       statusElement.className = "status success";
 
@@ -9407,18 +9414,7 @@ async function loadMyKycStatus() {
       return;
     }
 
-    const { data: latest, error: latestError } =
-      await supabaseClient
-        .from("kyc_submissions")
-        .select("status")
-        .eq("user_id", currentUser.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-    if (latestError) throw latestError;
-
-    const status = latest?.status || "not_submitted";
+    const latest = data?.[0]?.status || "not_submitted";
 
     const labels = {
       not_submitted: "Not submitted",
@@ -9427,7 +9423,7 @@ async function loadMyKycStatus() {
       cancelled: "Cancelled"
     };
 
-    statusElement.textContent = labels[status] || status;
+    statusElement.textContent = labels[latest] || latest;
     statusElement.className = "status pending";
 
     if (kycButton) {
@@ -9435,7 +9431,7 @@ async function loadMyKycStatus() {
     }
 
   } catch (error) {
-    console.error("KYC status error:", error.message);
+    console.error("KYC status error:", error);
     statusElement.textContent = "Unable to load KYC status";
   }
 }
