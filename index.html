@@ -9374,17 +9374,27 @@ $("submitKycBtn")?.addEventListener("click", async () => {
 });
   
   // LOAD USER KYC STATUS
+
 async function loadMyKycStatus() {
   const statusElement = $("kycAccountStatus");
 
-  if (!statusElement || !currentUser) return;
+  if (!statusElement) return;
 
   statusElement.textContent = "Loading KYC status...";
+
+  const { data: authData, error: authError } =
+    await supabaseClient.auth.getUser();
+
+  if (authError || !authData?.user) {
+    console.error("KYC authentication error:", authError);
+    statusElement.textContent = "Unable to load KYC status";
+    return;
+  }
 
   const { data, error } = await supabaseClient
     .from("kyc_submissions")
     .select("status")
-    .eq("user_id", currentUser.id)
+    .eq("user_id", authData.user.id)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -9409,6 +9419,7 @@ async function loadMyKycStatus() {
   statusElement.className =
     "status " + (status === "approved" ? "success" : "pending");
 }
+
   
 // ADMIN KYC REVIEW
 async function loadAdminKyc() {
