@@ -5948,6 +5948,54 @@ async function loadAdminUserOverview() {
           balanceActions.appendChild(addBalanceBtn);
           balanceActions.appendChild(deductBalanceBtn);
           card.appendChild(balanceActions);
+                    const accessBtn = document.createElement("button");
+
+          accessBtn.textContent = user.isBanned
+            ? "Unban User"
+            : "Ban User";
+
+          accessBtn.style.cssText =
+            user.isBanned
+              ? "background:#0c8f62;color:white;border:0;padding:9px 12px;border-radius:7px;margin-top:8px;"
+              : "background:#b83232;color:white;border:0;padding:9px 12px;border-radius:7px;margin-top:8px;";
+
+          accessBtn.addEventListener("click", async () => {
+            const action = user.isBanned ? "unban" : "ban";
+
+            const confirmed = confirm(
+              "Are you sure you want to " +
+              action.toUpperCase() +
+              " this user: " + user.email + "?"
+            );
+
+            if (!confirmed) return;
+
+            accessBtn.disabled = true;
+
+            try {
+              const { data, error } =
+                await supabaseClient.rpc(
+                  "admin_manage_user_access",
+                  {
+                    p_user_id: user.userId,
+                    p_action: action
+                  }
+                );
+
+              if (error) throw error;
+
+              alert(data);
+
+              await loadAdminUserOverview();
+
+            } catch (error) {
+              alert("Action failed: " + error.message);
+            } finally {
+              accessBtn.disabled = false;
+            }
+          });
+
+          card.appendChild(accessBtn);
 
           if (
             user.referrals.length > 0
