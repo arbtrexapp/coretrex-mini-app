@@ -9297,6 +9297,7 @@ card.appendChild(refundDetails);
       note.style.marginTop = "14px";
       card.appendChild(note);
 
+      if (item.status === "pending") {
       const actions = document.createElement("div");
       actions.style.display = "flex";
       actions.style.gap = "10px";
@@ -9351,6 +9352,7 @@ card.appendChild(refundDetails);
       actions.appendChild(approve);
       actions.appendChild(reject);
       card.appendChild(actions);
+      }
       list.appendChild(card);
     }
 
