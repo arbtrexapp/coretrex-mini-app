@@ -9238,6 +9238,12 @@ paymentDetails.textContent =
   " | TXID: " + (item.payment_txid || "Not submitted") +
   " | Refund wallet: " + (item.refund_wallet_address || "Not submitted");
 card.appendChild(paymentDetails);
+      const refundDetails = document.createElement("p");
+refundDetails.className = "muted";
+refundDetails.textContent =
+  "Refund Status: " + item.refund_status +
+  " | Refund TXID: " + (item.refund_txid || "Not recorded");
+card.appendChild(refundDetails);
 
       const userId = document.createElement("p");
       userId.className = "muted";
