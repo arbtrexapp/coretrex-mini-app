@@ -9372,12 +9372,7 @@ $("submitKycDepositBtn")?.addEventListener("click", async () => {
     message.style.color = "green";
     btn.textContent = "Details Submitted";
 
-    await createNotification(
-      currentUser.id,
-      "Deposit Details Submitted",
-      "Your $500 USDT TRC20 payment details are awaiting Admin verification.",
-      "kyc"
-    );
+    
 
   } catch (error) {
     console.error("Deposit submission error:", error);
