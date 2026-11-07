@@ -8420,8 +8420,60 @@ async function createPromoCampaign() {
     button.textContent = "Create Promotion and Send Private Links";
   }
 }
+async function loadAdminPromoInvestments() {
+  const list = $("promoInvestmentRecords");
+  if (!list || !isAdmin) return;
 
+  list.textContent = "Loading investment records...";
 
+  const { data, error } = await supabaseClient.rpc(
+    "admin_list_promo_investments"
+  );
+
+  if (error) {
+    list.textContent = "Unable to load investments: " + error.message;
+    return;
+  }
+
+  list.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    list.textContent = "No promotional investment records found.";
+    return;
+  }
+
+  data.forEach(item => {
+    const card = document.createElement("div");
+    card.style.cssText =
+      "padding:14px;margin:12px 0;background:#0b1019;" +
+      "border:1px solid #26364b;border-radius:12px;";
+
+    const heading = document.createElement("strong");
+    heading.textContent = item.campaign_title || "Promotion";
+
+    const details = document.createElement("p");
+    details.style.cssText =
+      "font-size:13px;white-space:pre-line;word-break:break-word;";
+
+    details.textContent =
+      "User: " + (item.user_email || item.user_id) +
+      "\nPrincipal: " + item.principal + " USDT" +
+      "\nProfit rate: " + item.profit_rate + "%" +
+      "\nExpected profit: " + item.expected_profit + " USDT" +
+      "\nTotal expected: " + item.total_expected + " USDT" +
+      "\nDuration: " + item.duration_days + " days" +
+      "\nStatus: " + item.status +
+      "\nStarted: " + (item.started_at || "N/A") +
+      "\nMaturity: " + (item.maturity_at || "N/A") +
+      "\nPayout wallet: " + (item.payout_address || "N/A") +
+      "\nPayout TXID: " + (item.payout_txid || "N/A");
+
+    card.append(heading, details);
+    list.appendChild(card);
+  });
+}
+
+  
 async function loadPromoDeposits() {
   const list = $("promoPendingDeposits");
   if (!list || !isAdmin) return;
