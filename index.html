@@ -2361,7 +2361,10 @@ function money(value) {
 
 
 function showScreen(id) {
-
+    if (id === "accountScreen") {
+    loadMyKycStatus();
+  }
+    
   document
     .querySelectorAll(".screen")
     .forEach(s =>
@@ -9007,6 +9010,43 @@ $("submitKycBtn")?.addEventListener("click", async () => {
     btn.textContent = "Submit KYC Application";
   }
 });
+  
+  // LOAD USER KYC STATUS
+async function loadMyKycStatus() {
+  const statusElement = $("kycAccountStatus");
+
+  if (!statusElement || !currentUser) return;
+
+  statusElement.textContent = "Loading KYC status...";
+
+  const { data, error } = await supabaseClient
+    .from("kyc_submissions")
+    .select("status")
+    .eq("user_id", currentUser.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error("KYC status error:", error.message);
+    statusElement.textContent = "Unable to load KYC status";
+    return;
+  }
+
+  const status = data?.status || "not_submitted";
+
+  const labels = {
+    not_submitted: "Not submitted",
+    pending: "Pending review",
+    approved: "Verified",
+    rejected: "Declined",
+    cancelled: "Cancelled"
+  };
+
+  statusElement.textContent = labels[status] || status;
+  statusElement.className =
+    "status " + (status === "approved" ? "success" : "pending");
+}
   
 // ADMIN KYC REVIEW
 async function loadAdminKyc() {
