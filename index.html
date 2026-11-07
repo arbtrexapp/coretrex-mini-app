@@ -5435,7 +5435,63 @@ async function loadAdminInvestments() {
     if (investment.status === "frozen") {
       actions.appendChild(makeAction("Unfreeze", false));
     }
+    
+    const eligiblePlans = ["starter", "growth", "advanced"];
+    const planKey = (investment.plan_name || "").trim().toLowerCase();
 
+    if (
+      investment.status === "completed" &&
+      eligiblePlans.includes(planKey)
+    ) {
+      if (investment.capital_released_at) {
+        const released = document.createElement("p");
+        released.textContent = "Capital already released";
+        released.style.color = "#0c8f62";
+        released.style.fontWeight = "bold";
+        actions.appendChild(released);
+      } else {
+        const releaseButton = document.createElement("button");
+        releaseButton.type = "button";
+        releaseButton.textContent = "Release Capital";
+        releaseButton.style.cssText =
+          "padding:9px 12px;border:0;border-radius:7px;" +
+          "background:#0c8f62;color:white;font-weight:bold;";
+
+        releaseButton.onclick = async () => {
+          const confirmed = confirm(
+            "Release $" +
+            Number(investment.amount).toLocaleString() +
+            " original capital to this user's available balance?"
+          );
+
+          if (!confirmed) return;
+
+          releaseButton.disabled = true;
+          releaseButton.textContent = "Please wait...";
+
+          const { error: releaseError } = await supabaseClient.rpc(
+            "admin_release_investment_capital",
+            {
+              p_investment_id: investment.id
+            }
+          );
+
+          if (releaseError) {
+            alert("Capital release failed: " + releaseError.message);
+            releaseButton.disabled = false;
+            releaseButton.textContent = "Release Capital";
+            return;
+          }
+
+          alert("Original investment capital released successfully.");
+
+          await loadAdminInvestments();
+          await loadAdminUserOverview();
+        };
+
+        actions.appendChild(releaseButton);
+      }
+    }
     card.appendChild(actions);
     list.appendChild(card);
   });
