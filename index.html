@@ -5750,6 +5750,8 @@ async function loadAdminUserOverview() {
         if (!users[row.user_id]) {
 
           users[row.user_id] = {
+          userId: row.user_id,
+            
             email:
               row.email ||
               "User",
