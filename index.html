@@ -9195,7 +9195,7 @@ async function loadAdminKyc() {
 status,
   created_at
 `)
-      .eq("status", "pending")
+      .in("status", ["pending", "approved", "rejected", "cancelled"])
       .order("created_at", { ascending: false });
 
     if (error) throw error;
