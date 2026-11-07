@@ -3173,52 +3173,48 @@ async function forgotPassword() {
   
   
 async function checkAdmin() {
+  try {
+    const { data: authData, error: authError } =
+      await supabaseClient.auth.getUser();
 
-  if (!currentUser) {
+    if (authError || !authData?.user) {
+      isAdmin = false;
+      $("adminBtn").classList.add("hidden");
+      console.error("Admin authentication error:", authError);
+      return false;
+    }
 
+    currentUser = authData.user;
+
+    const { data, error } = await supabaseClient
+      .from("admin_users")
+      .select("user_id")
+      .eq("user_id", authData.user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Admin lookup error:", error);
+      isAdmin = false;
+    } else {
+      isAdmin = !!data;
+    }
+
+    $("adminBtn").classList.toggle("hidden", !isAdmin);
+
+    console.log("ADMIN CHECK:", {
+      email: authData.user.email,
+      userId: authData.user.id,
+      isAdmin
+    });
+
+    return isAdmin;
+
+  } catch (error) {
+    console.error("Admin check failed:", error);
     isAdmin = false;
-
-    $("adminBtn")
-      .classList.add("hidden");
-
+    $("adminBtn").classList.add("hidden");
     return false;
-
   }
-
-
-  const {
-    data,
-    error
-  } =
-  await supabaseClient
-    .from("admin_users")
-    .select("user_id")
-    .eq(
-      "user_id",
-      currentUser.id
-    )
-    .maybeSingle();
-
-
-  isAdmin =
-    !error && !!data;
-
-
-  if (isAdmin) {
-
-    $("adminBtn")
-      .classList.remove("hidden");
-
-  } else {
-
-    $("adminBtn")
-      .classList.add("hidden");
-
-  }
-
-
-  return isAdmin;
-
 }
 
 
