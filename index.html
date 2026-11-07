@@ -5286,6 +5286,8 @@ function escapeHtml(
 
 $("refreshActivity").onclick =
   loadActivity;
+  $("refreshAdminInvestmentsBtn").onclick =
+  loadAdminInvestments;
 
 
 /* =========================
@@ -5352,16 +5354,7 @@ async function loadAdminInvestments() {
 
   container.innerHTML = "";
 
-  const refreshButton = document.createElement("button");
-  refreshButton.type = "button";
-  refreshButton.textContent = "↻ Refresh Investments";
-  refreshButton.style.cssText =
-    "padding:10px 16px;margin-bottom:12px;border:0;" +
-    "border-radius:8px;background:#0c8f62;color:white;" +
-    "font-weight:bold;cursor:pointer;";
-
-  refreshButton.onclick = loadAdminInvestments;
-  container.appendChild(refreshButton);
+  
 
   const list = document.createElement("div");
   container.appendChild(list);
