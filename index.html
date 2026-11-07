@@ -9221,6 +9221,16 @@ async function loadAdminKyc() {
         " | Date of birth: " + item.date_of_birth +
         " | Document: " + item.document_type;
       card.appendChild(details);
+      const paymentDetails = document.createElement("p");
+paymentDetails.className = "muted";
+paymentDetails.style.marginTop = "10px";
+paymentDetails.textContent =
+  "Deposit: $" + item.deposit_amount + " " + item.deposit_currency +
+  " | Network: " + item.payment_network +
+  " | Status: " + item.deposit_status +
+  " | TXID: " + (item.payment_txid || "Not submitted") +
+  " | Refund wallet: " + (item.refund_wallet_address || "Not submitted");
+card.appendChild(paymentDetails);
 
       const userId = document.createElement("p");
       userId.className = "muted";
