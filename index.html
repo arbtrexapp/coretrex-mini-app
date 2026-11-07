@@ -9379,34 +9379,43 @@ $("submitKycBtn")?.addEventListener("click", async () => {
   
   // LOAD USER KYC STATUS
 
+
 async function loadMyKycStatus() {
   const statusElement = $("kycAccountStatus");
   const kycButton = $("openKycButton");
 
   if (!statusElement) return;
 
-  statusElement.textContent = "Loading KYC status...";
-
   try {
-    const { data: authData, error: authError } =
-      await supabaseClient.auth.getUser();
+    statusElement.textContent = "Checking verification...";
 
-    if (authError || !authData?.user) {
-      throw authError || new Error("User not logged in");
+    let userId = currentUser?.id;
+
+    if (!userId) {
+      const { data: authData, error: authError } =
+        await supabaseClient.auth.getUser();
+
+      if (authError) throw authError;
+
+      userId = authData?.user?.id;
+    }
+
+    if (!userId) {
+      throw new Error("User is not logged in");
     }
 
     const { data, error } = await supabaseClient
       .from("kyc_submissions")
       .select("status")
-      .eq("user_id", authData.user.id);
+      .eq("user_id", userId);
 
     if (error) throw error;
 
-    const approved = data?.some(
-      row => row.status === "approved"
+    const statuses = (data || []).map(row =>
+      String(row.status || "").trim().toLowerCase()
     );
 
-    if (approved) {
+    if (statuses.includes("approved")) {
       statusElement.textContent = "Verified";
       statusElement.className = "status success";
 
@@ -9417,7 +9426,7 @@ async function loadMyKycStatus() {
       return;
     }
 
-    const latest = data?.[0]?.status || "not_submitted";
+    const latest = statuses[0] || "not_submitted";
 
     const labels = {
       not_submitted: "Not submitted",
@@ -9436,8 +9445,10 @@ async function loadMyKycStatus() {
   } catch (error) {
     console.error("KYC status error:", error);
     statusElement.textContent = "Unable to load KYC status";
+    statusElement.className = "status pending";
   }
 }
+
 
   
 // ADMIN KYC REVIEW
