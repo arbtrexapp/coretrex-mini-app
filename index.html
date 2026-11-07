@@ -9333,6 +9333,60 @@ async function loadAdminKyc() {
 }
 
 $("refreshAdminKycBtn")?.addEventListener("click", loadAdminKyc);
+
+  // SUBMIT KYC DEPOSIT DETAILS
+$("submitKycDepositBtn")?.addEventListener("click", async () => {
+  const btn = $("submitKycDepositBtn");
+  const message = $("kycDepositMessage");
+
+  const txid = $("kycDepositTxid").value.trim();
+  const refundWallet = $("kycRefundWallet").value.trim();
+
+  if (!currentUser) {
+    message.textContent = "Please log in first.";
+    return;
+  }
+
+  if (!txid || !refundWallet) {
+    message.textContent = "Please enter your TXID and refund wallet address.";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Submitting...";
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      "submit_kyc_deposit_details",
+      {
+        p_txid: txid,
+        p_refund_wallet: refundWallet
+      }
+    );
+
+    if (error) throw error;
+
+    message.textContent =
+      "Payment details submitted successfully. Awaiting Admin verification.";
+
+    message.style.color = "green";
+    btn.textContent = "Details Submitted";
+
+    await createNotification(
+      currentUser.id,
+      "Deposit Details Submitted",
+      "Your $500 USDT TRC20 payment details are awaiting Admin verification.",
+      "kyc"
+    );
+
+  } catch (error) {
+    console.error("Deposit submission error:", error);
+    message.textContent = "Submission failed: " + error.message;
+    message.style.color = "red";
+    btn.disabled = false;
+    btn.textContent = "Submit Payment Details";
+  }
+});
   
 })();
   
