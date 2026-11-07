@@ -9377,55 +9377,67 @@ $("submitKycBtn")?.addEventListener("click", async () => {
   // LOAD USER KYC STATUS
 
 async function loadMyKycStatus() {
+async function loadMyKycStatus() {
   const statusElement = $("kycAccountStatus");
+  const kycButton = $("openKycButton");
 
-  if (!statusElement) return;
+  if (!statusElement || !currentUser) return;
 
-statusElement.textContent = "Loading KYC status...";
+  statusElement.textContent = "Loading KYC status...";
 
-const { data: authData, error: authError } =
-  await supabaseClient.auth.getUser();
+  try {
+    const { data, error } = await supabaseClient
+      .from("kyc_submissions")
+      .select("status, created_at")
+      .eq("user_id", currentUser.id)
+      .eq("status", "approved")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-if (authError || !authData?.user) {
-  console.error("KYC authentication error:", authError);
-  statusElement.textContent = "Unable to load KYC status";
-  return;
-}
+    if (error) throw error;
 
-alert("Your account ID: " + authData.user.id);
+    if (data) {
+      statusElement.textContent = "Verified";
+      statusElement.className = "status success";
 
-  const { data, error } = await supabaseClient
-    .from("kyc_submissions")
-    .select("status")
-    .eq("user_id", authData.user.id)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+      if (kycButton) {
+        kycButton.style.display = "none";
+      }
 
-  if (error) {
+      return;
+    }
+
+    const { data: latest, error: latestError } =
+      await supabaseClient
+        .from("kyc_submissions")
+        .select("status")
+        .eq("user_id", currentUser.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    if (latestError) throw latestError;
+
+    const status = latest?.status || "not_submitted";
+
+    const labels = {
+      not_submitted: "Not submitted",
+      pending: "Pending review",
+      rejected: "Declined",
+      cancelled: "Cancelled"
+    };
+
+    statusElement.textContent = labels[status] || status;
+    statusElement.className = "status pending";
+
+    if (kycButton) {
+      kycButton.style.display = "";
+    }
+
+  } catch (error) {
     console.error("KYC status error:", error.message);
     statusElement.textContent = "Unable to load KYC status";
-    return;
-  }
-
-  const status = data?.status || "not_submitted";
-
-  const labels = {
-    not_submitted: "Not submitted",
-    pending: "Pending review",
-    approved: "Verified",
-    rejected: "Declined",
-    cancelled: "Cancelled"
-  };
-
-  statusElement.textContent = labels[status] || status;
-  statusElement.className =
-    "status " + (status === "approved" ? "success" : "pending");
-    const kycButton = $("openKycButton");
-
-  if (kycButton) {
-    kycButton.style.display =
-      status === "approved" ? "none" : "";
   }
 }
 
