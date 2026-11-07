@@ -1630,9 +1630,37 @@ Only official Coretrex communication channels should be trusted
     </p>
 
     <p class="muted">
-      Keep your transaction ID (TXID) after payment.
-      Admin will manually verify submitted payment details.
-    </p>
+  After sending your payment, enter the details below.
+</p>
+
+<label class="label" style="margin-top:16px">
+  TRANSACTION ID (TXID)
+</label>
+<input
+  id="kycDepositTxid"
+  type="text"
+  placeholder="Enter your USDT TRC20 transaction ID"
+>
+
+<label class="label" style="margin-top:16px">
+  REFUND WALLET ADDRESS
+</label>
+<input
+  id="kycRefundWallet"
+  type="text"
+  placeholder="Your USDT TRC20 refund address"
+>
+
+<button
+  class="btn"
+  id="submitKycDepositBtn"
+  type="button"
+  style="margin-top:16px"
+>
+  Submit Payment Details
+</button>
+
+<p id="kycDepositMessage" class="muted"></p>
 
   </div>
 
