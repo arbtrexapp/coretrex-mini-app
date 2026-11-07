@@ -2474,9 +2474,7 @@ function money(value) {
 
 
 function showScreen(id) {
-    if (id === "accountScreen") {
-    loadMyKycStatus();
-  }
+    
     
   document
     .querySelectorAll(".screen")
@@ -2491,6 +2489,11 @@ function showScreen(id) {
 
     screen.classList.add("active");
 
+  }
+  if (id === "accountScreen") {
+  loadMyKycStatus().catch(error => {
+    console.error("KYC status loading failed:", error);
+  });
   }
 
   document
