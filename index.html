@@ -1449,6 +1449,110 @@ Only official Coretrex communication channels should be trusted
 
 </section>
 
+  <!-- KYC VERIFICATION FORM -->
+<section id="kycScreen" class="screen">
+
+  <button
+    class="back"
+    type="button"
+    data-screen="accountScreen"
+  >
+    ← Back to Account
+  </button>
+
+  <h2>KYC Verification</h2>
+
+  <p class="muted">
+    Complete your identity details and upload your documents for
+    admin review. You can submit your application at any time.
+  </p>
+
+  <div class="card">
+
+    <label class="label">FULL NAME</label>
+    <input
+      id="kycFullName"
+      type="text"
+      placeholder="Enter your full legal name"
+      required
+    >
+
+    <label class="label" style="margin-top:16px">COUNTRY</label>
+    <input
+      id="kycCountry"
+      type="text"
+      placeholder="Enter your country"
+      required
+    >
+
+    <label class="label" style="margin-top:16px">DATE OF BIRTH</label>
+    <input
+      id="kycDateOfBirth"
+      type="date"
+      required
+    >
+
+    <label class="label" style="margin-top:16px">IDENTIFICATION DOCUMENT</label>
+    <select id="kycDocumentType" required>
+      <option value="">Select document type</option>
+      <option value="National ID / NIN">National ID / NIN</option>
+      <option value="International Passport">International Passport</option>
+      <option value="Driver Licence">Driver's Licence</option>
+      <option value="Voter Card">Voter's Card</option>
+    </select>
+
+    <label class="label" style="margin-top:16px">
+      DOCUMENT FRONT
+    </label>
+    <input
+      id="kycDocumentFront"
+      type="file"
+      accept="image/jpeg,image/png,image/webp,application/pdf"
+      required
+    >
+
+    <label class="label" style="margin-top:16px">
+      DOCUMENT BACK
+    </label>
+    <input
+      id="kycDocumentBack"
+      type="file"
+      accept="image/jpeg,image/png,image/webp,application/pdf"
+    >
+    <p class="muted">
+      Optional for passports or documents without a separate back.
+    </p>
+
+    <label class="label" style="margin-top:16px">
+      SELFIE PHOTO
+    </label>
+    <input
+      id="kycSelfie"
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      required
+    >
+
+    <p class="muted" style="margin-top:12px">
+      Maximum file size: 2 MB per file. Your documents are stored
+      privately and reviewed by Coretrex administrators.
+    </p>
+
+    <button
+      class="btn"
+      id="submitKycBtn"
+      type="button"
+      style="margin-top:16px"
+    >
+      Submit KYC Application
+    </button>
+
+    <p id="kycFormMessage" class="muted"></p>
+
+  </div>
+
+</section>
+
   <!-- NOTIFICATIONS -->
 
 <div id="notificationsScreen" class="screen">
