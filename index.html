@@ -4503,11 +4503,14 @@ if (amount >= 1000) {
   }
 
   if (!kycRecord) {
-    $("withdrawMessage").textContent =
-      "KYC verification is required for withdrawals of $1,000 or more. Please complete KYC from your Account before continuing.";
-    $("withdrawMessage").className = "error";
-    return;
-  }
+  $("withdrawMessage").textContent =
+    "KYC verification is required for withdrawals of $1,000 or more. Redirecting to KYC Verification...";
+
+  $("withdrawMessage").className = "error";
+
+  showScreen("kycScreen");
+  return;
+}
 }
     const fee =
       Math.round(
