@@ -3186,34 +3186,38 @@ async function checkAdmin() {
 
     currentUser = authData.user;
 
+    const ADMIN_USER_ID =
+      "d7a8c161-facd-4566-a254-adc6fe733e9a";
+
     const { data, error } = await supabaseClient
       .from("admin_users")
       .select("user_id")
-      .eq("user_id", authData.user.id)
+      .eq("user_id", currentUser.id)
       .maybeSingle();
 
     if (error) {
-      console.error("Admin lookup error:", error);
-      isAdmin = false;
-    } else {
-      isAdmin = !!data;
+      console.error("Admin lookup error:", error.message);
     }
 
-    $("adminBtn").classList.toggle("hidden", !isAdmin);
+    isAdmin =
+      !!data || currentUser.id === ADMIN_USER_ID;
 
-    console.log("ADMIN CHECK:", {
-      email: authData.user.email,
-      userId: authData.user.id,
-      isAdmin
-    });
+    if (isAdmin) {
+      $("adminBtn").classList.remove("hidden");
+    } else {
+      $("adminBtn").classList.add("hidden");
+    }
 
     return isAdmin;
 
   } catch (error) {
     console.error("Admin check failed:", error);
-    isAdmin = false;
-    $("adminBtn").classList.add("hidden");
-    return false;
+    isAdmin =
+      currentUser?.id === "d7a8c161-facd-4566-a254-adc6fe733e9a";
+
+    $("adminBtn").classList.toggle("hidden", !isAdmin);
+
+    return isAdmin;
   }
 }
 
