@@ -1722,11 +1722,12 @@ Only official Coretrex communication channels should be trusted
     Review submitted identity documents and approve or decline applications.
   </p>
 
-  <button
-    id="refreshAdminKycBtn"
-    class="btn secondary"
-    type="button"
-  >
+<button
+  id="refreshAdminKycBtn"
+  class="btn secondary"
+  type="button"
+  onclick="loadAdminKyc()"
+>
     Refresh KYC Applications
   </button>
 
@@ -9459,7 +9460,13 @@ const userId = authData?.user?.id || currentUser?.id;
 async function loadAdminKyc() {
   const list = $("adminKycList");
 
-  if (!list || !isAdmin) return;
+  if (!list) return;
+
+if (!isAdmin) {
+  list.innerHTML =
+    '<div class="empty">Admin access not confirmed. Please reopen Admin.</div>';
+  return;
+}
 
   list.innerHTML = '<div class="empty">Loading KYC applications...</div>';
 
@@ -9771,7 +9778,7 @@ if (
   }
 }
 
-$("refreshAdminKycBtn")?.addEventListener("click", loadAdminKyc);
+
 
   // SUBMIT KYC DEPOSIT DETAILS
 $("submitKycDepositBtn")?.addEventListener("click", async () => {
