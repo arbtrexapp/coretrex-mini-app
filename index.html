@@ -5309,20 +5309,10 @@ $("refreshActivity").onclick =
    ADMIN
 ========================= */
 
-$("adminBtn").onclick =
-  async () => {
-
-    if (!isAdmin) {
-      return;
-    }
-
-    showScreen(
-      "adminScreen"
-    );
-
-    await loadAdminData();
-
-  };
+$("adminBtn").onclick = () => {
+  if (!isAdmin) return;
+  showScreen("adminScreen");
+};
 
 
 async function loadAdminData() {
@@ -10192,7 +10182,61 @@ $("copyPromoAddressBtn")?.addEventListener(
     ></p>
 
   </div>
+<script>
+(() => {
+  const chatButton = document.getElementById("liveChatFloatBtn");
+  const chatPanel = document.getElementById("liveChatPanel");
+  const closeButton = document.getElementById("closeLiveChatBtn");
+  const sendButton = document.getElementById("sendLiveChatBtn");
+  const input = document.getElementById("liveChatInput");
+  const status = document.getElementById("liveChatStatus");
 
+  chatButton?.addEventListener("click", async () => {
+    chatPanel?.classList.remove("hidden");
+    await loadLiveChatMessages();
+  });
+
+  closeButton?.addEventListener("click", () => {
+    chatPanel?.classList.add("hidden");
+  });
+
+  sendButton?.addEventListener("click", async () => {
+    if (!currentUser) {
+      if (status) status.textContent = "Please log in to use Live Chat.";
+      return;
+    }
+
+    const message = input?.value.trim();
+    if (!message) return;
+
+    sendButton.disabled = true;
+    if (status) status.textContent = "Sending...";
+
+    try {
+      const { error } = await supabaseClient
+        .from("live_chat_messages")
+        .insert({
+          user_id: currentUser.id,
+          sender: "user",
+          message: message
+        });
+
+      if (error) throw error;
+
+      input.value = "";
+      if (status) status.textContent = "Sent.";
+      await loadLiveChatMessages();
+
+    } catch (error) {
+      console.error("Live Chat send error:", error);
+      if (status) status.textContent = "Unable to send: " + error.message;
+    } finally {
+      sendButton.disabled = false;
+    }
+  });
+})();
+</script>
+    
   </div>
 </body>
 </html>
