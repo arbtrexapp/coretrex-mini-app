@@ -3173,36 +3173,40 @@ async function forgotPassword() {
   
   
 
+
 async function checkAdmin() {
   const ADMIN_USER_ID =
     "d7a8c161-facd-4566-a254-adc6fe733e9a";
+
+  const ADMIN_EMAIL =
+    "kallyhonn@gmail.com";
 
   try {
     const { data, error } =
       await supabaseClient.auth.getUser();
 
-    // Use the authenticated session user if available.
-    // Otherwise, fall back to the existing currentUser.
     const user = data?.user || currentUser;
 
     if (!user) {
       isAdmin = false;
       $("adminBtn").classList.add("hidden");
-      console.error("No authenticated user found:", error);
+      console.error("No signed-in user:", error);
       return false;
     }
 
     currentUser = user;
 
-    // The account ID determines whether the Admin button
-    // should be displayed.
-    isAdmin = user.id === ADMIN_USER_ID;
+    isAdmin =
+      user.id === ADMIN_USER_ID ||
+      user.email?.toLowerCase() === ADMIN_EMAIL;
+
+    const adminButton = $("adminBtn");
+
+    adminButton.classList.toggle("hidden", !isAdmin);
 
     if (isAdmin) {
-      $("adminBtn").classList.remove("hidden");
-      console.log("Coretrex admin recognized.");
-    } else {
-      $("adminBtn").classList.add("hidden");
+      adminButton.style.removeProperty("display");
+      console.log("Admin access recognized:", user.id);
     }
 
     return isAdmin;
@@ -3211,7 +3215,8 @@ async function checkAdmin() {
     console.error("Admin check failed:", error);
 
     isAdmin =
-      currentUser?.id === ADMIN_USER_ID;
+      currentUser?.id === ADMIN_USER_ID ||
+      currentUser?.email?.toLowerCase() === ADMIN_EMAIL;
 
     $("adminBtn").classList.toggle("hidden", !isAdmin);
 
