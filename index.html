@@ -2508,10 +2508,16 @@ function showScreen(id) {
 
   }
   if (id === "accountScreen") {
+
+  checkAdmin().catch(error => {
+    console.error("Admin visibility check failed:", error);
+  });
+
   loadMyKycStatus().catch(error => {
     console.error("KYC status loading failed:", error);
   });
-  }
+
+}
 
   document
     .querySelectorAll(".bottom button")
