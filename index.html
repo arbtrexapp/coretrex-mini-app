@@ -9818,6 +9818,17 @@ $("submitKycDepositBtn")?.addEventListener("click", async () => {
     btn.textContent = "Submit Payment Details";
   }
 });
+
+  // MAKE INIT FUNCTIONS ACCESSIBLE TO THE REST OF COREТREX
+window.loadMySupportMessages = loadMySupportMessages;
+window.loadAdminSupportMessages = loadAdminSupportMessages;
+window.loadLiveChatMessages = loadLiveChatMessages;
+window.loadAdminLiveChatUsers = loadAdminLiveChatUsers;
+window.loadAdminLiveChatMessages = loadAdminLiveChatMessages;
+window.loadMyKycStatus = loadMyKycStatus;
+window.loadAdminKyc = loadAdminKyc;
+window.loadAdminPromoInvestments = loadAdminPromoInvestments;
+window.loadPromoDeposits = loadPromoDeposits;
   
 })();
   
