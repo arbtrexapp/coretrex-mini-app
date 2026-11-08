@@ -2514,7 +2514,7 @@ function showScreen(id) {
     console.error("Admin visibility check failed:", error);
   });
 
-  loadMyKycStatus().catch(error => {
+  window.loadMyKycStatus().catch(error => {
     console.error("KYC status loading failed:", error);
   });
 
@@ -2548,7 +2548,7 @@ function showScreen(id) {
   
 if (id === "contactScreen") {
 
-  loadMySupportMessages()
+  window.loadMySupportMessages()
     .catch(error => {
 
       console.error(
@@ -2568,7 +2568,7 @@ if (id === "contactScreen") {
     if (id === "adminScreen" && isAdmin) {
 
   loadAdminData();
-   loadAdminKyc();   
+   window.loadAdminKyc();   
 
 }
   
@@ -5327,18 +5327,17 @@ $("adminMessage")
       "Loading admin data...";
 
 
-await Promise.all([
+await Promise.allSettled([
   loadPendingDeposits(),
   loadPendingWithdrawals(),
   loadApprovedWithdrawals(),
-  loadAdminSupportMessages(),
-  loadAdminLiveChatUsers(),
+  window.loadAdminSupportMessages(),
+  window.loadAdminLiveChatUsers(),
   loadAdminNotificationUsers(),
   loadAdminUserOverview(),
   loadAdminInvestments(),
-  loadAdminPromoInvestments()
+  window.loadAdminPromoInvestments()
 ]);
-
 
 $("adminMessage")
     .textContent = "";
@@ -10204,7 +10203,7 @@ $("copyPromoAddressBtn")?.addEventListener(
 
   chatButton?.addEventListener("click", async () => {
     chatPanel?.classList.remove("hidden");
-    await loadLiveChatMessages();
+    await window.loadLiveChatMessages();
   });
 
   closeButton?.addEventListener("click", () => {
@@ -10236,8 +10235,7 @@ $("copyPromoAddressBtn")?.addEventListener(
 
       input.value = "";
       if (status) status.textContent = "Sent.";
-      await loadLiveChatMessages();
-
+      await window.loadLiveChatMessages();
     } catch (error) {
       console.error("Live Chat send error:", error);
       if (status) status.textContent = "Unable to send: " + error.message;
