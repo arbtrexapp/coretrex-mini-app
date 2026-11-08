@@ -7630,7 +7630,15 @@ supabaseClient.auth
 
 
 (async function init() {
-    window.loadLiveChatMessages = loadLiveChatMessages;
+      window.loadMySupportMessages = loadMySupportMessages;
+  window.loadAdminSupportMessages = loadAdminSupportMessages;
+  window.loadLiveChatMessages = loadLiveChatMessages;
+  window.loadAdminLiveChatUsers = loadAdminLiveChatUsers;
+  window.loadAdminLiveChatMessages = loadAdminLiveChatMessages;
+  window.loadMyKycStatus = loadMyKycStatus;
+  window.loadAdminKyc = loadAdminKyc;
+  window.loadAdminPromoInvestments = loadAdminPromoInvestments;
+  window.loadPromoDeposits = loadPromoDeposits;
 
   updateDepositAsset();
 
