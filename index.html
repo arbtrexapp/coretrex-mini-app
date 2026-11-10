@@ -8949,6 +8949,7 @@ async function createPromoCampaign() {
     button.textContent = "Create Promotion and Send Private Links";
   }
 }
+
 async function loadAdminPromoInvestments() {
   const list = $("promoInvestmentRecords");
   if (!list || !isAdmin) return;
@@ -8998,9 +8999,73 @@ async function loadAdminPromoInvestments() {
       "\nPayout TXID: " + (item.payout_txid || "N/A");
 
     card.append(heading, details);
+
+    if (item.status === "claim_requested") {
+      const txidInput = document.createElement("input");
+      txidInput.type = "text";
+      txidInput.placeholder = "Enter actual payout transaction ID";
+      txidInput.style.cssText =
+        "width:100%;box-sizing:border-box;margin:8px 0;padding:12px;";
+
+      const noteInput = document.createElement("input");
+      noteInput.type = "text";
+      noteInput.placeholder = "Admin payment note (optional)";
+      noteInput.style.cssText =
+        "width:100%;box-sizing:border-box;margin:8px 0;padding:12px;";
+
+      const payButton = document.createElement("button");
+      payButton.type = "button";
+      payButton.className = "btn";
+      payButton.textContent = "Confirm Payment Sent";
+      payButton.style.width = "100%";
+
+      const result = document.createElement("p");
+      result.className = "muted";
+
+      payButton.addEventListener("click", async () => {
+        const txid = txidInput.value.trim();
+
+        if (txid.length < 10) {
+          result.textContent = "Enter the actual payout TXID.";
+          result.className = "error";
+          return;
+        }
+
+        payButton.disabled = true;
+        payButton.textContent = "Processing payment...";
+        result.textContent = "Recording payout...";
+
+        try {
+          const { error: payoutError } =
+            await supabaseClient.rpc("admin_mark_promo_paid", {
+              p_investment_id: item.investment_id,
+              p_payout_txid: txid,
+              p_admin_note: noteInput.value.trim() || null
+            });
+
+          if (payoutError) throw payoutError;
+
+          result.textContent =
+            "Payment recorded and user notified successfully.";
+          result.className = "success";
+
+          await loadAdminPromoInvestments();
+
+        } catch (err) {
+          result.textContent = "Payout failed: " + err.message;
+          result.className = "error";
+          payButton.disabled = false;
+          payButton.textContent = "Confirm Payment Sent";
+        }
+      });
+
+      card.append(txidInput, noteInput, payButton, result);
+    }
+
     list.appendChild(card);
   });
 }
+
 
   
 async function loadPromoDeposits() {
