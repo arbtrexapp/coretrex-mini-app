@@ -5771,10 +5771,29 @@ async function loadAdminInvestments() {
       Number(investment.amount || 0).toLocaleString();
 
     const details = document.createElement("p");
-    details.textContent =
-      "User: " + (investment.user_email || "Unknown") +
-      " | Status: " + (investment.status || "Unknown");
 
+const startedDate = investment.started_at
+  ? new Date(investment.started_at).toLocaleString("en-NG")
+  : "Not recorded";
+
+let endDate = "Not available";
+
+if (investment.completed_at) {
+  endDate = new Date(investment.completed_at).toLocaleString("en-NG");
+} else if (investment.target_deadline) {
+  endDate = new Date(investment.target_deadline).toLocaleString("en-NG");
+} else if (investment.started_at && investment.duration_hours != null) {
+  endDate = new Date(
+    new Date(investment.started_at).getTime() +
+    Number(investment.duration_hours) * 60 * 60 * 1000
+  ).toLocaleString("en-NG");
+}
+
+details.textContent =
+  "User: " + (investment.user_email || "Unknown") +
+  " | Status: " + (investment.status || "Unknown") +
+  "\nInvestment Started: " + startedDate +
+  "\n" + (investment.completed_at ? "Investment Ended: " : "Expected End: ") + endDate;
     const idText = document.createElement("p");
     idText.textContent = "Investment ID: " + investment.id;
 
