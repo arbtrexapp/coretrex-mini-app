@@ -1493,6 +1493,67 @@ Only official Coretrex communication channels should be trusted
 
 </section>
 
+  <!-- EDIT NAME PAGE -->
+<section id="editNameScreen" class="screen">
+
+  <button class="back" type="button" data-screen="accountScreen">
+    ← Back to Account
+  </button>
+
+  <h2>Edit Your Name</h2>
+
+  <div class="card">
+    <label class="label">FULL NAME</label>
+    <input
+      id="editProfileName"
+      type="text"
+      placeholder="Enter your full name"
+    >
+
+    <button id="saveProfileNameBtn" class="btn" type="button">
+      Save Name
+    </button>
+
+    <p id="profileNameMessage" class="muted"></p>
+  </div>
+
+</section>
+
+<!-- CHANGE PASSWORD PAGE -->
+<section id="changePasswordScreen" class="screen">
+
+  <button class="back" type="button" data-screen="accountScreen">
+    ← Back to Account
+  </button>
+
+  <h2>Change Password</h2>
+
+  <div class="card">
+    <label class="label">NEW PASSWORD</label>
+    <input
+      id="accountNewPassword"
+      type="password"
+      placeholder="Minimum 6 characters"
+    >
+
+    <label class="label" style="margin-top:15px">
+      CONFIRM NEW PASSWORD
+    </label>
+    <input
+      id="accountConfirmPassword"
+      type="password"
+      placeholder="Confirm new password"
+    >
+
+    <button id="changeAccountPasswordBtn" class="btn" type="button">
+      Change Password
+    </button>
+
+    <p id="accountPasswordMessage" class="muted"></p>
+  </div>
+
+</section>
+
   <!-- KYC VERIFICATION FORM -->
 <section id="kycScreen" class="screen">
 
