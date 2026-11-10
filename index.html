@@ -9434,6 +9434,64 @@ async function createPromoCampaign() {
   }
 }
 
+async function loadPromoOfferRecipients() {
+  const list = $("promoOfferRecipients");
+  if (!list || !isAdmin) return;
+
+  list.textContent = "Loading promotional offer recipients...";
+
+  const { data, error } = await supabaseClient.rpc(
+    "admin_list_promo_offer_recipients"
+  );
+
+  if (error) {
+    list.textContent = "Unable to load recipients: " + error.message;
+    return;
+  }
+
+  list.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    list.textContent = "No promotional offers have been sent yet.";
+    return;
+  }
+
+  data.forEach(item => {
+    const card = document.createElement("div");
+
+    card.style.cssText =
+      "padding:14px;margin:12px 0;background:#0b1019;" +
+      "border:1px solid #26364b;border-radius:12px;";
+
+    const heading = document.createElement("strong");
+    heading.textContent = item.full_name || item.email || "Unknown user";
+
+    const details = document.createElement("p");
+    details.style.cssText =
+      "font-size:13px;white-space:pre-line;word-break:break-word;";
+
+    details.textContent =
+      "Email: " + (item.email || "Not available") +
+      "\nPromotion: " + (item.promotion_title || "Unknown") +
+      "\nInvestment amount: " + item.investment_amount + " USDT" +
+      "\nProfit rate: " + item.profit_rate + "%" +
+      "\nDuration: " + item.duration_days + " days" +
+      "\nOffer status: " + (item.offer_status || "Unknown") +
+      "\nNotification sent: " +
+      (item.notification_sent_at
+        ? new Date(item.notification_sent_at).toLocaleString("en-NG")
+        : "Not available") +
+      "\nActivated: " +
+      (item.activated_at
+        ? new Date(item.activated_at).toLocaleString("en-NG")
+        : "Not yet activated");
+
+    card.append(heading, details);
+    list.appendChild(card);
+  });
+}
+
+  
 async function loadAdminPromoInvestments() {
   const list = $("promoInvestmentRecords");
   if (!list || !isAdmin) return;
