@@ -5301,6 +5301,155 @@ async function loadActivity() {
 
 }
 
+  
+async function loadHomeRecentHistory() {
+  const box = $("homeRecentHistory");
+  if (!box || !currentUser) return;
+
+  box.innerHTML = '<div class="empty">Loading your recent activity...</div>';
+
+  const [txResult, invResult] = await Promise.all([
+    supabaseClient
+      .from("transactions")
+      .select("id, transaction_type, amount, status, reference, description, created_at")
+      .eq("user_id", currentUser.id)
+      .order("created_at", { ascending: false })
+      .limit(50),
+
+    supabaseClient
+      .from("investments")
+      .select("id, plan_name, amount, status, started_at, duration_hours, profit_rate, expected_profit, target_amount, target_deadline, target_progress")
+      .eq("user_id", currentUser.id)
+      .order("started_at", { ascending: false })
+      .limit(50)
+  ]);
+
+  if (txResult.error || invResult.error) {
+    box.innerHTML = '<div class="empty error">Unable to load account history.</div>';
+    console.error(txResult.error || invResult.error);
+    return;
+  }
+
+  const transactions = (txResult.data || []).map(t => ({
+    kind: "transaction",
+    title: formatTransactionType(t.transaction_type),
+    amount: t.amount,
+    status: t.status,
+    date: t.created_at,
+    details: t
+  }));
+
+  const investments = (invResult.data || []).map(i => ({
+    kind: "investment",
+    title: `${formatTransactionType(i.plan_name)} Investment`,
+    amount: i.amount,
+    status: i.status,
+    date: i.started_at,
+    details: i
+  }));
+
+  window.coretrexHistoryItems = [...transactions, ...investments]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 5);
+
+  if (!window.coretrexHistoryItems.length) {
+    box.innerHTML = '<div class="empty">No transactions or investments yet.</div>';
+    return;
+  }
+
+  box.innerHTML = window.coretrexHistoryItems.map((item, index) => `
+    <button
+      type="button"
+      class="history-item"
+      style="width:100%;text-align:left;margin-bottom:9px"
+      onclick="showHomeHistoryDetail(${index})"
+    >
+      <div class="row">
+        <b>${escapeHtml(item.title)}</b>
+        <span class="status">${escapeHtml(item.status || "Pending")}</span>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <span class="muted">${new Date(item.date).toLocaleString("en-NG")}</span>
+        <b>${money(item.amount)}</b>
+      </div>
+      <div class="muted" style="margin-top:6px">Tap to view full details →</div>
+    </button>
+  `).join("");
+}
+
+function showHomeHistoryDetail(index) {
+  const box = $("homeRecentHistory");
+  const item = window.coretrexHistoryItems?.[index];
+
+  if (!box || !item) return;
+
+  const d = item.details;
+  const date = item.date
+    ? new Date(item.date).toLocaleString("en-NG")
+    : "Not available";
+
+  let details = `
+    <div class="card" style="margin-top:12px">
+      <button type="button" class="btn secondary"
+        style="width:auto" onclick="loadHomeRecentHistory()">
+        ← Back to History
+      </button>
+      <h3>${escapeHtml(item.title)}</h3>
+      <div class="row"><span class="muted">Amount</span><b>${money(item.amount)}</b></div>
+      <div class="row"><span class="muted">Status</span><b>${escapeHtml(item.status || "Pending")}</b></div>
+      <div class="muted" style="margin-top:10px">Date: ${date}</div>
+  `;
+
+  if (item.kind === "transaction") {
+    details += `
+      <div class="muted" style="margin-top:10px">
+        Type: ${escapeHtml(d.transaction_type)}
+      </div>
+      <div class="muted" style="margin-top:8px">
+        Description: ${escapeHtml(d.description || "Not provided")}
+      </div>
+      <div class="muted" style="margin-top:8px;word-break:break-all">
+        Reference / TXID: ${escapeHtml(d.reference || "Not provided")}
+      </div>
+      <div class="muted" style="margin-top:8px">
+        Record ID: ${escapeHtml(d.id)}
+      </div>
+    `;
+  } else {
+    details += `
+      <div class="muted" style="margin-top:10px">
+        Plan: ${escapeHtml(d.plan_name)}
+      </div>
+      <div class="muted" style="margin-top:8px">
+        Duration: ${escapeHtml(d.duration_hours ?? "Not specified")} hours
+      </div>
+      <div class="muted" style="margin-top:8px">
+        Profit rate: ${escapeHtml(d.profit_rate ?? "Not specified")}%
+      </div>
+      <div class="muted" style="margin-top:8px">
+        Expected profit: ${money(d.expected_profit)}
+      </div>
+      <div class="muted" style="margin-top:8px">
+        Target amount: ${money(d.target_amount)}
+      </div>
+      <div class="muted" style="margin-top:8px">
+        Target deadline: ${d.target_deadline ? new Date(d.target_deadline).toLocaleString("en-NG") : "Not applicable"}
+      </div>
+      <div class="muted" style="margin-top:8px">
+        Record ID: ${escapeHtml(d.id)}
+      </div>
+    `;
+  }
+
+  details += "</div>";
+  box.innerHTML = details;
+}
+
+$("viewFullHistoryBtn")?.addEventListener("click", () => {
+  showScreen("activityScreen");
+  loadActivity();
+});
+
 
 function formatTransactionType(
   type
