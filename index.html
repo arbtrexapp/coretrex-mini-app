@@ -2603,9 +2603,10 @@ function showScreen(id) {
   }
 
 
-  if (id === "homeScreen") {
+    if (id === "homeScreen") {
 
     loadAccount();
+    loadHomeRecentHistory();
 
   }
 
@@ -3334,6 +3335,8 @@ async function openApp() {
   await loadAccount();
 
   await loadActivity();
+  
+  await loadHomeRecentHistory();
     if (promoToken) {
 
     showScreen("promoOfferScreen");
