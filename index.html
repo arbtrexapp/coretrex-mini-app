@@ -2297,6 +2297,48 @@ Only official Coretrex communication channels should be trusted
 
     </div>
 
+    
+<!-- WITHDRAWAL HISTORY -->
+<div class="card">
+  <h3>Withdrawal History</h3>
+  <p class="muted">Approved, completed and declined withdrawal requests.</p>
+
+  <select id="withdrawalHistoryFilter" class="input">
+    <option value="all">All statuses</option>
+    <option value="approved">Approved</option>
+    <option value="completed">Completed / Paid</option>
+    <option value="rejected">Declined</option>
+  </select>
+
+  <button id="refreshWithdrawalHistoryBtn" class="btn secondary" type="button">
+    ↻ Refresh Withdrawal History
+  </button>
+
+  <div id="adminWithdrawalHistoryList">
+    <div class="empty">Withdrawal history will appear here.</div>
+  </div>
+</div>
+
+<!-- DEPOSIT HISTORY -->
+<div class="card">
+  <h3>Deposit History</h3>
+  <p class="muted">Approved and declined deposit requests.</p>
+
+  <select id="depositHistoryFilter" class="input">
+    <option value="all">All statuses</option>
+    <option value="approved">Approved</option>
+    <option value="rejected">Declined</option>
+  </select>
+
+  <button id="refreshDepositHistoryBtn" class="btn secondary" type="button">
+    ↻ Refresh Deposit History
+  </button>
+
+  <div id="adminDepositHistoryList">
+    <div class="empty">Deposit history will appear here.</div>
+  </div>
+</div>
+
     <p
       id="adminMessage"
       class="muted"
