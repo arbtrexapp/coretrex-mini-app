@@ -3397,6 +3397,76 @@ async function openApp() {
 
 }
 
+  $("saveProfileNameBtn")?.addEventListener("click", async () => {
+  const name = $("editProfileName").value.trim();
+  const message = $("profileNameMessage");
+  const button = $("saveProfileNameBtn");
+
+  if (!name) {
+    message.textContent = "Please enter your full name.";
+    message.className = "error";
+    return;
+  }
+
+  button.disabled = true;
+  message.textContent = "Saving...";
+
+  const { error } = await supabaseClient
+    .from("profiles")
+    .update({ full_name: name })
+    .eq("id", currentUser.id);
+
+  button.disabled = false;
+
+  if (error) {
+    message.textContent = error.message;
+    message.className = "error";
+    return;
+  }
+
+  message.textContent = "Your name has been updated successfully.";
+  message.className = "success";
+});
+
+$("changeAccountPasswordBtn")?.addEventListener("click", async () => {
+  const password = $("accountNewPassword").value;
+  const confirm = $("accountConfirmPassword").value;
+  const message = $("accountPasswordMessage");
+  const button = $("changeAccountPasswordBtn");
+
+  if (password.length < 6) {
+    message.textContent = "Password must contain at least 6 characters.";
+    message.className = "error";
+    return;
+  }
+
+  if (password !== confirm) {
+    message.textContent = "Passwords do not match.";
+    message.className = "error";
+    return;
+  }
+
+  button.disabled = true;
+  message.textContent = "Updating password...";
+
+  const { error } = await supabaseClient.auth.updateUser({
+    password: password
+  });
+
+  button.disabled = false;
+
+  if (error) {
+    message.textContent = error.message;
+    message.className = "error";
+    return;
+  }
+
+  $("accountNewPassword").value = "";
+  $("accountConfirmPassword").value = "";
+  message.textContent = "Password changed successfully.";
+  message.className = "success";
+});
+
 
 async function loadAccount() {
 
