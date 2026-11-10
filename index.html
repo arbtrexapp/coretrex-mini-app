@@ -7524,6 +7524,144 @@ async function completeWithdrawal(
 
 }
 
+  
+let adminWithdrawalHistoryData = [];
+let adminDepositHistoryData = [];
+
+async function loadWithdrawalHistory() {
+  const box = $("adminWithdrawalHistoryList");
+  if (!box) return;
+
+  box.innerHTML = '<div class="empty">Loading withdrawal history...</div>';
+
+  const { data, error } = await supabaseClient.rpc(
+    "admin_get_withdrawal_history"
+  );
+
+  if (error) {
+    box.innerHTML = `<div class="empty error">${escapeHtml(error.message)}</div>`;
+    return;
+  }
+
+  adminWithdrawalHistoryData = data || [];
+  renderWithdrawalHistory();
+}
+
+function renderWithdrawalHistory() {
+  const box = $("adminWithdrawalHistoryList");
+  if (!box) return;
+
+  const filter = $("withdrawalHistoryFilter").value;
+  const rows = adminWithdrawalHistoryData.filter(w =>
+    filter === "all" || w.status === filter
+  );
+
+  if (!rows.length) {
+    box.innerHTML = '<div class="empty">No matching withdrawal records found.</div>';
+    return;
+  }
+
+  box.innerHTML = rows.map(w => {
+    const date = new Date(w.created_at).toLocaleString("en-NG");
+    const status = w.status === "rejected" ? "Declined" :
+      w.status === "completed" ? "Completed / Paid" : "Approved";
+    const statusClass = w.status === "rejected" ? "rejected" : "approved";
+
+    return `
+      <div class="history-item">
+        <div class="row">
+          <div>
+            <b>${money(w.amount)}</b>
+            <div class="muted">${escapeHtml(w.full_name || "User")}</div>
+            <div class="muted">${escapeHtml(w.user_email || "")}</div>
+          </div>
+          <span class="status ${statusClass}">${status}</span>
+        </div>
+        <div class="muted" style="margin-top:9px">
+          Network: ${escapeHtml(w.network || "Not specified")}
+        </div>
+        <div class="muted">
+          Wallet: ${escapeHtml(w.wallet_address || "Not provided")}
+        </div>
+        <div class="muted">
+          Separate fee: ${money(w.fee_amount || 0)}
+        </div>
+        ${w.fee_txid ? `<div class="muted">Fee TXID: ${escapeHtml(w.fee_txid)}</div>` : ""}
+        <div class="muted" style="margin-top:9px">Requested: ${date}</div>
+        <div class="muted">Request ID: ${escapeHtml(w.id)}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+async function loadDepositHistory() {
+  const box = $("adminDepositHistoryList");
+  if (!box) return;
+
+  box.innerHTML = '<div class="empty">Loading deposit history...</div>';
+
+  const { data, error } = await supabaseClient.rpc(
+    "admin_get_deposit_history"
+  );
+
+  if (error) {
+    box.innerHTML = `<div class="empty error">${escapeHtml(error.message)}</div>`;
+    return;
+  }
+
+  adminDepositHistoryData = data || [];
+  renderDepositHistory();
+}
+
+function renderDepositHistory() {
+  const box = $("adminDepositHistoryList");
+  if (!box) return;
+
+  const filter = $("depositHistoryFilter").value;
+  const rows = adminDepositHistoryData.filter(d =>
+    filter === "all" || d.status === filter
+  );
+
+  if (!rows.length) {
+    box.innerHTML = '<div class="empty">No matching deposit records found.</div>';
+    return;
+  }
+
+  box.innerHTML = rows.map(d => {
+    const date = new Date(d.created_at).toLocaleString("en-NG");
+    const status = d.status === "rejected" ? "Declined" : "Approved";
+    const statusClass = d.status === "rejected" ? "rejected" : "approved";
+
+    return `
+      <div class="history-item">
+        <div class="row">
+          <div>
+            <b>${money(d.amount)}</b>
+            <div class="muted">${escapeHtml(d.full_name || "User")}</div>
+            <div class="muted">${escapeHtml(d.user_email || "")}</div>
+          </div>
+          <span class="status ${statusClass}">${status}</span>
+        </div>
+        <div class="muted" style="margin-top:9px">
+          Network: ${escapeHtml(d.network || "Not specified")}
+        </div>
+        <div class="muted">
+          Transaction ID: ${escapeHtml(d.txid || "Not provided")}
+        </div>
+        ${d.description ? `<div class="muted">${escapeHtml(d.description)}</div>` : ""}
+        <div class="muted" style="margin-top:9px">Requested: ${date}</div>
+        <div class="muted">Request ID: ${escapeHtml(d.id)}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+$("refreshWithdrawalHistoryBtn").onclick = loadWithdrawalHistory;
+$("refreshDepositHistoryBtn").onclick = loadDepositHistory;
+
+$("withdrawalHistoryFilter").onchange = renderWithdrawalHistory;
+$("depositHistoryFilter").onchange = renderDepositHistory;
+
 
 $("refreshDepositsBtn").onclick =
   loadPendingDeposits;
