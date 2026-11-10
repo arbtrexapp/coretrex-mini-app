@@ -5736,6 +5736,7 @@ await Promise.allSettled([
   loadAdminNotificationUsers(),
   loadAdminUserOverview(),
   loadAdminInvestments(),
+    loadPromoOfferRecipients(),
   window.loadAdminPromoInvestments()
 ]);
 
@@ -9765,6 +9766,33 @@ $("createPromoBtn")?.addEventListener(
       }
 
       await loadPromoRecipients();
+
+    } catch (error) {
+      if (list) {
+        list.textContent = "Refresh failed: " + error.message;
+      }
+    }
+  }
+);
+
+  $("refreshPromoRecipientsList")?.addEventListener(
+  "click",
+  async () => {
+    const list = $("promoOfferRecipients");
+
+    try {
+      if (list) list.textContent = "Checking admin access...";
+
+      const allowed = await checkAdmin();
+
+      if (!allowed) {
+        if (list) {
+          list.textContent = "Admin access check failed. Please sign in again.";
+        }
+        return;
+      }
+
+      await loadPromoOfferRecipients();
 
     } catch (error) {
       if (list) {
