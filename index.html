@@ -553,6 +553,51 @@ button.history-item:last-child {
       </div>
     </div>
 
+    
+    <!-- LIVE MARKET CHART -->
+    <div class="card" style="margin-top:15px">
+      <div class="row" style="align-items:center;justify-content:space-between">
+        <h3 style="margin:0">Live Market Chart</h3>
+        <span class="muted" id="liveChartUpdated">Loading...</span>
+      </div>
+
+      <div class="row" style="gap:8px;margin-top:16px">
+        <button type="button" class="btn secondary" id="chartBTC"
+          onclick="selectMarketChart('bitcoin')"
+          style="flex:1">BTC</button>
+        <button type="button" class="btn secondary" id="chartETH"
+          onclick="selectMarketChart('ethereum')"
+          style="flex:1">ETH</button>
+      </div>
+
+      <div style="margin-top:17px">
+        <div class="muted" id="liveChartName">Bitcoin (BTC)</div>
+        <div id="liveChartPrice" style="font-size:25px;font-weight:800;margin-top:5px">
+          Loading price...
+        </div>
+        <div id="liveChartChange" style="font-size:12px;margin-top:5px"></div>
+      </div>
+
+      <div class="row" style="gap:6px;margin-top:18px">
+        <button type="button" class="btn secondary" id="chart24H"
+          onclick="loadLiveMarketChart('24h')" style="flex:1">24H</button>
+        <button type="button" class="btn secondary" id="chart7D"
+          onclick="loadLiveMarketChart('7d')" style="flex:1">7D</button>
+        <button type="button" class="btn secondary" id="chart30D"
+          onclick="loadLiveMarketChart('30d')" style="flex:1">30D</button>
+      </div>
+
+      <div id="liveMarketChart"
+        style="width:100%;height:190px;margin-top:15px">
+        <div class="empty">Loading market chart...</div>
+      </div>
+
+      <div class="row" style="justify-content:space-between;margin-top:8px">
+        <span class="muted">Market data provided by Coretrex</span>
+        <span class="muted" id="liveChartRange">Last 24 hours</span>
+      </div>
+    </div>
+
     <!-- INVESTMENT PROFIT OVERVIEW -->
     <div class="card" style="margin-top:15px">
       <h3 style="margin-top:0">Investment Profit Overview</h3>
