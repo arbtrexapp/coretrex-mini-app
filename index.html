@@ -5390,179 +5390,204 @@ $("verifySecurityCodeBtn").onclick =
 ========================= */
 
 async function loadActivity() {
-
   if (!currentUser) return;
 
+  const box = $("activityList");
+  box.innerHTML = '<div class="empty">Loading activity...</div>';
 
-  $("activityList")
-    .innerHTML =
-      '<div class="empty">Loading activity...</div>';
-
-
-  const {
-    data,
-    error
-  } =
-  await supabaseClient
+  const { data, error } = await supabaseClient
     .from("transactions")
-    .select(
-      "id, transaction_type, amount, status, reference, description, created_at"
-    )
-    .eq(
-      "user_id",
-      currentUser.id
-    )
-    .order(
-      "created_at",
-      {
-        ascending:false
-      }
-    )
-    .limit(50);
-
+    .select("id, transaction_type, amount, status, reference, description, created_at, network, txid")
+    .eq("user_id", currentUser.id)
+    .order("created_at", { ascending: false })
+    .limit(100);
 
   if (error) {
-
-    $("activityList")
-      .innerHTML =
-        `<div class="empty error">${escapeHtml(error.message)}</div>`;
-
+    box.innerHTML = `<div class="empty error">${escapeHtml(error.message)}</div>`;
     return;
-
   }
 
-
-  if (
-    !data ||
-    data.length === 0
-  ) {
-
-    $("activityList")
-      .innerHTML =
-        '<div class="empty">No transactions yet.</div>';
-
+  if (!data || !data.length) {
+    box.innerHTML = '<div class="empty">No transactions yet.</div>';
     return;
-
   }
 
+  window.coretrexActivityItems = data;
 
-  $("activityList")
-    .innerHTML =
-      data.map(
-        tx => {
+  const groups = {};
 
-          const status =
-            String(
-              tx.status ||
-              "pending"
-            ).toLowerCase();
+  data.forEach((tx, index) => {
+    const d = new Date(tx.created_at);
+    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 
+    if (!groups[key]) groups[key] = { date: d, items: [] };
+    groups[key].items.push({ tx, index });
+  });
 
-          const date =
-            new Date(
-              tx.created_at
-            ).toLocaleString(
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  box.innerHTML = Object.values(groups).map(group => {
+    const groupDate = new Date(group.date);
+    groupDate.setHours(0, 0, 0, 0);
+
+    let heading = group.date.toLocaleDateString("en-NG", {
+      weekday: "long",
+      month: "long",
+      day: "numeric"
+    });
+
+    if (groupDate.getTime() === today.getTime()) {
+      heading = "Today";
+    } else if (groupDate.getTime() === yesterday.getTime()) {
+      heading = "Yesterday";
+    }
+
+    return `
+      <div style="margin-bottom:24px">
+        <div style="color:#8290a3;font-size:13px;margin-bottom:12px">
+          ${heading}
+        </div>
+
+        <div class="history-list">
+          ${group.items.map(({ tx, index }) => {
+            const type = String(tx.transaction_type || "").toLowerCase();
+
+            const incoming =
+              /deposit|credit|profit|commission|capital_release|refund|bonus|cashback|reward|transfer_received/.test(type);
+
+            const direction = incoming ? "incoming" : "outgoing";
+            const arrow = incoming ? "↓" : "↑";
+            const label = incoming ? "Credit" : "Debit";
+            const sign = incoming ? "+" : "-";
+
+            const time = new Date(tx.created_at).toLocaleTimeString(
               "en-NG",
-              {
-                dateStyle:"medium",
-                timeStyle:"short"
-              }
+              { hour: "2-digit", minute: "2-digit", hour12: true }
             );
 
+            return `
+              <button
+                type="button"
+                class="history-row"
+                onclick="showActivityDetail(${index})"
+              >
+                <span class="history-icon ${direction}">${arrow}</span>
 
-          return `
-
-            <div class="history-item">
-
-              <div class="row">
-
-                <div>
-
-                  <b>
-                    ${escapeHtml(
-                      formatTransactionType(
-                        tx.transaction_type
-                      )
-                    )}
-                  </b>
-
-                  <div class="muted">
-                    ${escapeHtml(
-                      tx.description ||
-                      ""
-                    )}
-                  </div>
-
-                </div>
-
-                <span
-                  class="status ${escapeHtml(status)}"
-                >
-                  ${escapeHtml(
-                    capitalize(status)
-                  )}
+                <span class="history-info">
+                  <span class="history-title">
+                    ${escapeHtml(formatTransactionType(tx.transaction_type))}
+                  </span>
+                  <span class="history-date">${time}</span>
                 </span>
 
-              </div>
-
-
-              <div
-                class="row"
-                style="margin-top:12px"
-              >
-
-                <span class="muted">
-                  Amount
+                <span style="text-align:right;white-space:nowrap">
+                  <span class="history-amount ${direction}">
+                    ${sign}${money(tx.amount)}
+                  </span>
+                  <span style="
+                    display:block;
+                    margin-top:5px;
+                    font-size:11px;
+                    font-weight:700;
+                    padding:5px 8px;
+                    border-radius:7px;
+                    background:${incoming ? '#493f20' : '#351d2a'};
+                    color:${incoming ? '#e6c64c' : '#ef7180'};
+                  ">${label}</span>
                 </span>
-
-                <b>
-                  ${money(tx.amount)}
-                </b>
-
-              </div>
-
-
-              ${
-                tx.reference
-                  ? `
-
-                    <div style="margin-top:9px">
-
-                      <span class="muted">
-                        Reference / TXID
-                      </span>
-
-                      <div
-                        class="address"
-                        style="margin-top:5px"
-                      >
-                        ${escapeHtml(
-                          tx.reference
-                        )}
-                      </div>
-
-                    </div>
-
-                  `
-                  : ""
-              }
-
-
-              <div
-                class="muted"
-                style="margin-top:9px"
-              >
-                ${date}
-              </div>
-
-            </div>
-
-          `;
-
-        }
-      ).join("");
-
+              </button>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  }).join("");
 }
+
+function showActivityDetail(index) {
+  const tx = window.coretrexActivityItems?.[index];
+  const box = $("activityList");
+
+  if (!tx || !box) return;
+
+  const date = tx.created_at
+    ? new Date(tx.created_at).toLocaleString("en-NG")
+    : "Not available";
+
+  const status = capitalize(String(tx.status || "Pending"));
+
+  box.innerHTML = `
+    <div class="card">
+      <button
+        type="button"
+        class="btn secondary"
+        style="width:auto"
+        onclick="loadActivity()"
+      >
+        ← Back to Transactions
+      </button>
+
+      <h3 style="margin-top:20px">
+        ${escapeHtml(formatTransactionType(tx.transaction_type))}
+      </h3>
+
+      <div class="row" style="margin-top:18px">
+        <span class="muted">Amount</span>
+        <b>${money(tx.amount)}</b>
+      </div>
+
+      <div class="row" style="margin-top:14px">
+        <span class="muted">Status</span>
+        <b>${escapeHtml(status)}</b>
+      </div>
+
+      <div style="margin-top:18px">
+        <div class="muted">Transaction type</div>
+        <div style="margin-top:5px">
+          ${escapeHtml(tx.transaction_type || "Not available")}
+        </div>
+      </div>
+
+      <div style="margin-top:16px">
+        <div class="muted">Description</div>
+        <div style="margin-top:5px">
+          ${escapeHtml(tx.description || "Not provided")}
+        </div>
+      </div>
+
+      <div style="margin-top:16px">
+        <div class="muted">Network</div>
+        <div style="margin-top:5px">
+          ${escapeHtml(tx.network || "Not provided")}
+        </div>
+      </div>
+
+      <div style="margin-top:16px">
+        <div class="muted">Reference / TXID</div>
+        <div class="address" style="margin-top:5px">
+          ${escapeHtml(tx.txid || tx.reference || "Not provided")}
+        </div>
+      </div>
+
+      <div style="margin-top:16px">
+        <div class="muted">Transaction date</div>
+        <div style="margin-top:5px">${date}</div>
+      </div>
+
+      <div style="margin-top:16px">
+        <div class="muted">Record ID</div>
+        <div class="address" style="margin-top:5px">
+          ${escapeHtml(tx.id)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 
   
 async function loadHomeRecentHistory() {
