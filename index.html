@@ -1328,123 +1328,146 @@ Only official Coretrex communication channels should be trusted
       Available Coretrex plans.
     </p>
 
-    <div class="card">
+    
+<div class="card">
+  <div class="plan-grid">
 
-      <div class="plan">
+    <!-- STARTER PLAN -->
+    <div class="plan-card">
+      <div class="plan-icon">🌱</div>
+      <h3>Starter Plan</h3>
+      <div class="plan-return">10%</div>
+      <div class="plan-return-label">PROFIT ONLY</div>
+      <div class="plan-divider"></div>
 
-        <div>
-
-          <b>Starter</b>
-
-          <div class="muted">
-            Minimum $100 · 24 hours · 10% profit
-          </div>
-
-        </div>
-
-        <button
-          class="btn secondary"
-          style="width:auto;padding:10px 13px"
-          data-plan="starter"
-        >
-          Activate
-        </button>
-
+      <div class="plan-detail">
+        <span>Minimum</span>
+        <strong>$100</strong>
+      </div>
+      <div class="plan-detail">
+        <span>Duration</span>
+        <strong>24 Hours</strong>
+      </div>
+      <div class="plan-detail">
+        <span>Return</span>
+        <strong>Profit Only</strong>
       </div>
 
-
-      <div class="plan">
-
-        <div>
-
-          <b>Growth</b>
-
-          <div class="muted">
-            Minimum $250 · 72 hours · 50% profit
-          </div>
-
-        </div>
-
-        <button
-          class="btn secondary"
-          style="width:auto;padding:10px 13px"
-          data-plan="growth"
-        >
-          Activate
-        </button>
-
-      </div>
-
-
-      <div class="plan">
-
-        <div>
-
-          <b>Advanced</b>
-
-          <div class="muted">
-            Minimum $500 · 2 weeks · 75% profit
-          </div>
-
-        </div>
-
-        <button
-          class="btn secondary"
-          style="width:auto;padding:10px 13px"
-          data-plan="advanced"
-        >
-          Activate
-        </button>
-
-      </div>
-
-
-      <div class="plan">
-
-        <div>
-
-          <b>Fourth</b>
-
-          <div class="muted">
-            Minimum $1,200 · 1 month · 100% profit
-          </div>
-
-        </div>
-
-        <button
-          class="btn secondary"
-          style="width:auto;padding:10px 13px"
-          data-plan="fourth"
-        >
-          Activate
-        </button>
-
-      </div>
-
-
-      <div class="plan">
-
-        <div>
-
-          <b>Fifth</b>
-
-          <div class="muted">
-            Minimum $2,000 · 3 months · $20,000 profit target
-          </div>
-
-        </div>
-
-        <button
-          class="btn secondary"
-          style="width:auto;padding:10px 13px"
-          data-plan="fifth"
-        >
-          Activate
-        </button>
-
-      </div>
-
+      <button class="plan-action" data-plan="starter">
+        Activate Plan
+      </button>
     </div>
+
+    <!-- GROWTH PLAN -->
+    <div class="plan-card">
+      <div class="plan-icon">📈</div>
+      <h3>Growth Plan</h3>
+      <div class="plan-return">50%</div>
+      <div class="plan-return-label">PROFIT ONLY</div>
+      <div class="plan-divider"></div>
+
+      <div class="plan-detail">
+        <span>Minimum</span>
+        <strong>$250</strong>
+      </div>
+      <div class="plan-detail">
+        <span>Duration</span>
+        <strong>72 Hours</strong>
+      </div>
+      <div class="plan-detail">
+        <span>Return</span>
+        <strong>Profit Only</strong>
+      </div>
+
+      <button class="plan-action" data-plan="growth">
+        Activate Plan
+      </button>
+    </div>
+
+    <!-- ADVANCED PLAN -->
+    <div class="plan-card">
+      <div class="plan-icon">⚡</div>
+      <h3>Advanced Plan</h3>
+      <div class="plan-return">75%</div>
+      <div class="plan-return-label">PROFIT ONLY</div>
+      <div class="plan-divider"></div>
+
+      <div class="plan-detail">
+        <span>Minimum</span>
+        <strong>$500</strong>
+      </div>
+      <div class="plan-detail">
+        <span>Duration</span>
+        <strong>2 Weeks</strong>
+      </div>
+      <div class="plan-detail">
+        <span>Return</span>
+        <strong>Profit Only</strong>
+      </div>
+
+      <button class="plan-action" data-plan="advanced">
+        Activate Plan
+      </button>
+    </div>
+
+    <!-- FOURTH PLAN -->
+    <div class="plan-card featured">
+      <div class="plan-popular">FEATURED PLAN</div>
+      <div class="plan-icon">👑</div>
+      <h3>Fourth Plan</h3>
+      <div class="plan-return">100%</div>
+      <div class="plan-return-label">CAPITAL + PROFIT</div>
+      <div class="plan-divider"></div>
+
+      <div class="plan-detail">
+        <span>Minimum</span>
+        <strong>$1,200</strong>
+      </div>
+      <div class="plan-detail">
+        <span>Duration</span>
+        <strong>1 Month</strong>
+      </div>
+      <div class="plan-detail">
+        <span>Return</span>
+        <strong>Capital + Profit</strong>
+      </div>
+
+      <button class="plan-action" data-plan="fourth">
+        Activate Plan
+      </button>
+    </div>
+
+    <!-- FIFTH PLAN -->
+    <div class="plan-card" style="grid-column:1/-1">
+      <div class="plan-icon">💎</div>
+      <h3>Fifth Plan</h3>
+      <div class="plan-return">$20,000</div>
+      <div class="plan-return-label">PROFIT TARGET</div>
+      <div class="plan-divider"></div>
+
+      <div class="plan-detail">
+        <span>Minimum</span>
+        <strong>$2,000</strong>
+      </div>
+      <div class="plan-detail">
+        <span>Duration</span>
+        <strong>3 Months</strong>
+      </div>
+      <div class="plan-detail">
+        <span>Return</span>
+        <strong>Capital + Profit</strong>
+      </div>
+
+      <button class="plan-action" data-plan="fifth">
+        Activate Plan
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+      
 
     <div class="notice">
       Investment activation requires sufficient available balance.
