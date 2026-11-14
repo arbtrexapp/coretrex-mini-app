@@ -3662,7 +3662,8 @@ async function openApp() {
   await Promise.all([
   loadMarketSnapshot(),
   loadInvestmentProfitOverview(),
-  loadLiveMarketChart("24h")
+  loadLiveMarketChart("24h"),
+  loadPortfolioOverview()
 ]);
     if (promoToken) {
 
