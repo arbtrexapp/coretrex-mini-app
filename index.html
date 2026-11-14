@@ -1352,133 +1352,116 @@ Only official Coretrex communication channels should be trusted
 
 <section id="contactScreen" class="screen">
 
-  <div class="top">
-    <div class="logo">C</div>
-    <div>
-      <div class="brand">Coretrex</div>
-      <div class="eyebrow">CONTACT US</div>
+  <!-- SUPPORT HEADER -->
+  <div class="contact-hero">
+    <div class="contact-hero-top">
+      <div class="contact-hero-icon">✉</div>
+      <div>
+        <div style="font-size:19px;font-weight:800;color:#f1f5f9">
+          Support Centre
+        </div>
+        <div style="font-size:12px;color:#9aabbc;margin-top:5px">
+          We're here to help you
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:18px">
+      <div class="account-status">● CUSTOMER SUPPORT</div>
+      <p class="muted" style="margin-top:12px">
+        Have a question or need assistance? Send our team a message.
+        We'll review your request and respond through your support inbox.
+      </p>
     </div>
   </div>
 
-
-  <div class="card">
-
-    <div class="label">SUPPORT</div>
-
-    <h3>Contact Us</h3>
-
-    <p class="muted">
-      Have a question or need assistance? Send us a message
-      and our support team will review your request.
-    </p>
-
-  </div>
-
-
-  <div class="card">
-
-    <div class="label">SEND A MESSAGE</div>
+  <!-- SEND MESSAGE -->
+  <div class="contact-card">
+    <div class="contact-support-heading">
+      <div>
+        <div class="label">GET IN TOUCH</div>
+        <h3 style="margin:5px 0 0">Send a Message</h3>
+      </div>
+      <div class="contact-support-icon">↗</div>
+    </div>
 
     <form id="contactForm">
 
-      <div class="label">
-        SUBJECT
-      </div>
-
+      <div class="label">SUBJECT</div>
       <input
         type="text"
         id="contactSubject"
-        placeholder="Enter subject"
+        placeholder="What do you need help with?"
         required
       >
 
-      <div
-        class="label"
-        style="margin-top:15px"
-      >
-        MESSAGE
+      <div class="contact-form-field">
+        <div class="label">YOUR MESSAGE</div>
+        <textarea
+          id="contactMessage"
+          class="contact-message-input"
+          placeholder="Describe how we can help you..."
+          required
+        ></textarea>
       </div>
-
-      <input 
-        type="text"
-        id="contactMessage"
-        placeholder="Write your message"
-        required
-      >
 
       <button
         type="submit"
-        class="btn"
-        style="margin-top:15px"
+        class="btn contact-send-button"
       >
-        Send Message
+        ✉ &nbsp; Send Message
       </button>
 
       <p
         id="contactFormMessage"
         class="muted"
-        style="margin-top:10px"
+        style="margin-top:12px"
       ></p>
 
     </form>
+  </div>
+
+  <!-- SUPPORT HISTORY -->
+  <div class="contact-card">
+    <div class="contact-support-heading">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="contact-support-icon">▤</div>
+        <div>
+          <div class="label">YOUR SUPPORT HISTORY</div>
+          <h3 style="margin:5px 0 0">My Messages</h3>
+        </div>
+      </div>
+
+      <button
+        id="refreshMySupportBtn"
+        class="btn secondary"
+        type="button"
+        style="width:auto;padding:10px 13px"
+      >
+        ↻ Refresh
+      </button>
+    </div>
 
     <div
-  class="card"
-  style="margin-top:15px"
->
-
-  <div
-  class="row"
-  style="align-items:center"
->
-
-  <div>
-
-    <div class="label">
-      MY SUPPORT MESSAGES
+      id="mySupportList"
+      style="margin-top:10px"
+    >
+      <div class="empty">
+        Loading messages...
+      </div>
     </div>
-
-    <h3 style="margin:6px 0 0">
-      Messages
-    </h3>
-
   </div>
 
   <button
-    id="refreshMySupportBtn"
+    type="button"
     class="btn secondary"
-    type="button"
-    style="width:auto;padding:10px 13px"
-  >
-    Refresh
-  </button>
-
-</div>
-
-  <div
-    id="mySupportList"
-    style="margin-top:10px"
-  >
-    <div class="empty">
-      Loading messages...
-    </div>
-  </div>
-
-</div>
-
-  </div>
-
-
-  <button
-    type="button"
-    class="btn"
     data-screen="homeScreen"
+    style="margin-top:15px"
   >
-    Back to Account
+    ← Back to Home
   </button>
 
 </section>
-
 
       
 <!-- DEPOSIT -->
