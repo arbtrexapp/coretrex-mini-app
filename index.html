@@ -4132,6 +4132,22 @@ function updateDepositAsset() {
 
 }
 
+  function selectDepositNetwork(asset, button) {
+
+  $("depositAsset").value = asset;
+
+  updateDepositAsset();
+
+  document.querySelectorAll(".deposit-network-option")
+    .forEach(option => option.classList.remove("active"));
+
+  button.classList.add("active");
+}
+
+window.selectDepositNetwork = selectDepositNetwork;
+
+updateDepositAsset();
+
 
 $("depositAsset")
   .addEventListener(
