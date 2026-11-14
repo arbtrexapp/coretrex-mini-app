@@ -3015,11 +3015,17 @@ const referralCodeFromUrl =
   ).get("ref");
   
    
+
 const DEPOSIT_ASSETS = {
 
-  USDT: {
+  USDT_TRC20: {
     network: "USDT — TRC20",
     address: "TLFM28HbiGBgMVdqug2M7pJRW4pDLfzUMH"
+  },
+
+  USDT_ERC20: {
+    network: "USDT — ERC20 (Ethereum)",
+    address: "0xCBC6AD0B86cfdf5E59905bD9680403ED91bF1Ddc"
   },
 
   BTC: {
@@ -3033,6 +3039,7 @@ const DEPOSIT_ASSETS = {
   }
 
 };
+
 
 
 const WITHDRAW_FEE_ADDRESS =
