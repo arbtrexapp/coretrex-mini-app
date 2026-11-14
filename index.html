@@ -1640,50 +1640,70 @@ Only official Coretrex communication channels should be trusted
 </section>
 
 
-  <!-- ACTIVITY -->
-  <section id="activityScreen" class="screen">
+  <!-- ACTIVITY -->   
+<section id="activityScreen" class="screen">
 
-    <button
-      class="back"
-      data-screen="homeScreen"
-    >
-      ← Back
-    </button>
+  <button
+    class="back"
+    type="button"
+    data-screen="homeScreen"
+  >
+    ← Back to Home
+  </button>
 
-    <div class="row">
+  <!-- ACTIVITY HEADER -->
+  <div class="activity-hero">
+    <div class="activity-hero-top">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="activity-hero-icon">↻</div>
+        <div>
+          <div style="font-size:19px;font-weight:800;color:#f1f5f9">
+            Transaction Activity
+          </div>
+          <div style="font-size:12px;color:#9aabbc;margin-top:5px">
+            Your complete account history
+          </div>
+        </div>
+      </div>
+      <span class="account-status">● HISTORY</span>
+    </div>
 
+    <p class="muted" style="margin-top:15px">
+      Review your deposits, withdrawals and other account transactions.
+      Select any transaction to view its full details.
+    </p>
+  </div>
+
+  <!-- TRANSACTION HISTORY -->
+  <div class="activity-history-card">
+
+    <div class="activity-hero-top">
       <div>
-
-        <h2 style="margin-bottom:4px">
-          Activity
-        </h2>
-
-        <p class="muted">
-          Your recent account transactions.
-        </p>
-
+        <div class="label">ACCOUNT RECORDS</div>
+        <h3 style="margin:5px 0 0">Recent Activity</h3>
       </div>
 
       <button
         id="refreshActivity"
-        class="btn secondary"
-        style="width:auto;padding:10px 13px"
+        class="btn secondary activity-refresh"
+        type="button"
       >
-        Refresh
+        ↻ Refresh
       </button>
-
     </div>
 
     <div
-      class="card"
       id="activityList"
+      style="margin-top:14px"
     >
       <div class="empty">
         Loading activity...
       </div>
     </div>
 
-  </section>
+  </div>
+
+</section>
 
 
   <!-- INVEST -->
