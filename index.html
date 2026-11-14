@@ -5807,31 +5807,173 @@ async function loadInvestmentProfitOverview() {
       </div>
     </div>
 
+    
     <div style="margin-top:20px">
-      ${items.map(inv => `
-        <div style="
-          padding:13px 0;
-          border-bottom:1px solid #29364a
-        ">
-          <b>${escapeHtml(formatTransactionType(inv.plan_name))}</b>
+      ${items.map(inv => {
+        const progress = Math.max(
+          0,
+          Math.min(
+            100,
+            ((now - inv.start) / (inv.end - inv.start)) * 100
+          )
+        );
 
-          <div class="muted" style="margin-top:7px">
-            Invested: ${money(inv.amount)}
-          </div>
+        const accumulatedProfit =
+          inv.profit * progress / 100;
 
-          <div style="color:#35c759;margin-top:5px">
-            Possible profit: ${money(inv.profit)}
-          </div>
+        const remainingMs = Math.max(0, inv.end - now);
+        const remainingDays = Math.floor(remainingMs / 86400000);
+        const remainingHours = Math.floor(
+          (remainingMs % 86400000) / 3600000
+        );
 
-          <div class="muted" style="margin-top:5px">
-            Started: ${new Date(inv.start).toLocaleString("en-NG")}
-          </div>
+        const remainingLabel = remainingMs <= 0
+          ? "Maturity reached"
+          : remainingDays > 0
+            ? `${remainingDays} days ${remainingHours} hours`
+            : `${remainingHours} hours`;
 
-          <div class="muted" style="margin-top:5px">
-            Expected end: ${new Date(inv.end).toLocaleString("en-NG")}
+        const returnsCapital =
+          /fourth|fifth|plan\s*4|plan\s*5/i.test(
+            String(inv.plan_name || "")
+          );
+
+        const expectedPayout =
+          inv.profit + (returnsCapital ? Number(inv.amount || 0) : 0);
+
+        return `
+          <div class="card" style="
+            margin-top:14px;
+            padding:16px;
+            border:1px solid #29364a
+          ">
+            <div class="row" style="align-items:center">
+              <b style="font-size:16px">
+                ${escapeHtml(formatTransactionType(inv.plan_name))}
+              </b>
+
+              <span style="
+                background:#064b38;
+                color:#35c759;
+                padding:5px 9px;
+                border-radius:20px;
+                font-size:11px
+              ">
+                ${returnsCapital ? "Capital + Profit" : "Profit Only"}
+              </span>
+            </div>
+
+            <div class="row" style="
+              margin-top:18px;
+              align-items:center;
+              justify-content:space-between
+            ">
+              <div>
+                <div class="muted">Invested</div>
+                <b>${money(inv.amount)}</b>
+              </div>
+
+              <div style="text-align:right">
+                <div class="muted">Duration</div>
+                <b>${Number(inv.duration_hours || 0) / 24} Days</b>
+              </div>
+            </div>
+
+            <div style="
+              display:grid;
+              grid-template-columns:1fr 1fr;
+              gap:12px;
+              margin-top:18px;
+              padding-top:14px;
+              border-top:1px solid #29364a
+            ">
+              <div>
+                <div class="muted">Started</div>
+                <b style="font-size:12px">
+                  ${new Date(inv.start).toLocaleString("en-NG")}
+                </b>
+              </div>
+
+              <div>
+                <div class="muted">Maturity Date</div>
+                <b style="font-size:12px">
+                  ${new Date(inv.end).toLocaleString("en-NG")}
+                </b>
+              </div>
+            </div>
+
+            <div style="margin-top:18px">
+              <div class="row" style="justify-content:space-between">
+                <b>Progress to Maturity</b>
+                <b style="color:#35c759">
+                  ${progress.toFixed(1)}%
+                </b>
+              </div>
+
+              <div style="
+                width:100%;
+                height:10px;
+                background:#29364a;
+                border-radius:20px;
+                overflow:hidden;
+                margin-top:9px
+              ">
+                <div style="
+                  width:${progress}%;
+                  height:100%;
+                  background:#35c759;
+                  border-radius:20px;
+                  transition:width .4s
+                "></div>
+              </div>
+
+              <div class="muted" style="margin-top:8px">
+                ${remainingLabel} remaining
+              </div>
+            </div>
+
+            <div style="
+              display:grid;
+              grid-template-columns:1fr 1fr;
+              gap:12px;
+              margin-top:18px;
+              padding-top:14px;
+              border-top:1px solid #29364a
+            ">
+              <div>
+                <div class="muted">Profit Accumulated*</div>
+                <b style="color:#35c759">
+                  ${money(accumulatedProfit)}
+                </b>
+              </div>
+
+              <div>
+                <div class="muted">Expected Profit</div>
+                <b style="color:#35c759">
+                  ${money(inv.profit)}
+                </b>
+              </div>
+            </div>
+
+            <div style="
+              margin-top:16px;
+              padding-top:14px;
+              border-top:1px solid #29364a;
+              text-align:center
+            ">
+              <div class="muted">Expected Payout</div>
+              <h3 style="margin:6px 0;color:#35c759">
+                ${money(expectedPayout)}
+              </h3>
+              <div class="muted" style="font-size:11px">
+                ${returnsCapital
+                  ? "Capital + Profit"
+                  : "Profit only"}
+              </div>
+            </div>
           </div>
-        </div>
-      `).join("")}
+        `;
+      }).join("")}
     </div>
   `;
 
