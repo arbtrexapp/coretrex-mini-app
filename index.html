@@ -1873,164 +1873,144 @@ Only official Coretrex communication channels should be trusted
 
 
     
-  <!-- ACCOUNT -->
-  <section id="accountScreen" class="screen">
+  <!-- ACCOUNT -->    
+<section id="accountScreen" class="screen">
 
-  <h2>Account</h2>
+  <h2>My Account</h2>
+  <p class="muted">Manage your profile, security and account preferences.</p>
 
-  <div class="card">
-
-    <div class="label">
-      EMAIL
+  <!-- ACCOUNT OVERVIEW -->
+  <div class="account-hero">
+    <div class="account-hero-top">
+      <div class="account-avatar">C</div>
+      <div style="min-width:0">
+        <div style="font-size:18px;font-weight:800;color:#f1f5f9">
+          Coretrex Member
+        </div>
+        <div style="font-size:12px;color:#9aabbc;margin-top:5px">
+          Account overview
+        </div>
+      </div>
+      <span class="account-status">● ACTIVE</span>
     </div>
 
-    <p id="accountEmail"></p>
-
-    <div
-      class="label"
-      style="margin-top:18px"
-    >
-      STATUS
+    <div class="account-info-row" style="margin-top:15px">
+      <div class="label">REGISTERED EMAIL</div>
+      <div id="accountEmail" style="margin-top:6px;word-break:break-all"></div>
     </div>
-
-    <p>Active</p>
-
   </div>
 
-    <div class="card">
-  <div class="label">PROFILE & SECURITY</div>
-
-  <button
-    class="btn secondary"
-    type="button"
-    data-screen="editNameScreen"
-  >
-    Edit Name →
-  </button>
-
-  <button
-    class="btn secondary"
-    type="button"
-    data-screen="changePasswordScreen"
-    style="margin-top:10px"
-  >
-    Change Password →
-  </button>
-</div>
-
-<div class="card">
-  <div class="label">IDENTITY VERIFICATION</div>
-  <h3>KYC Verification</h3>
-  <p class="muted">
-    Verify your identity to secure your account and prepare for withdrawals.
-    You can complete this process at any time.
-  </p>
-  <p id="kycAccountStatus" class="status pending">
-    Not submitted
-  </p>
-  <button
-    id="openKycButton"
-    class="btn"
-    type="button"
-    data-screen="kycScreen"
-    style="margin-top:12px"
-  >
-    Open KYC Verification
-  </button>
-</div>
-    
-  <div class="card">
-
-    <div class="label">
-      REFERRAL
+  <!-- PROFILE & SECURITY -->
+  <div class="account-section">
+    <div class="account-section-heading">
+      <div class="account-section-icon">♙</div>
+      <div>
+        <b>Profile & Security</b>
+        <div class="muted" style="font-size:12px">Personal details and password</div>
+      </div>
     </div>
 
-    <h3>Referral Program</h3>
+    <button class="btn secondary account-action"
+      type="button" data-screen="editNameScreen">
+      <span>✎ &nbsp; Edit Name</span><span>›</span>
+    </button>
+
+    <button class="btn secondary account-action"
+      type="button" data-screen="changePasswordScreen">
+      <span>⌑ &nbsp; Change Password</span><span>›</span>
+    </button>
+  </div>
+
+  <!-- IDENTITY VERIFICATION -->
+  <div class="account-section">
+    <div class="account-section-heading">
+      <div class="account-section-icon">◇</div>
+      <div>
+        <b>Identity Verification</b>
+        <div class="muted" style="font-size:12px">Account verification status</div>
+      </div>
+    </div>
 
     <p class="muted">
-      Invite others to join Coretrex and earn referral commissions
-      according to the platform's referral terms.
+      Verify your identity to secure your account and prepare for withdrawals.
     </p>
 
-    <div
-      class="label"
-      style="margin-top:18px"
-    >
-      YOUR REFERRAL CODE
-    </div>
-
-    <p id="referralCode">
-      Loading...
+    <p id="kycAccountStatus" class="status pending">
+      Not submitted
     </p>
 
-    <div
-      class="label"
-      style="margin-top:18px"
-    >
-      REFERRAL LINK
-    </div>
-
-    <p
-      id="referralLink"
-      class="muted"
-      style="word-break:break-all"
-    >
-      Loading...
-    </p>
-
-    <div
-      class="label"
-      style="margin-top:18px"
-    >
-      REFERRAL COMMISSION
-    </div>
-
-    <p id="referralBalance">
-      $0.00
-    </p>
-
-    <button
-      class="btn secondary"
-      id="copyReferralBtn"
-      type="button"
-    >
-      Copy Referral Link
+    <button id="openKycButton" class="btn"
+      type="button" data-screen="kycScreen"
+      style="margin-top:12px">
+      Open KYC Verification →
     </button>
-
-    <button
-      class="btn"
-      id="transferReferralBtn"
-      type="button"
-      style="margin-top:9px"
-    >
-      Transfer Commission to Balance
-    </button>
-
-    <p
-      id="referralMessage"
-      class="muted"
-      style="margin-top:10px"
-    ></p>
-
   </div>
 
+  <!-- REFERRAL CENTRE -->
+  <div class="account-section">
+    <div class="account-section-heading">
+      <div class="account-section-icon">♧</div>
+      <div>
+        <b>Referral Centre</b>
+        <div class="muted" style="font-size:12px">Invite friends and earn commissions</div>
+      </div>
+    </div>
 
-  <button
-    class="btn secondary hidden"
-    id="adminBtn"
-    style="margin-bottom:9px"
-  >
-    Admin
-  </button>
+    <div class="account-info-row">
+      <div class="label">YOUR REFERRAL CODE</div>
+      <div id="referralCode" class="account-referral-value">Loading...</div>
+    </div>
 
-  <button
-    class="btn danger"
-    id="logoutBtn"
-  >
-    Logout
-  </button>
+    <div class="account-info-row">
+      <div class="label">YOUR REFERRAL LINK</div>
+      <div id="referralLink" class="account-referral-value">Loading...</div>
+    </div>
+
+    <div class="account-info-row">
+      <div class="label">AVAILABLE REFERRAL COMMISSION</div>
+      <div id="referralBalance"
+        style="font-size:23px;font-weight:800;color:#45e69b;margin-top:7px">
+        $0.00
+      </div>
+    </div>
+
+    <button class="btn secondary account-action"
+      id="copyReferralBtn" type="button">
+      <span>▣ &nbsp; Copy Referral Link</span><span>›</span>
+    </button>
+
+    <button class="btn account-action"
+      id="transferReferralBtn" type="button">
+      <span>⇧ &nbsp; Transfer Commission to Balance</span><span>›</span>
+    </button>
+
+    <p id="referralMessage" class="muted" style="margin-top:10px"></p>
+  </div>
+
+  <!-- ACCOUNT ACTIONS -->
+  <div class="account-section">
+    <div class="account-section-heading">
+      <div class="account-section-icon">⚙</div>
+      <div>
+        <b>Account Actions</b>
+        <div class="muted" style="font-size:12px">Manage your account access</div>
+      </div>
+    </div>
+
+    <button class="btn secondary hidden"
+      id="adminBtn" type="button">
+      Admin Dashboard →
+    </button>
+
+    <button class="btn danger"
+      id="logoutBtn" type="button"
+      style="margin-top:10px">
+      ↪ &nbsp; Logout
+    </button>
+  </div>
 
 </section>
+
 
   <!-- EDIT NAME PAGE -->
 <section id="editNameScreen" class="screen">
