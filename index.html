@@ -324,6 +324,100 @@ button.history-item:last-child {
   }
 }
 
+    
+/* MODERN DEPOSIT PAGE */
+.deposit-summary {
+  padding: 19px;
+  border: 1px solid #244638;
+  border-radius: 17px;
+  background: linear-gradient(120deg, #092b20, #10231d);
+  margin: 16px 0;
+}
+
+.deposit-summary-label {
+  color: #a9c8b9;
+  font-size: 11px;
+}
+
+.deposit-summary-amount {
+  color: #ffffff;
+  font-size: 27px;
+  font-weight: 900;
+  margin-top: 7px;
+}
+
+.deposit-network-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+
+.deposit-network-option {
+  min-width: 0;
+  padding: 12px 4px;
+  border: 1px solid #29374a;
+  border-radius: 12px;
+  background: #101824;
+  color: #dce7f0;
+  text-align: center;
+  font-size: 10px;
+}
+
+.deposit-network-option.active {
+  border: 1px solid #16b978;
+  background: #103326;
+  box-shadow: 0 0 12px rgba(22,185,120,.15);
+}
+
+.deposit-network-icon {
+  display: block;
+  font-size: 22px;
+  margin-bottom: 7px;
+}
+
+.deposit-address-panel {
+  padding: 14px;
+  border: 1px solid #244638;
+  border-radius: 15px;
+  background: #0c1715;
+  margin: 12px 0;
+}
+
+.deposit-address-heading {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.deposit-address-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.deposit-address-content .address {
+  flex: 1;
+  min-width: 0;
+}
+
+.deposit-copy-button {
+  width: auto;
+  padding: 10px 13px;
+  margin: 0;
+}
+
+.deposit-submit {
+  background: linear-gradient(120deg, #087b4d, #13a966);
+  color: #ffffff;
+}
+
+@media (max-width: 360px) {
+  .deposit-network-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 
     .code-box{
       margin-top:15px;
