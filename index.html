@@ -6197,6 +6197,7 @@ async function loadActivity() {
   }).join("");
 }
 
+
 function showActivityDetail(index) {
   const tx = window.coretrexActivityItems?.[index];
   const box = $("activityList");
@@ -6204,80 +6205,100 @@ function showActivityDetail(index) {
   if (!tx || !box) return;
 
   const date = tx.created_at
-    ? new Date(tx.created_at).toLocaleString("en-NG")
+    ? new Date(tx.created_at).toLocaleString("en-NG", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      })
     : "Not available";
 
   const status = capitalize(String(tx.status || "Pending"));
 
+  const type = formatTransactionType(tx.transaction_type);
+  const isCredit = String(tx.transaction_type || "")
+    .toLowerCase()
+    .includes("deposit");
+
+  const icon = isCredit ? "↙" : "↗";
+
   box.innerHTML = `
-    <div class="card">
-      <button
-        type="button"
-        class="btn secondary"
-        style="width:auto"
-        onclick="loadActivity()"
-      >
-        ← Back to Transactions
-      </button>
+    <button
+      type="button"
+      class="btn secondary transaction-detail-back"
+      onclick="loadActivity()"
+    >
+      ← Back to Transactions
+    </button>
 
-      <h3 style="margin-top:20px">
-        ${escapeHtml(formatTransactionType(tx.transaction_type))}
-      </h3>
+    <div class="transaction-detail-hero">
 
-      <div class="row" style="margin-top:18px">
-        <span class="muted">Amount</span>
-        <b>${money(tx.amount)}</b>
+      <div class="transaction-detail-icon">
+        ${icon}
       </div>
 
-      <div class="row" style="margin-top:14px">
-        <span class="muted">Status</span>
-        <b>${escapeHtml(status)}</b>
+      <div class="muted" style="font-size:12px">
+        ${escapeHtml(type)}
       </div>
 
-      <div style="margin-top:18px">
-        <div class="muted">Transaction type</div>
-        <div style="margin-top:5px">
+      <div class="transaction-detail-amount">
+        ${money(tx.amount)}
+      </div>
+
+      <span class="transaction-detail-status">
+        ${escapeHtml(status)}
+      </span>
+
+    </div>
+
+    <div class="transaction-detail-card">
+
+      <div class="activity-hero-top">
+        <b>Transaction Information</b>
+        <span style="color:#45e69b">●</span>
+      </div>
+
+      <div class="transaction-detail-row">
+        <div class="transaction-detail-label">Transaction Type</div>
+        <div class="transaction-detail-value">
           ${escapeHtml(tx.transaction_type || "Not available")}
         </div>
       </div>
 
-      <div style="margin-top:16px">
-        <div class="muted">Description</div>
-        <div style="margin-top:5px">
+      <div class="transaction-detail-row">
+        <div class="transaction-detail-label">Description</div>
+        <div class="transaction-detail-value">
           ${escapeHtml(tx.description || "Not provided")}
         </div>
       </div>
 
-      <div style="margin-top:16px">
-        <div class="muted">Network</div>
-        <div style="margin-top:5px">
+      <div class="transaction-detail-row">
+        <div class="transaction-detail-label">Network</div>
+        <div class="transaction-detail-value">
           ${escapeHtml(tx.network || "Not provided")}
         </div>
       </div>
 
-      <div style="margin-top:16px">
-        <div class="muted">Reference / TXID</div>
-        <div class="address" style="margin-top:5px">
+      <div class="transaction-detail-row">
+        <div class="transaction-detail-label">Reference / TXID</div>
+        <div class="transaction-detail-value">
           ${escapeHtml(tx.txid || tx.reference || "Not provided")}
         </div>
       </div>
 
-      <div style="margin-top:16px">
-        <div class="muted">Transaction date</div>
-        <div style="margin-top:5px">${date}</div>
+      <div class="transaction-detail-row">
+        <div class="transaction-detail-label">Transaction Date</div>
+        <div class="transaction-detail-value">${date}</div>
       </div>
 
-      <div style="margin-top:16px">
-        <div class="muted">Record ID</div>
-        <div class="address" style="margin-top:5px">
-          ${escapeHtml(tx.id)}
+      <div class="transaction-detail-row">
+        <div class="transaction-detail-label">Transaction Record ID</div>
+        <div class="transaction-detail-value">
+          ${escapeHtml(tx.id || "Not available")}
         </div>
       </div>
+
     </div>
   `;
 }
-
-
 
 async function loadMarketSnapshot() {
   const box = $("marketSnapshot");
