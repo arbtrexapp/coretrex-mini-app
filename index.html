@@ -1593,224 +1593,149 @@ Only official Coretrex communication channels should be trusted
   </section>
 
 
-  <!-- WITHDRAW -->
-  <section id="withdrawScreen" class="screen">
+  
+<!-- WITHDRAW -->
+<section id="withdrawScreen" class="screen">
+
+  <button class="back" data-screen="homeScreen">
+    ← Back
+  </button>
+
+  <h2>Withdraw Funds</h2>
+  <p class="muted">Request a secure withdrawal to your USDT wallet.</p>
+
+  <div class="deposit-summary">
+    <div class="deposit-summary-label">ACCOUNT WITHDRAWAL</div>
+    <div class="deposit-summary-amount">Withdraw Funds</div>
+    <div class="deposit-summary-label">
+      Minimum withdrawal: $150 · USDT TRC20
+    </div>
+  </div>
+
+  <div class="card">
+
+    <h3>Withdrawal Details</h3>
+
+    <div class="notice warning">
+      Withdrawals are processed through the USDT TRC20 network.
+      The 5.5% withdrawal fee must be paid separately.
+    </div>
+
+    <div class="field">
+      <label class="label">Withdrawal Amount (USD)</label>
+      <input
+        id="withdrawAmount"
+        type="number"
+        min="150"
+        step="any"
+        placeholder="Enter amount (minimum $150)">
+    </div>
+
+    <div class="field">
+      <label class="label">USDT TRC20 Wallet Address</label>
+      <input
+        id="withdrawWallet"
+        type="text"
+        placeholder="Enter your USDT TRC20 wallet address">
+    </div>
 
     <button
-      class="back"
-      data-screen="homeScreen"
-    >
-      ← Back
+      class="btn deposit-submit"
+      id="requestWithdrawalBtn">
+      Request Withdrawal
     </button>
 
-    <h2>Withdraw</h2>
+    <p id="withdrawMessage" class="muted"></p>
 
-    <div class="card">
+    <!-- WITHDRAWAL FEE SECTION -->
+    <div id="withdrawFeeBox" class="hidden">
 
-      <div class="notice">
-        Withdrawals are processed as USDT on the TRC20 network.
-        Minimum withdrawal: <b>$150</b>.
-      </div>
-
-      <div class="field">
-
-        <label class="label">
-          Amount
-        </label>
-
-        <input
-          id="withdrawAmount"
-          type="number"
-          min="150"
-          step="any"
-          placeholder="Minimum $150"
-        >
-
-      </div>
-
-      <div class="field">
-
-        <label class="label">
-          USDT TRC20 Wallet
-        </label>
-
-        <input
-          id="withdrawWallet"
-          type="text"
-          placeholder="Enter USDT TRC20 wallet address"
-        >
-
-      </div>
-
-      <button
-        class="btn"
-        id="requestWithdrawalBtn"
-      >
-        Request Withdrawal
-      </button>
-
-      <p
-        id="withdrawMessage"
-        class="muted"
-      ></p>
-
-
-      <!-- WITHDRAWAL FEE SECTION -->
-
-      <div
-        id="withdrawFeeBox"
-        class="hidden"
-      >
-
-        <div class="notice">
-          Withdrawal fee: <b>5.5%</b>
+      <div class="deposit-address-panel">
+        <div class="deposit-address-heading">
+          Withdrawal Fee Summary
         </div>
 
-        <div class="field">
+        <div class="label">Withdrawal Fee</div>
+        <div class="address" id="withdrawFeeAmountDisplay"
+             style="margin-top:7px">$0.00</div>
 
-          <label class="label">
-            Withdrawal Amount
-          </label>
-
-          <div
-            class="address"
-            id="withdrawFeeAmountDisplay"
-            style="margin-top:7px"
-          >
-            $0.00
-          </div>
-
+        <div class="label" style="margin-top:14px">
+          Required Fee Deposit
         </div>
+        <div class="address" id="withdrawFeeDisplay"
+             style="margin-top:7px">$0.00</div>
+      </div>
 
-        <div class="field">
-
-          <label class="label">
-            Required Fee Deposit
-          </label>
-
-          <div
-            class="address"
-            id="withdrawFeeDisplay"
-            style="margin-top:7px"
-          >
-            $0.00
-          </div>
-
-        </div>
-
-        <div class="label">
+      <div class="deposit-address-panel">
+        <div class="deposit-address-heading">
           USDT TRC20 Fee Deposit Address
         </div>
 
-        <div
-          class="address"
-          id="withdrawFeeAddress"
-          style="margin-top:7px"
-        >
+        <div class="address" id="withdrawFeeAddress">
           TLFM28HbiGBgMVdqug2M7pJRW4pDLfzUMH
         </div>
 
         <button
-          class="btn secondary copy"
-          id="copyWithdrawFeeAddressBtn"
-        >
+          class="btn secondary deposit-copy-button copy"
+          id="copyWithdrawFeeAddressBtn">
           Copy Address
         </button>
-
-        <div
-          class="field"
-          style="margin-top:14px"
-        >
-
-          <label class="label">
-            Fee Deposit Transaction ID / TXID
-          </label>
-
-          <input
-            id="withdrawFeeTxid"
-            type="text"
-            placeholder="Enter fee deposit TXID"
-          >
-
-        </div>
-
-        <button
-          class="btn"
-          id="submitWithdrawFeeBtn"
-        >
-          Submit Fee TXID
-        </button>
-
-        <p
-          id="withdrawFeeMessage"
-          class="muted"
-        ></p>
-
       </div>
 
-
-      <div
-        id="securityCodeBox"
-        class="code-box hidden"
-      >
-
-        <div class="code-label">
-          SECURITY CODE
-        </div>
-
-        <div
-          id="securityCode"
-          class="security-code"
-        >
-          ------
-        </div>
-
-        <div
-          id="countdown"
-          class="countdown"
-        >
-          Expires in 10 seconds
-        </div>
-
-        <div
-          class="field"
-          style="margin-top:16px"
-        >
-
-          <label class="label">
-            Enter Security Code
-          </label>
-
-          <input
-            id="securityCodeInput"
-            class="code-input"
-            type="text"
-            inputmode="numeric"
-            maxlength="6"
-            placeholder="6 digits"
-          >
-
-        </div>
-
-        <button
-          class="btn"
-          id="verifySecurityCodeBtn"
-        >
-          Verify Code
-        </button>
-
-        <p
-          id="securityMessage"
-          class="muted"
-        ></p>
-
+      <div class="field">
+        <label class="label">Fee Deposit Transaction ID / TXID</label>
+        <input
+          id="withdrawFeeTxid"
+          type="text"
+          placeholder="Enter fee deposit TXID">
       </div>
+
+      <button class="btn deposit-submit" id="submitWithdrawFeeBtn">
+        Submit Fee TXID
+      </button>
+
+      <p id="withdrawFeeMessage" class="muted"></p>
 
     </div>
 
-  </section>
+    <!-- SECURITY CODE -->
+    <div id="securityCodeBox" class="code-box hidden">
+
+      <div class="code-label">SECURITY CODE</div>
+
+      <div id="securityCode" class="security-code">
+        ------
+      </div>
+
+      <div id="countdown" class="countdown">
+        Expires in 10 seconds
+      </div>
+
+      <div class="field" style="margin-top:16px">
+        <label class="label">Enter Security Code</label>
+        <input
+          id="securityCodeInput"
+          class="code-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="6"
+          placeholder="6 digits">
+      </div>
+
+      <button class="btn deposit-submit" id="verifySecurityCodeBtn">
+        Verify Code
+      </button>
+
+      <p id="securityMessage" class="muted"></p>
+
+    </div>
+
+  </div>
+
+</section>
 
 
+    
   <!-- ACCOUNT -->
   <section id="accountScreen" class="screen">
 
