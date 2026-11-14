@@ -3557,6 +3557,11 @@ async function openApp() {
   await loadActivity();
   
   await loadHomeRecentHistory();
+
+  await Promise.all([
+  loadMarketSnapshot(),
+  loadInvestmentProfitOverview()
+]);
     if (promoToken) {
 
     showScreen("promoOfferScreen");
@@ -5621,6 +5626,313 @@ function showActivityDetail(index) {
   `;
 }
 
+
+async function loadMarketSnapshot() {
+  const box = $("marketSnapshot");
+  const updated = $("marketUpdated");
+
+  if (!box) return;
+
+  try {
+    const response = await fetch(
+      "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,tether&price_change_percentage=24h"
+    );
+
+    if (!response.ok) throw new Error("Market data unavailable");
+
+    const coins = await response.json();
+
+    const symbols = {
+      bitcoin: "BTC",
+      ethereum: "ETH",
+      tether: "USDT"
+    };
+
+    box.innerHTML = coins.map(coin => {
+      const change = Number(coin.price_change_percentage_24h || 0);
+      const positive = change >= 0;
+
+      return `
+        <div class="row" style="
+          padding:12px 0;
+          border-bottom:1px solid #29364a;
+          align-items:center
+        ">
+          <div>
+            <b>${symbols[coin.id]}</b>
+            <div class="muted">${escapeHtml(coin.name)}</div>
+          </div>
+
+          <div style="text-align:right">
+            <b>$${Number(coin.current_price).toLocaleString("en-US", {
+              maximumFractionDigits: coin.id === "tether" ? 4 : 2
+            })}</b>
+
+            <div style="
+              color:${positive ? '#35c759' : '#ef7180'};
+              font-size:12px;
+              margin-top:4px
+            ">
+              ${positive ? "+" : ""}${change.toFixed(2)}% (24h)
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    if (updated) {
+      updated.textContent = "Updated " +
+        new Date().toLocaleTimeString("en-NG", {
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+    }
+
+  } catch (error) {
+    console.error("Market snapshot error:", error);
+
+    box.innerHTML =
+      '<div class="empty">Market prices are temporarily unavailable. Please try again later.</div>';
+
+    if (updated) updated.textContent = "Unavailable";
+  }
+}
+
+
+async function loadInvestmentProfitOverview() {
+  const summary = $("investmentProfitSummary");
+  const graph = $("investmentProfitGraph");
+
+  if (!summary || !graph || !currentUser) return;
+
+  summary.innerHTML =
+    '<div class="empty">Loading your investments...</div>';
+
+  const { data, error } = await supabaseClient
+    .from("investments")
+    .select("id, plan_name, amount, status, started_at, duration_hours, expected_profit, target_deadline")
+    .eq("user_id", currentUser.id)
+    .eq("status", "active")
+    .order("started_at", { ascending: true });
+
+  if (error) {
+    console.error("Investment overview error:", error);
+    summary.innerHTML =
+      '<div class="empty error">Unable to load investment information.</div>';
+    graph.innerHTML = "";
+    return;
+  }
+
+  const investments = data || [];
+
+  if (!investments.length) {
+    summary.innerHTML =
+      '<div class="empty">You currently have no active investments.</div>';
+    graph.innerHTML = "";
+    return;
+  }
+
+  const now = Date.now();
+
+  const items = investments.map(inv => {
+    const start = new Date(inv.started_at).getTime();
+
+    const end = inv.target_deadline
+      ? new Date(inv.target_deadline).getTime()
+      : start + Number(inv.duration_hours || 0) * 60 * 60 * 1000;
+
+    const profit = Number(inv.expected_profit || 0);
+
+    return {
+      ...inv,
+      start,
+      end,
+      profit
+    };
+  }).filter(inv =>
+    Number.isFinite(inv.start) &&
+    Number.isFinite(inv.end) &&
+    inv.end > inv.start
+  );
+
+  if (!items.length) {
+    summary.innerHTML =
+      '<div class="empty">Investment dates are not available for projection.</div>';
+    graph.innerHTML = "";
+    return;
+  }
+
+  const totalCapital = items.reduce(
+    (sum, inv) => sum + Number(inv.amount || 0), 0
+  );
+
+  const totalProfit = items.reduce(
+    (sum, inv) => sum + inv.profit, 0
+  );
+
+  const projectedProfitAt = time => items.reduce((sum, inv) => {
+    const progress = Math.max(
+      0,
+      Math.min(1, (time - inv.start) / (inv.end - inv.start))
+    );
+
+    return sum + inv.profit * progress;
+  }, 0);
+
+  const nextEnd = Math.max(...items.map(inv => inv.end));
+
+  const remaining = Math.max(0, nextEnd - now);
+  const daysLeft = Math.ceil(remaining / 86400000);
+
+  summary.innerHTML = `
+    <div class="stats" style="margin-top:12px">
+      <div class="stat">
+        <span class="label">Active investments</span>
+        <strong>${items.length}</strong>
+      </div>
+
+      <div class="stat">
+        <span class="label">Invested capital</span>
+        <strong>${money(totalCapital)}</strong>
+      </div>
+
+      <div class="stat">
+        <span class="label">Possible profit</span>
+        <strong style="color:#35c759">${money(totalProfit)}</strong>
+      </div>
+
+      <div class="stat">
+        <span class="label">Next maturity</span>
+        <strong>${daysLeft === 0 ? "Due" : daysLeft + " days"}</strong>
+      </div>
+    </div>
+
+    <div style="margin-top:20px">
+      ${items.map(inv => `
+        <div style="
+          padding:13px 0;
+          border-bottom:1px solid #29364a
+        ">
+          <b>${escapeHtml(formatTransactionType(inv.plan_name))}</b>
+
+          <div class="muted" style="margin-top:7px">
+            Invested: ${money(inv.amount)}
+          </div>
+
+          <div style="color:#35c759;margin-top:5px">
+            Possible profit: ${money(inv.profit)}
+          </div>
+
+          <div class="muted" style="margin-top:5px">
+            Started: ${new Date(inv.start).toLocaleString("en-NG")}
+          </div>
+
+          <div class="muted" style="margin-top:5px">
+            Expected end: ${new Date(inv.end).toLocaleString("en-NG")}
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+  const chartStart = Math.min(now, ...items.map(inv => inv.start));
+  const chartEnd = Math.max(now, nextEnd);
+
+  const points = Array.from({ length: 31 }, (_, i) => {
+    const time = chartStart +
+      (chartEnd - chartStart) * i / 30;
+
+    return {
+      time,
+      profit: projectedProfitAt(time)
+    };
+  });
+
+  const maxProfit = Math.max(
+    1,
+    ...points.map(point => point.profit)
+  );
+
+  const width = 600;
+  const height = 210;
+  const left = 12;
+  const right = 12;
+  const top = 15;
+  const bottom = 32;
+
+  const chartWidth = width - left - right;
+  const chartHeight = height - top - bottom;
+
+  const coordinates = points.map((point, i) => ({
+    x: left + chartWidth * i / (points.length - 1),
+    y: top + chartHeight -
+      (point.profit / maxProfit) * chartHeight
+  }));
+
+  const linePath = coordinates.map((point, i) =>
+    `${i === 0 ? "M" : "L"} ${point.x} ${point.y}`
+  ).join(" ");
+
+  const areaPath =
+    linePath +
+    ` L ${coordinates[coordinates.length - 1].x} ${height - bottom}` +
+    ` L ${coordinates[0].x} ${height - bottom} Z`;
+
+  const currentProfit = projectedProfitAt(now);
+
+  graph.innerHTML = `
+    <div style="margin-bottom:10px">
+      <span class="muted">Estimated profit accumulated by now</span>
+      <h3 style="color:#35c759;margin:5px 0">
+        ${money(currentProfit)}
+      </h3>
+    </div>
+
+    <svg viewBox="0 0 ${width} ${height}"
+      style="width:100%;height:auto;display:block"
+      role="img"
+      aria-label="Projected investment profit accumulation graph">
+
+      <defs>
+        <linearGradient id="profitGraphFill"
+          x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#35c759" stop-opacity="0.30"/>
+          <stop offset="100%" stop-color="#35c759" stop-opacity="0.01"/>
+        </linearGradient>
+      </defs>
+
+      ${[0, 0.5, 1].map(level => {
+        const y = top + chartHeight * level;
+        return `
+          <line x1="${left}" y1="${y}"
+            x2="${width-right}" y2="${y}"
+            stroke="#29364a" stroke-dasharray="4 5"/>
+        `;
+      }).join("")}
+
+      <path d="${areaPath}" fill="url(#profitGraphFill)"/>
+
+      <path d="${linePath}"
+        fill="none"
+        stroke="#35c759"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+      <text x="${left}" y="${height-8}"
+        fill="#aab5c6" font-size="12">Start</text>
+
+      <text x="${width-right}" y="${height-8}"
+        fill="#aab5c6" font-size="12"
+        text-anchor="end">Final maturity</text>
+    </svg>
+
+    <div class="row" style="margin-top:8px">
+      <span class="muted">Projected total profit</span>
+      <b style="color:#35c759">${money(totalProfit)}</b>
+    </div>
+  `;
+}
 
   
 async function loadHomeRecentHistory() {
