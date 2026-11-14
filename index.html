@@ -200,11 +200,130 @@ button.history-item:last-child {
     .footer{text-align:center;color:#566274;font-size:11px;margin-top:25px}
     .hidden{display:none!important}
     .back{background:none;border:0;color:#94a3b8;padding:0;margin-bottom:18px}
-    .plan{
-      display:flex;justify-content:space-between;gap:12px;align-items:center;
-      padding:15px 0;border-bottom:1px solid #202b39
-    }
-    .plan:last-child{border-bottom:0}
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+  margin-top: 18px;
+}
+
+.plan-card {
+  position: relative;
+  padding: 17px 13px 14px;
+  border: 1px solid #244638;
+  border-radius: 17px;
+  background: linear-gradient(160deg, #101b19, #080e0d);
+  box-shadow: 0 5px 16px rgba(0,0,0,.25);
+  overflow: visible;
+}
+
+.plan-card.featured {
+  border: 1px solid #19c878;
+  background: linear-gradient(160deg, #123d2c, #091510);
+  box-shadow: 0 0 17px rgba(25,200,120,.20);
+}
+
+.plan-popular {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 13px;
+  border-radius: 20px;
+  background: #087b4d;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.plan-icon {
+  width: 43px;
+  height: 43px;
+  margin: 12px auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #087b55;
+  border-radius: 50%;
+  background: #09271b;
+  color: #35d98b;
+  font-size: 23px;
+}
+
+.plan-card h3 {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: #f1f5f9;
+}
+
+.plan-return {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 25px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.plan-return-label {
+  margin-top: 2px;
+  min-height: 25px;
+  text-align: center;
+  color: #35d98b;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+
+.plan-divider {
+  height: 1px;
+  margin: 12px 0;
+  background: #263a32;
+}
+
+.plan-detail {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  margin: 10px 0;
+  font-size: 10px;
+}
+
+.plan-detail span:first-child {
+  color: #81938b;
+}
+
+.plan-detail strong {
+  color: #e2eee8;
+  text-align: right;
+  font-size: 10px;
+}
+
+.plan-action {
+  width: 100%;
+  margin-top: 12px;
+  padding: 11px 5px;
+  border: 1px solid #159b60;
+  border-radius: 9px;
+  background: linear-gradient(120deg, #087b4d, #13a966);
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.plan-card.featured .plan-action {
+  background: linear-gradient(120deg, #12a866, #20c879);
+}
+
+@media (max-width: 360px) {
+  .plan-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 
     .code-box{
       margin-top:15px;
