@@ -6047,26 +6047,31 @@ async function loadPortfolioOverview() {
 
   if (!capitalBox || !currentUser) return;
 
-  const { data, error } = await supabaseClient
-    .from("investments")
-    .select("amount, status, expected_profit, plan_name")
-    .eq("user_id", currentUser.id);
+  const [activeResult, completedResult] = await Promise.all([
+    supabaseClient
+      .from("investments")
+      .select("amount, status, expected_profit, plan_name")
+      .eq("user_id", currentUser.id)
+      .eq("status", "active"),
 
-  if (error) {
-    console.error("Portfolio overview error:", error);
+    supabaseClient
+      .from("investments")
+      .select("id")
+      .eq("user_id", currentUser.id)
+      .eq("status", "completed")
+  ]);
+
+  if (activeResult.error || completedResult.error) {
+    console.error(
+      "Portfolio overview error:",
+      activeResult.error || completedResult.error
+    );
     capitalBox.textContent = "Unavailable";
     return;
   }
 
-  const investments = data || [];
-
-  const active = investments.filter(
-    inv => String(inv.status).toLowerCase() === "active"
-  );
-
-  const completed = investments.filter(
-    inv => String(inv.status).toLowerCase() === "completed"
-  );
+  const active = activeResult.data || [];
+  const completed = completedResult.data || [];
 
   const totalCapital = active.reduce(
     (sum, inv) => sum + Number(inv.amount || 0), 0
@@ -6089,6 +6094,7 @@ async function loadPortfolioOverview() {
   }, 0);
 
   capitalBox.textContent = money(totalCapital);
+
   countBox.textContent =
     `${active.length} active investment${active.length === 1 ? "" : "s"}`;
 
@@ -6097,7 +6103,6 @@ async function loadPortfolioOverview() {
   profitBox.textContent = money(totalProfit);
   payoutBox.textContent = money(totalPayout);
 }
-
 
 async function loadInvestmentProfitOverview() {
   const summary = $("investmentProfitSummary");
