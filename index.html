@@ -88,6 +88,85 @@
 button.history-item:last-child {
   border-bottom: 1px solid #202b3b;
 }
+    
+.history-list {
+  background: #111e33;
+  border: 1px solid #202e45;
+  border-radius: 16px;
+  padding: 10px 16px;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid #29364a;
+  width: 100%;
+  background: transparent;
+  color: #f4f7fb;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  border-radius: 0;
+  text-align: left;
+}
+
+.history-row:last-child {
+  border-bottom: 0;
+}
+
+.history-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
+  background: #263044;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 23px;
+  font-weight: bold;
+}
+
+.history-icon.incoming {
+  color: #39c85a;
+}
+
+.history-icon.outgoing {
+  color: #e6c64c;
+}
+
+.history-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.history-date {
+  color: #aab5c6;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.history-amount {
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.history-amount.incoming {
+  color: #35c759;
+}
+
+.history-amount.outgoing {
+  color: #aab5c6;
+}
+
     .row{display:flex;justify-content:space-between;gap:12px}
     .status{
       font-size:11px;padding:5px 9px;border-radius:20px;
