@@ -600,14 +600,14 @@ button.history-item:last-child {
     <div>
       <div class="label">Recent transactions</div>
     </div>
-    <button
-      id="viewFullHistoryBtn"
-      class="label"
-      type="button"
-      
-    >
-      View All
-    </button>
+    <a
+  id="viewFullHistoryBtn"
+  class="label"
+  href="#"
+  style="text-decoration:none;cursor:pointer"
+>
+  View all
+</a>
   </div>
 
   <div id="homeRecentHistory" style="margin-top:12px">
@@ -5734,7 +5734,8 @@ function showHomeHistoryDetail(index) {
   box.innerHTML = details;
 }
 
-$("viewFullHistoryBtn")?.addEventListener("click", () => {
+$("viewFullHistoryBtn")?.addEventListener("click", (event) => {
+  event.preventDefault();
   showScreen("activityScreen");
   loadActivity();
 });
