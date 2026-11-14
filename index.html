@@ -541,6 +541,67 @@ button.history-item:last-child {
       </div>
     </div>
 
+    
+    <!-- PORTFOLIO OVERVIEW -->
+    <div class="card" style="margin-top:15px">
+      <div class="row" style="align-items:center;justify-content:space-between">
+        <h3 style="margin:0">Portfolio Overview</h3>
+        <span style="
+          background:#064b38;
+          color:#35c759;
+          padding:5px 10px;
+          border-radius:20px;
+          font-size:11px
+        ">MY PORTFOLIO</span>
+      </div>
+
+      <div style="
+        margin-top:17px;
+        padding:16px;
+        background:linear-gradient(120deg,#064b38,#087b55);
+        border-radius:14px
+      ">
+        <div style="font-size:12px;color:#c8f5df">
+          Total Active Investment
+        </div>
+        <div id="portfolioActiveCapital"
+          style="font-size:27px;font-weight:900;color:white;margin-top:6px">
+          $0.00
+        </div>
+        <div id="portfolioActiveCount"
+          style="font-size:12px;color:#c8f5df;margin-top:5px">
+          0 active investments
+        </div>
+      </div>
+
+      <div class="stats" style="margin-top:12px">
+        <div class="stat">
+          <span class="label">Active Investments</span>
+          <strong id="portfolioActiveNumber">0</strong>
+        </div>
+
+        <div class="stat">
+          <span class="label">Completed</span>
+          <strong id="portfolioCompletedNumber">0</strong>
+        </div>
+
+        <div class="stat">
+          <span class="label">Estimated Profit</span>
+          <strong id="portfolioEstimatedProfit" style="color:#35c759">$0.00</strong>
+        </div>
+
+        <div class="stat">
+          <span class="label">Expected Payout</span>
+          <strong id="portfolioExpectedPayout">$0.00</strong>
+        </div>
+      </div>
+
+      <div class="muted" style="font-size:11px;margin-top:12px">
+        Portfolio figures are calculated from your investment records.
+        Estimated profits and payouts are not guaranteed.
+      </div>
+    </div>
+
     <!-- MARKET SNAPSHOT -->
     <div class="card" style="margin-top:15px">
       <div class="row" style="align-items:center">
