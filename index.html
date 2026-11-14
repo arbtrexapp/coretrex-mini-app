@@ -1253,111 +1253,128 @@ Only official Coretrex communication channels should be trusted
 
 </section>
 
-  <!-- DEPOSIT -->
-  <section id="depositScreen" class="screen">
 
-    <button class="back" data-screen="homeScreen">
-      ← Back
-    </button>
+      
+<!-- DEPOSIT -->
+<section id="depositScreen" class="screen">
 
-    <h2>Deposit Centre</h2>
+  <button class="back" data-screen="homeScreen">
+    ← Back
+  </button>
 
-    <p class="muted">
-      Send funds to the selected Coretrex deposit address, then submit your transaction details for review.
-    </p>
+  <h2>Deposit Funds</h2>
+  <p class="muted">Add funds to your Coretrex account securely.</p>
 
-    <div class="card">
+  <div class="deposit-summary">
+    <div class="deposit-summary-label">ACCOUNT FUNDING</div>
+    <div class="deposit-summary-amount">Make a Deposit</div>
+    <div class="deposit-summary-label">Choose your preferred payment network below.</div>
+  </div>
 
-      <div class="field">
+  <div class="card">
 
-        <label class="label">Asset</label>
+    <h3>Choose Network</h3>
 
-        <select id="depositAsset">
+    <div class="deposit-network-grid">
 
-          <option value="USDT">USDT</option>
-
-          <option value="BTC">BTC</option>
-
-          <option value="ETH">ETH</option>
-
-        </select>
-
-      </div>
-
-      <div class="label">Network</div>
-
-      <div
-        id="depositNetwork"
-        style="font-weight:700;margin:6px 0 10px"
-      >
-        USDT — TRC20
-      </div>
-
-      <div class="label">
-        Deposit Address
-      </div>
-
-      <div
-        class="address"
-        id="depositAddress"
-      ></div>
-
-      <button
-        class="btn secondary copy"
-        id="copyAddressBtn"
-      >
-        Copy Address
+      <button type="button"
+        class="deposit-network-option active"
+        onclick="selectDepositNetwork('USDT_TRC20',this)">
+        <span class="deposit-network-icon">🔴</span>
+        <b>USDT</b>
+        <div>TRC20</div>
       </button>
 
-      <div class="notice warning">
-        Make sure you use the correct network. Sending an asset through the wrong network may result in loss of funds.
-      </div>
-
-      <div class="field">
-
-        <label class="label">
-          Amount
-        </label>
-
-        <input
-          id="depositAmount"
-          type="number"
-          min="0"
-          step="any"
-          placeholder="Enter amount"
-        >
-
-      </div>
-
-      <div class="field">
-
-        <label class="label">
-          Transaction ID / TX Hash
-        </label>
-
-        <input
-          id="depositTxid"
-          type="text"
-          placeholder="Enter transaction hash"
-        >
-
-      </div>
-
-      <button
-        class="btn"
-        id="submitDepositBtn"
-      >
-        Submit Deposit
+      <button type="button"
+        class="deposit-network-option"
+        onclick="selectDepositNetwork('USDT_ERC20',this)">
+        <span class="deposit-network-icon">💎</span>
+        <b>USDT</b>
+        <div>ERC20</div>
       </button>
 
-      <p
-        id="depositMessage"
-        class="muted"
-      ></p>
+      <button type="button"
+        class="deposit-network-option"
+        onclick="selectDepositNetwork('BTC',this)">
+        <span class="deposit-network-icon">₿</span>
+        <b>Bitcoin</b>
+        <div>BTC</div>
+      </button>
+
+      <button type="button"
+        class="deposit-network-option"
+        onclick="selectDepositNetwork('ETH',this)">
+        <span class="deposit-network-icon">♦</span>
+        <b>Ethereum</b>
+        <div>ETH</div>
+      </button>
 
     </div>
 
-  </section>
+    <select id="depositAsset" class="hidden">
+      <option value="USDT_TRC20">USDT TRC20</option>
+      <option value="USDT_ERC20">USDT ERC20</option>
+      <option value="BTC">BTC</option>
+      <option value="ETH">ETH</option>
+    </select>
+
+    <div class="deposit-address-panel">
+
+      <div class="deposit-address-heading">
+        Deposit Address
+      </div>
+
+      <div class="label" id="depositNetwork">
+        USDT — TRC20
+      </div>
+
+      <div class="deposit-address-content">
+        <div class="address" id="depositAddress"></div>
+
+        <button
+          type="button"
+          class="btn secondary deposit-copy-button"
+          id="copyAddressBtn">
+          Copy
+        </button>
+      </div>
+
+    </div>
+
+    <div class="notice warning">
+      Important: Send only the selected asset through the correct network. Transfers made through the wrong network may be permanently lost.
+    </div>
+
+    <div class="field">
+      <label class="label">Deposit Amount</label>
+      <input
+        id="depositAmount"
+        type="number"
+        min="0"
+        step="any"
+        placeholder="Enter amount">
+    </div>
+
+    <div class="field">
+      <label class="label">Transaction ID / TX Hash</label>
+      <input
+        id="depositTxid"
+        type="text"
+        placeholder="Paste your transaction hash">
+    </div>
+
+    <button
+      class="btn deposit-submit"
+      id="submitDepositBtn"
+      type="button">
+      I Have Made a Deposit
+    </button>
+
+    <p id="depositMessage" class="muted"></p>
+
+  </div>
+
+</section>
 
 
   <!-- ACTIVITY -->
