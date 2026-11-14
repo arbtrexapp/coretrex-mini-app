@@ -5621,24 +5621,50 @@ async function loadHomeRecentHistory() {
     return;
   }
 
-  box.innerHTML = window.coretrexHistoryItems.map((item, index) => `
-    <button
-      type="button"
-      class="history-item"
-      style="width:100%;text-align:left;margin-bottom:9px"
-      onclick="showHomeHistoryDetail(${index})"
-    >
-      <div class="row">
-        <b>${escapeHtml(item.title)}</b>
-        <span class="status">${escapeHtml(item.status || "Pending")}</span>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <span class="muted">${new Date(item.date).toLocaleString("en-NG")}</span>
-        <b>${money(item.amount)}</b>
-      </div>
-      <div class="muted" style="margin-top:6px">Tap to view full details →</div>
-    </button>
-  `).join("");
+  
+  box.innerHTML = `
+    <div class="history-list">
+      ${window.coretrexHistoryItems.map((item, index) => {
+        const type = String(
+          item.details.transaction_type || item.details.plan_name || ""
+        ).toLowerCase();
+
+        const incoming =
+          /deposit|credit|profit|commission|capital_release|refund|bonus|cashback|reward|transfer_received/.test(type);
+
+        const direction = incoming ? "incoming" : "outgoing";
+        const arrow = incoming ? "↓" : "↑";
+        const sign = incoming ? "+" : "-";
+
+        const date = item.date
+          ? new Date(item.date).toLocaleString("en-NG", {
+              day: "2-digit",
+              month: "short",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true
+            })
+          : "";
+
+        return `
+          <button
+            type="button"
+            class="history-row"
+            onclick="showHomeHistoryDetail(${index})"
+          >
+            <span class="history-icon ${direction}">${arrow}</span>
+            <span class="history-info">
+              <span class="history-title">${escapeHtml(item.title)}</span>
+              <span class="history-date">${date}</span>
+            </span>
+            <span class="history-amount ${direction}">
+              ${sign}${money(item.amount)}
+            </span>
+          </button>
+        `;
+      }).join("")}
+    </div>
+  `;
 }
 
 function showHomeHistoryDetail(index) {
