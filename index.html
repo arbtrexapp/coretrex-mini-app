@@ -10450,163 +10450,128 @@ $("refreshMySupportBtn")?.addEventListener(
   
 let selectedSupportMessageId = null;
 
-
 async function loadAdminSupportMessages() {
-
-  const list =
-    $("adminSupportList");
+  const list = $("adminSupportList");
 
   if (!list || !currentUser) return;
-
 
   list.innerHTML =
     '<div class="empty">Loading messages...</div>';
 
-
-  const {
-    data,
-    error
-  } =
-  await supabaseClient
+  const { data, error } = await supabaseClient
     .from("support_messages")
-    .select(
-      "id, user_id, subject, message, admin_reply, status, created_at"
-    )
-    .order(
-      "created_at",
-      {
-        ascending: false
-      }
-    );
-
+    .select("id, user_id, subject, message, admin_reply, status, created_at, attachment_path, attachment_name, attachment_type, attachment_size")
+    .order("created_at", { ascending: false });
 
   if (error) {
-
-    console.error(
-      "Support messages error:",
-      error.message
-    );
-
+    console.error("Support messages error:", error.message);
     list.innerHTML =
       '<div class="empty">Unable to load support messages.</div>';
-
     return;
-
   }
-
 
   if (!data || data.length === 0) {
-
     list.innerHTML =
       '<div class="empty">No support messages yet.</div>';
-
     return;
-
   }
-
 
   list.innerHTML = "";
 
+  for (const item of data) {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.style.marginTop = "10px";
 
-  data.forEach(
-    (item) => {
+    const status = document.createElement("div");
+    status.className = "label";
+    status.textContent = item.status || "open";
+    card.appendChild(status);
 
-      const card =
-        document.createElement("div");
+    const subject = document.createElement("h3");
+    subject.style.margin = "6px 0";
+    subject.textContent = item.subject || "Support request";
+    card.appendChild(subject);
 
-      card.className =
-        "card";
+    const message = document.createElement("p");
+    message.className = "muted";
+    message.textContent = item.message || "";
+    card.appendChild(message);
 
-      card.style.marginTop =
-        "10px";
+    if (item.attachment_path) {
+      const { data: fileData, error: fileError } =
+        await supabaseClient.storage
+          .from("live-chat-files")
+          .createSignedUrl(item.attachment_path, 3600);
 
-
-      card.innerHTML = `
-
-        <div class="label">
-          ${item.status || "open"}
-        </div>
-
-        <h3 style="margin:6px 0">
-          ${item.subject}
-        </h3>
-
-        <p class="muted">
-          ${item.message}
-        </p>
-
-        ${
-          item.admin_reply
-            ? `
-              <div class="label"
-                   style="margin-top:12px">
-                ADMIN REPLY
-              </div>
-
-              <p>
-                ${item.admin_reply}
-              </p>
-            `
-            : ""
+      if (!fileError && fileData?.signedUrl) {
+        if (item.attachment_type?.startsWith("image/")) {
+          const preview = document.createElement("img");
+          preview.src = fileData.signedUrl;
+          preview.alt = item.attachment_name || "User attachment";
+          preview.style.display = "block";
+          preview.style.maxWidth = "100%";
+          preview.style.maxHeight = "240px";
+          preview.style.objectFit = "contain";
+          preview.style.borderRadius = "10px";
+          preview.style.marginTop = "10px";
+          card.appendChild(preview);
         }
 
-        <button
-          class="btn secondary supportReplySelect"
-          type="button"
-          style="margin-top:10px"
-        >
-          ${
-            item.admin_reply
-              ? "Reply Again"
-              : "Reply"
-          }
-        </button>
-
-      `;
-
-
-      const replyButton =
-        card.querySelector(
-          ".supportReplySelect"
-        );
-
-
-      replyButton.addEventListener(
-        "click",
-        () => {
-
-          selectedSupportMessageId =
-            item.id;
-
-
-          $("adminSupportReply")
-            ?.classList
-            .remove("hidden");
-
-
-          $("adminSupportReplyText")
-            .value = "";
-
-
-          $("adminSupportMessage")
-            .textContent =
-            "Replying to: " +
-            item.subject;
-
-          $("adminSupportReplyText")
-            ?.focus();
-
-        }
-      );
-
-
-      list.appendChild(card);
-
+        const link = document.createElement("a");
+        link.href = fileData.signedUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent =
+          "📎 " + (item.attachment_name || "Open attachment");
+        link.style.display = "block";
+        link.style.marginTop = "10px";
+        link.style.color = "#35c98b";
+        card.appendChild(link);
+      } else {
+        const unavailable = document.createElement("p");
+        unavailable.textContent = "Attachment unavailable.";
+        card.appendChild(unavailable);
+      }
     }
-  );
 
+    if (item.admin_reply) {
+      const replyLabel = document.createElement("div");
+      replyLabel.className = "label";
+      replyLabel.style.marginTop = "12px";
+      replyLabel.textContent = "ADMIN REPLY";
+      card.appendChild(replyLabel);
+
+      const reply = document.createElement("p");
+      reply.textContent = item.admin_reply;
+      card.appendChild(reply);
+    }
+
+    const replyButton = document.createElement("button");
+    replyButton.className = "btn secondary supportReplySelect";
+    replyButton.type = "button";
+    replyButton.style.marginTop = "10px";
+    replyButton.textContent =
+      item.admin_reply ? "Reply Again" : "Reply";
+
+    replyButton.addEventListener("click", () => {
+      selectedSupportMessageId = item.id;
+
+      $("adminSupportReply")
+        ?.classList.remove("hidden");
+
+      $("adminSupportReplyText").value = "";
+
+      $("adminSupportMessage").textContent =
+        "Replying to: " + item.subject;
+
+      $("adminSupportReplyText")?.focus();
+    });
+
+    card.appendChild(replyButton);
+    list.appendChild(card);
+  }
 }
-
 
 $("refreshSupportBtn")?.addEventListener(
   "click",
