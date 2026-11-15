@@ -12718,37 +12718,109 @@ $("copyPromoAddressBtn")?.addEventListener(
     chatPanel?.classList.add("hidden");
   });
 
+    const attachButton = document.getElementById("attachLiveChatBtn");
+  const fileInput = document.getElementById("liveChatFile");
+
+  attachButton?.addEventListener("click", () => {
+    fileInput?.click();
+  });
+
+  fileInput?.addEventListener("change", () => {
+    const file = fileInput.files?.[0];
+
+    if (file && status) {
+      status.textContent = "Selected: " + file.name;
+    }
+  });
+
   sendButton?.addEventListener("click", async () => {
     if (!currentUser) {
       if (status) status.textContent = "Please log in to use Live Chat.";
       return;
     }
 
-    const message = input?.value.trim();
-    if (!message) return;
+    const message = input?.value.trim() || "";
+    const file = fileInput?.files?.[0];
+
+    if (!message && !file) {
+      if (status) status.textContent = "Write a message or attach a file.";
+      return;
+    }
+
+    if (file && file.size > 10 * 1024 * 1024) {
+      if (status) status.textContent = "File must not exceed 10 MB.";
+      return;
+    }
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "application/pdf",
+      "text/plain",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ];
+
+    if (file && !allowedTypes.includes(file.type)) {
+      if (status) status.textContent = "This file type is not supported.";
+      return;
+    }
 
     sendButton.disabled = true;
+    if (attachButton) attachButton.disabled = true;
+
     if (status) status.textContent = "Sending...";
 
     try {
+      let attachmentPath = null;
+
+      if (file) {
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+        attachmentPath =
+          currentUser.id + "/" +
+          Date.now() + "_" + safeName;
+
+        const { error: uploadError } = await supabaseClient
+          .storage
+          .from("live-chat-files")
+          .upload(attachmentPath, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: file.type
+          });
+
+        if (uploadError) throw uploadError;
+      }
+
       const { error } = await supabaseClient
         .from("live_chat_messages")
         .insert({
           user_id: currentUser.id,
           sender: "user",
-          message: message
+          message: message || (file ? "Sent an attachment." : ""),
+          attachment_path: attachmentPath,
+          attachment_name: file?.name || null,
+          attachment_type: file?.type || null,
+          attachment_size: file?.size || null
         });
 
       if (error) throw error;
 
-      input.value = "";
-      if (status) status.textContent = "Sent.";
+      if (input) input.value = "";
+      if (fileInput) fileInput.value = "";
+
+      if (status) status.textContent = "Message sent successfully.";
+
       await window.loadLiveChatMessages();
+
     } catch (error) {
       console.error("Live Chat send error:", error);
       if (status) status.textContent = "Unable to send: " + error.message;
     } finally {
       sendButton.disabled = false;
+      if (attachButton) attachButton.disabled = false;
     }
   });
 })();
