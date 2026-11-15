@@ -10978,118 +10978,128 @@ async function loadAdminLiveChatUsers() {
 
 } 
   
-  async function loadAdminLiveChatMessages() {
+  
+async function loadAdminLiveChatMessages() {
+  const box = $("adminLiveChatMessages");
 
-  const box =
-    $("adminLiveChatMessages");
-
-  if (!box || !selectedLiveChatUserId) {
-    return;
-  }
-
+  if (!box || !selectedLiveChatUserId) return;
 
   box.innerHTML =
-    '<div class="empty">Loading chat...</div>';
+    '<div class="empty">Loading conversation...</div>';
 
-
-  const {
-    data,
-    error
-  } =
-  await supabaseClient
+  const { data, error } = await supabaseClient
     .from("live_chat_messages")
-    .select(
-      "id, sender, message, created_at"
-    )
-    .eq(
-      "user_id",
-      selectedLiveChatUserId
-    )
-    .order(
-      "created_at",
-      {
-        ascending: true
-      }
-    );
-
+    .select("id, sender, message, created_at, attachment_path, attachment_name, attachment_type, attachment_size")
+    .eq("user_id", selectedLiveChatUserId)
+    .order("created_at", { ascending: true });
 
   if (error) {
-
-    console.error(
-      "Admin live chat messages error:",
-      error.message
-    );
-
+    console.error("Admin live chat messages error:", error.message);
     box.innerHTML =
       '<div class="empty">Unable to load chat.</div>';
-
     return;
-
   }
-
 
   if (!data || data.length === 0) {
-
     box.innerHTML =
       '<div class="empty">No messages yet.</div>';
-
     return;
-
   }
-
 
   box.innerHTML = "";
 
+  for (const item of data) {
+    const row = document.createElement("div");
+    row.style.marginBottom = "14px";
+    row.style.textAlign =
+      item.sender === "admin" ? "right" : "left";
 
-  data.forEach(
-    item => {
+    const bubble = document.createElement("div");
+    bubble.style.display = "inline-block";
+    bubble.style.maxWidth = "85%";
+    bubble.style.padding = "11px 13px";
+    bubble.style.borderRadius = "14px";
+    bubble.style.background =
+      item.sender === "admin" ? "#123d30" : "#0b121c";
+    bubble.style.color = "#ffffff";
+    bubble.style.textAlign = "left";
+    bubble.style.overflowWrap = "anywhere";
 
-      const row =
-        document.createElement("div");
+    const sender = document.createElement("div");
+    sender.textContent =
+      item.sender === "admin" ? "Coretrex Support" : "User";
+    sender.style.fontSize = "11px";
+    sender.style.fontWeight = "700";
+    sender.style.color = "#35c98b";
+    sender.style.marginBottom = "6px";
+    bubble.appendChild(sender);
 
-      row.style.marginBottom =
-        "10px";
-
-      row.style.textAlign =
-        item.sender === "admin"
-          ? "right"
-          : "left";
-
-
-      const bubble =
-        document.createElement("div");
-
-      bubble.textContent =
-        item.message;
-
-      bubble.style.display =
-        "inline-block";
-
-      bubble.style.maxWidth =
-        "85%";
-
-      bubble.style.padding =
-        "9px 12px";
-
-      bubble.style.borderRadius =
-        "12px";
-
-      bubble.style.background =
-        "#0b121c";
-
-
-      row.appendChild(bubble);
-
-      box.appendChild(row);
-
+    if (item.message) {
+      const message = document.createElement("div");
+      message.textContent = item.message;
+      message.style.whiteSpace = "pre-wrap";
+      bubble.appendChild(message);
     }
-  );
 
+    if (item.attachment_path) {
+      const { data: fileData, error: fileError } =
+        await supabaseClient.storage
+          .from("live-chat-files")
+          .createSignedUrl(item.attachment_path, 3600);
 
-  box.scrollTop =
-    box.scrollHeight;
+      if (!fileError && fileData?.signedUrl) {
+        if (item.attachment_type?.startsWith("image/")) {
+          const preview = document.createElement("img");
+          preview.src = fileData.signedUrl;
+          preview.alt = item.attachment_name || "Chat image";
+          preview.style.display = "block";
+          preview.style.maxWidth = "100%";
+          preview.style.maxHeight = "240px";
+          preview.style.objectFit = "contain";
+          preview.style.borderRadius = "10px";
+          preview.style.marginTop = "8px";
+          bubble.appendChild(preview);
+        }
 
+        const link = document.createElement("a");
+        link.href = fileData.signedUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent =
+          "📎 " + (item.attachment_name || "Open attachment");
+        link.style.display = "block";
+        link.style.marginTop = "10px";
+        link.style.padding = "10px";
+        link.style.borderRadius = "10px";
+        link.style.background = "#071d17";
+        link.style.color = "#55dca4";
+        link.style.textDecoration = "none";
+        bubble.appendChild(link);
+      } else {
+        const unavailable = document.createElement("div");
+        unavailable.textContent = "Attachment unavailable.";
+        unavailable.style.marginTop = "8px";
+        unavailable.style.color = "#f0b36b";
+        bubble.appendChild(unavailable);
+      }
+    }
+
+    const time = document.createElement("div");
+    time.textContent = new Date(item.created_at).toLocaleString();
+    time.style.fontSize = "10px";
+    time.style.color = "#9ba9a3";
+    time.style.marginTop = "7px";
+    bubble.appendChild(time);
+
+    row.appendChild(bubble);
+    box.appendChild(row);
+  }
+
+  box.scrollTop = box.scrollHeight;
 }
+
+
+
 
   $("sendAdminLiveChatBtn")?.addEventListener(
   "click",
