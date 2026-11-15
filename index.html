@@ -10193,94 +10193,141 @@ $("transferReferralBtn")?.addEventListener(
 
   }
 );  
+  
+  const contactAttachBtn = $("contactAttachBtn");
+  const contactFile = $("contactFile");
+  const contactFileName = $("contactFileName");
+
+  contactAttachBtn?.addEventListener("click", () => {
+    contactFile?.click();
+  });
+
+  contactFile?.addEventListener("change", () => {
+    const file = contactFile.files?.[0];
+
+    if (contactFileName) {
+      contactFileName.textContent =
+        file ? "Selected: " + file.name : "";
+    }
+  });
+
   $("contactForm")?.addEventListener(
-  "submit",
-  async (e) => {
+    "submit",
+    async (e) => {
+      e.preventDefault();
 
-    e.preventDefault();
+      if (!currentUser) {
+        $("contactFormMessage").textContent =
+          "Please log in to send a message.";
+        return;
+      }
 
+      const subject = $("contactSubject").value.trim();
+      const message = $("contactMessage").value.trim();
+      const file = contactFile?.files?.[0];
 
-    if (!currentUser) {
+      if (!subject || !message) {
+        $("contactFormMessage").textContent =
+          "Please enter a subject and message.";
+        return;
+      }
 
-      $("contactFormMessage").textContent =
-        "Please log in to send a message.";
+      if (file && file.size > 10 * 1024 * 1024) {
+        $("contactFormMessage").textContent =
+          "File must not exceed 10 MB.";
+        return;
+      }
 
-      return;
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "application/pdf",
+        "text/plain",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      ];
 
-    }
+      if (file && !allowedTypes.includes(file.type)) {
+        $("contactFormMessage").textContent =
+          "This file type is not supported.";
+        return;
+      }
 
+      const sendButton =
+        $("contactForm").querySelector(
+          'button[type="submit"]'
+        );
 
-    const subject =
-      $("contactSubject")
-        .value
-        .trim();
-
-    const message =
-      $("contactMessage")
-        .value
-        .trim();
-
-
-    if (!subject || !message) {
-
-      $("contactFormMessage").textContent =
-        "Please enter a subject and message.";
-
-      return;
-
-    }
-
-
-    $("contactFormMessage").textContent =
-      "Sending message...";
-
-
-    const {
-      error
-    } =
-    await supabaseClient
-      .from("support_messages")
-      .insert({
-
-        user_id:
-          currentUser.id,
-
-        subject:
-          subject,
-
-        message:
-          message
-
-      });
-
-
-    if (error) {
-
-      console.error(
-        "Support message error:",
-        error.message
-      );
+      if (sendButton) sendButton.disabled = true;
+      if (contactAttachBtn) contactAttachBtn.disabled = true;
 
       $("contactFormMessage").textContent =
-        "Unable to send your message. Please try again.";
+        "Sending your support message...";
 
-      return;
+      try {
+        let attachmentPath = null;
 
+        if (file) {
+          const safeName = file.name.replace(
+            /[^a-zA-Z0-9._-]/g,
+            "_"
+          );
+
+          attachmentPath =
+            currentUser.id + "/" +
+            Date.now() + "_" + safeName;
+
+          const { error: uploadError } =
+            await supabaseClient.storage
+              .from("live-chat-files")
+              .upload(attachmentPath, file, {
+                cacheControl: "3600",
+                upsert: false,
+                contentType: file.type
+              });
+
+          if (uploadError) throw uploadError;
+        }
+
+        const { error } = await supabaseClient
+          .from("support_messages")
+          .insert({
+            user_id: currentUser.id,
+            subject: subject,
+            message: message,
+            attachment_path: attachmentPath,
+            attachment_name: file?.name || null,
+            attachment_type: file?.type || null,
+            attachment_size: file?.size || null
+          });
+
+        if (error) throw error;
+
+        $("contactFormMessage").textContent =
+          "Your support message and attachment were sent successfully.";
+
+        $("contactSubject").value = "";
+        $("contactMessage").value = "";
+
+        if (contactFile) contactFile.value = "";
+        if (contactFileName) contactFileName.textContent = "";
+
+        await loadMySupportMessages();
+
+      } catch (error) {
+        console.error("Contact support error:", error);
+
+        $("contactFormMessage").textContent =
+          "Unable to send: " + error.message;
+
+      } finally {
+        if (sendButton) sendButton.disabled = false;
+        if (contactAttachBtn) contactAttachBtn.disabled = false;
+      }
     }
+  );
 
-
-    $("contactFormMessage").textContent =
-      "Your message has been sent successfully.";
-
-
-    $("contactSubject").value =
-      "";
-
-    $("contactMessage").value =
-      "";
-
-  }
-);
   
 async function loadMySupportMessages() {
 
