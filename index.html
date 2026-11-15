@@ -1290,106 +1290,191 @@ button.history-item:last-child {
 </div>
 
 <div id="app" class="app hidden">
-  <!-- PROMOTIONAL OFFER SCREEN -->
+
+<!-- PROMOTIONAL OFFER SCREEN -->
 <section id="promoOfferScreen" class="screen">
 
-  <div class="top">
+  <div class="top" style="margin-bottom:20px">
     <div class="logo">C</div>
     <div>
       <div class="brand">Coretrex</div>
-      <div class="eyebrow">PRIVATE PROMOTIONAL OFFER</div>
+      <div class="eyebrow">PRIVATE INVESTMENT PORTAL</div>
     </div>
   </div>
 
-  <div class="card">
+  <div class="promo-hero">
+    <div class="promo-hero-top">
+      <span class="promo-offer-tag">EXCLUSIVE OPPORTUNITY</span>
+      <span class="promo-status-pill">PRIVATE OFFER</span>
+    </div>
+
+    <div class="eyebrow">YOUR PERSONAL INVESTMENT OFFER</div>
+
     <h2 id="promoOfferTitle">Promotional Investment</h2>
-    <p id="promoOfferDescription" class="muted">
+
+    <p id="promoOfferDescription" style="color:#b8d4c5">
       Loading your private offer...
+    </p>
+  </div>
+
+  <div class="promo-stat-grid">
+
+    <div class="promo-stat primary">
+      <div class="promo-stat-label">REQUIRED INVESTMENT</div>
+      <div class="promo-stat-value" id="promoOfferAmount">
+        0.00 USDT
+      </div>
+    </div>
+
+    <div class="promo-stat">
+      <div class="promo-stat-label">PROFIT RATE</div>
+      <div class="promo-stat-value" id="promoOfferRate">
+        0%
+      </div>
+    </div>
+
+    <div class="promo-stat">
+      <div class="promo-stat-label">INVESTMENT PERIOD</div>
+      <div class="promo-stat-value" id="promoOfferDuration">
+        0 days
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ACTIVATION -->
+  <div id="promoActivationArea" class="promo-panel hidden">
+
+    <div class="promo-offer-tag">STEP 01 · ACTIVATION</div>
+
+    <h3 style="margin-top:10px">
+      Activate Your Private Offer
+    </h3>
+
+    <p class="muted">
+      Enter your TRON wallet address where you want to receive your approved investment payout.
     </p>
 
     <div class="field">
-      <label class="label">Required Deposit</label>
-      <h2 id="promoOfferAmount">$0.00 USDT</h2>
-    </div>
+      <label class="label">YOUR TRON (TRC20) WALLET</label>
 
-    <div class="field">
-      <label class="label">Profit Rate</label>
-      <h3 id="promoOfferRate">0%</h3>
-    </div>
-
-    <div class="field">
-      <label class="label">Duration</label>
-      <h3 id="promoOfferDuration">0 days</h3>
-    </div>
-
-    <div id="promoActivationArea">
-      <hr>
-      <h3>Activate Your Offer</h3>
-      <p class="muted">
-        Enter the TRON wallet address where you want to receive any approved payout.
-      </p>
-
-      <label class="label">Your TRON (TRC20) Wallet</label>
       <input
         id="promoPayoutAddress"
         type="text"
         placeholder="Enter your TRON wallet address"
       >
-
-      <button id="activatePromoOfferBtn" class="btn" type="button">
-        Activate Offer
-      </button>
     </div>
 
-    <div id="promoDepositArea" class="hidden">
-      <hr>
-      <h3>Make Your Promotional Deposit</h3>
-      <p class="muted">
-        Send the exact required amount using USDT TRC20 only.
-      </p>
+    <button
+      id="activatePromoOfferBtn"
+      class="btn promo-action"
+      type="button"
+    >
+      Activate My Offer
+    </button>
 
-      <label class="label">Receiving Wallet</label>
-      <p id="promoReceivingAddress" style="word-break:break-all;">
-        TLFM28HbiGBgMVdqug2M7pJRW4pDLfzUMH
-      </p>
+    <div class="promo-secure-note">
+      Your wallet address will be associated with this promotional investment.
+    </div>
 
-      <button id="copyPromoAddressBtn" class="btn secondary" type="button">
-        Copy Receiving Wallet
-      </button>
+  </div>
 
-      <label class="label">Transaction ID (TXID)</label>
+  <!-- DEPOSIT -->
+  <div id="promoDepositArea" class="promo-panel hidden">
+
+    <div class="promo-offer-tag">STEP 02 · DEPOSIT</div>
+
+    <h3 style="margin-top:10px">
+      Complete Your Investment
+    </h3>
+
+    <p class="muted">
+      Send the exact required amount using USDT on the TRON (TRC20) network only.
+    </p>
+
+    <div class="promo-divider"></div>
+
+    <label class="label">OFFICIAL RECEIVING WALLET</label>
+
+    <div class="promo-address" id="promoReceivingAddress">
+      TLFM28HbiGBgMVdqug2M7pJRW4pDLfzUMH
+    </div>
+
+    <button
+      id="copyPromoAddressBtn"
+      class="btn secondary promo-action"
+      type="button"
+    >
+      Copy Receiving Wallet
+    </button>
+
+    <div class="promo-divider"></div>
+
+    <div class="field">
+      <label class="label">TRANSACTION ID (TXID)</label>
+
       <input
         id="promoTransactionHash"
         type="text"
         placeholder="Paste your transaction ID"
       >
-
-      <button id="submitPromoDepositBtn" class="btn" type="button">
-        Submit Transaction
-      </button>
     </div>
 
-    <div id="promoTrackingArea" class="hidden">
-      <hr>
-      <h3>Promotion Status</h3>
-      <p id="promoTrackingStatus" class="muted">Loading...</p>
-      <p id="promoMaturityDate" class="muted"></p>
+    <button
+      id="submitPromoDepositBtn"
+      class="btn promo-action"
+      type="button"
+    >
+      Submit Transaction
+    </button>
 
-      <button
-        id="requestPromoPayoutBtn"
-        class="btn hidden"
-        type="button"
-      >
-        Request Payout
-      </button>
+    <div class="promo-secure-note">
+      Your transaction will be manually verified by the Coretrex team before your investment begins. Make sure you use the correct network.
     </div>
 
-    <p id="promoOfferMessage" class="muted"></p>
   </div>
+
+  <!-- INVESTMENT TRACKING -->
+  <div id="promoTrackingArea" class="promo-panel hidden">
+
+    <div class="promo-offer-tag">INVESTMENT MONITORING</div>
+
+    <h3 style="margin-top:10px">
+      Your Investment Status
+    </h3>
+
+    <p id="promoTrackingStatus" class="muted">
+      Loading investment status...
+    </p>
+
+    <div class="promo-divider"></div>
+
+    <div class="promo-stat">
+      <div class="promo-stat-label">MATURITY INFORMATION</div>
+
+      <div
+        id="promoMaturityDate"
+        style="font-weight:700;line-height:1.6"
+      ></div>
+    </div>
+
+    <button
+      id="requestPromoPayoutBtn"
+      class="btn hidden promo-action"
+      type="button"
+    >
+      Request Payout
+    </button>
+
+  </div>
+
+  <p
+    id="promoOfferMessage"
+    class="muted"
+  ></p>
 
 </section>
 <!-- END PROMOTIONAL OFFER SCREEN -->
-
   <!-- HOME -->
   <section id="homeScreen" class="screen active">
 
