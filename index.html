@@ -3626,145 +3626,192 @@ if (id === "contactScreen") {
   
 }
 
-  async function loadNotifications() {
+  
+async function loadNotifications() {
+  const list = $("notificationsList");
 
-  const list =
-    $("notificationsList");
-
-  if (!list || !currentUser) {
-    return;
-  }
+  if (!list || !currentUser) return;
 
   list.innerHTML =
     '<div class="empty">Loading notifications...</div>';
 
-  const {
-    data,
-    error
-  } =
-  await supabaseClient
+  const { data, error } = await supabaseClient
     .from("notifications")
-    .select(
-      "id, title, message, type, is_read, created_at"
-    )
-    .eq(
-      "user_id",
-      currentUser.id
-    )
-    .order(
-      "created_at",
-      {
-        ascending: false
-      }
-    );
+    .select("id, title, message, type, is_read, created_at")
+    .eq("user_id", currentUser.id)
+    .order("created_at", { ascending: false });
 
   if (error) {
-
-    console.error(
-      "Notifications load error:",
-      error.message
-    );
-
+    console.error("Notifications load error:", error.message);
     list.innerHTML =
       '<div class="empty">Unable to load notifications.</div>';
-
     return;
-
   }
 
-  if (!data || data.length === 0) {
+  window.coretrexNotifications = data || [];
 
+  if (!data || data.length === 0) {
     list.innerHTML =
       '<div class="empty">No notifications yet.</div>';
-
     return;
-
   }
 
   list.innerHTML = "";
 
-  data.forEach(
-    item => {
+  data.forEach(item => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "notification-list-item";
 
-      const card =
-        document.createElement("div");
+    const icon = document.createElement("div");
+    icon.className = "notification-list-icon";
+    icon.textContent = "◈";
 
-      card.className =
-        "card";
+    const content = document.createElement("div");
+    content.className = "notification-list-content";
 
-      card.style.marginBottom =
-        "10px";
+    const title = document.createElement("div");
+    title.className = "notification-list-title";
+    title.textContent = item.title || "Notification";
 
-      const row =
-        document.createElement("div");
+    const date = document.createElement("div");
+    date.className = "notification-list-date";
+    date.textContent = new Date(item.created_at)
+      .toLocaleDateString("en-NG", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      });
 
-      row.className =
-        "row";
+    content.appendChild(title);
+    content.appendChild(date);
 
-      const content =
-        document.createElement("div");
+    button.appendChild(icon);
+    button.appendChild(content);
 
-      const title =
-        document.createElement("strong");
-
-      title.textContent =
-        item.title;
-
-      const message =
-        document.createElement("div");
-
-      message.className =
-        "muted";
-
-      message.style.marginTop =
-        "6px";
-
-      const parts = item.message.split(/(https?:\/\/[^\s]+)/g);
-
-parts.forEach(part => {
-  if (/^https?:\/\//i.test(part)) {
-    const link = document.createElement("a");
-    link.href = part;
-    link.textContent = "Open promotional offer";
-    link.rel = "noopener noreferrer";
-    link.style.color = "#0c8f62";
-    link.style.display = "block";
-    link.style.marginTop = "8px";
-    message.appendChild(link);
-  } else {
-    message.appendChild(document.createTextNode(part));
-  }
-});
-      const date =
-        document.createElement("div");
-
-      date.className =
-        "muted";
-
-      date.style.marginTop =
-        "8px";
-
-      date.style.fontSize =
-        "11px";
-
-      date.textContent =
-        new Date(
-          item.created_at
-        ).toLocaleDateString();
-
-      content.appendChild(title);
-      content.appendChild(message);
-      content.appendChild(date);
-
-      row.appendChild(content);
-
-      card.appendChild(row);
-
-      list.appendChild(card);
-
+    if (!item.is_read) {
+      const dot = document.createElement("div");
+      dot.className = "notification-unread-dot";
+      button.appendChild(dot);
     }
+
+    button.addEventListener("click", () => {
+      openNotificationDetail(item.id);
+    });
+
+    list.appendChild(button);
+  });
+}
+
+
+function openNotificationDetail(notificationId) {
+  const list = $("notificationsList");
+
+  const item = window.coretrexNotifications?.find(
+    notification => String(notification.id) === String(notificationId)
   );
 
+  if (!list || !item) return;
+
+  list.innerHTML = "";
+
+  const back = document.createElement("button");
+  back.type = "button";
+  back.className = "btn secondary";
+  back.textContent = "← Back to Notifications";
+  back.addEventListener("click", loadNotifications);
+
+  const card = document.createElement("div");
+  card.className = "notification-detail-card";
+
+  const label = document.createElement("div");
+  label.className = "eyebrow";
+  label.textContent = "NOTIFICATION DETAILS";
+
+  const title = document.createElement("div");
+  title.className = "notification-detail-title";
+  title.textContent = item.title || "Notification";
+
+  const message = document.createElement("div");
+  message.className = "notification-detail-message";
+
+  const messageText = String(item.message || "No additional details.");
+
+  const parts = messageText.split(/(https?:\/\/[^\s]+)/g);
+
+  parts.forEach(part => {
+    if (/^https?:\/\//i.test(part)) {
+      const link = document.createElement("a");
+      link.href = part;
+      link.textContent = "Open promotional offer";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.style.display = "block";
+      link.style.marginTop = "12px";
+      link.style.color = "#43df9a";
+      message.appendChild(link);
+    } else {
+      message.appendChild(document.createTextNode(part));
+    }
+  });
+
+  const date = document.createElement("div");
+  date.className = "notification-detail-date";
+  date.textContent =
+    "Received: " +
+    new Date(item.created_at).toLocaleString("en-NG", {
+      dateStyle: "medium",
+      timeStyle: "short"
+    });
+
+  const deleteButton = document.createElement("button");
+  deleteButton.type = "button";
+  deleteButton.className = "notification-delete-link";
+  deleteButton.textContent = "Delete notification";
+
+  deleteButton.addEventListener("click", () => {
+    deleteNotification(item.id);
+  });
+
+  card.appendChild(label);
+  card.appendChild(title);
+  card.appendChild(message);
+  card.appendChild(date);
+
+  list.appendChild(back);
+  list.appendChild(card);
+  list.appendChild(deleteButton);
+}
+
+
+async function deleteNotification(notificationId) {
+  const list = $("notificationsList");
+
+  if (!currentUser || !list) return;
+
+  list.innerHTML =
+    '<div class="empty">Deleting notification...</div>';
+
+  const { error } = await supabaseClient
+    .from("notifications")
+    .delete()
+    .eq("id", notificationId)
+    .eq("user_id", currentUser.id);
+
+  if (error) {
+    console.error("Notification delete error:", error.message);
+    list.innerHTML =
+      '<div class="empty">Unable to delete notification. Please try again.</div>';
+    return;
+  }
+
+  window.coretrexNotifications =
+    (window.coretrexNotifications || []).filter(
+      item => String(item.id) !== String(notificationId)
+    );
+
+  await loadNotifications();
+  await loadNotificationUnreadCount();
 }
 
   async function createNotification(
