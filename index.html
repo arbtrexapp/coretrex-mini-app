@@ -1449,14 +1449,39 @@ button.history-item:last-child {
 
     <div class="promo-divider"></div>
 
-    <div class="promo-stat">
-      <div class="promo-stat-label">MATURITY INFORMATION</div>
+    <div class="promo-stat-grid">
 
-      <div
-        id="promoMaturityDate"
-        style="font-weight:700;line-height:1.6"
-      ></div>
-    </div>
+  <div class="promo-stat">
+    <div class="promo-stat-label">INVESTED CAPITAL</div>
+    <div class="promo-stat-value" id="promoPrincipal">0.00 USDT</div>
+  </div>
+
+  <div class="promo-stat">
+    <div class="promo-stat-label">EXPECTED PROFIT</div>
+    <div class="promo-stat-value" id="promoExpectedProfit">0.00 USDT</div>
+  </div>
+
+  <div class="promo-stat primary">
+    <div class="promo-stat-label">TOTAL EXPECTED PAYOUT</div>
+    <div class="promo-stat-value" id="promoTotalExpected">0.00 USDT</div>
+  </div>
+
+</div>
+
+<div class="promo-stat" style="margin-top:12px">
+  <div class="promo-stat-label">INVESTMENT START DATE</div>
+  <div id="promoStartDate" style="font-weight:700">—</div>
+
+  <div class="promo-divider"></div>
+
+  <div class="promo-stat-label">MATURITY DATE</div>
+  <div id="promoMaturityDate" style="font-weight:700;line-height:1.6">—</div>
+
+  <div class="promo-divider"></div>
+
+  <div class="promo-stat-label">TIME REMAINING</div>
+  <div id="promoCountdown" style="font-size:18px;font-weight:800;color:#8ce4b5">—</div>
+</div>
 
     <button
       id="requestPromoPayoutBtn"
