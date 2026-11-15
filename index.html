@@ -10329,126 +10329,115 @@ $("transferReferralBtn")?.addEventListener(
   );
 
   
-async function loadMySupportMessages() {
 
-  const list =
-    $("mySupportList");
+async function loadMySupportMessages() {
+  const list = $("mySupportList");
 
   if (!list || !currentUser) return;
-
 
   list.innerHTML =
     '<div class="empty">Loading messages...</div>';
 
-
-  const {
-    data,
-    error
-  } =
-  await supabaseClient
+  const { data, error } = await supabaseClient
     .from("support_messages")
-    .select(
-      "id, subject, message, admin_reply, status, created_at, replied_at, resolved_at"
-    )
-    .eq(
-      "user_id",
-      currentUser.id
-    )
-    .order(
-      "created_at",
-      {
-        ascending: false
-      }
-    );
-
+    .select("id, subject, message, admin_reply, status, created_at, replied_at, resolved_at, attachment_path, attachment_name, attachment_type, attachment_size")
+    .eq("user_id", currentUser.id)
+    .order("created_at", { ascending: false });
 
   if (error) {
-
-    console.error(
-      "My support messages error:",
-      error.message
-    );
-
-    list.innerHTML =
-      '<div class="empty">ERROR: ' +
-      error.message +
-      '</div>';
-
+    console.error("My support messages error:", error.message);
+    list.textContent = "Unable to load support messages.";
     return;
-
   }
-
 
   if (!data || data.length === 0) {
-
     list.innerHTML =
       '<div class="empty">You have not sent any support messages yet.</div>';
-
     return;
-
   }
-
 
   list.innerHTML = "";
 
+  for (const item of data) {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.style.marginTop = "10px";
 
-  data.forEach(
-    (item) => {
+    const status = document.createElement("div");
+    status.className = "label";
+    status.textContent = item.status || "open";
+    card.appendChild(status);
 
-      const card =
-        document.createElement("div");
+    const subject = document.createElement("h3");
+    subject.style.margin = "6px 0";
+    subject.textContent = item.subject || "Support request";
+    card.appendChild(subject);
 
-      card.className =
-        "card";
+    const message = document.createElement("p");
+    message.textContent = item.message || "";
+    card.appendChild(message);
 
-      card.style.marginTop =
-        "10px";
+    if (item.attachment_path) {
+      const { data: fileData, error: fileError } =
+        await supabaseClient.storage
+          .from("live-chat-files")
+          .createSignedUrl(item.attachment_path, 3600);
 
-
-      card.innerHTML = `
-
-        <div class="label">
-          ${item.status || "open"}
-        </div>
-
-        <h3 style="margin:6px 0">
-          ${item.subject}
-        </h3>
-
-        <p>
-          ${item.message}
-        </p>
-
-        ${
-          item.admin_reply
-            ? `
-              <div
-                class="label"
-                style="margin-top:12px"
-              >
-                ADMIN REPLY
-              </div>
-
-              <p>
-                ${item.admin_reply}
-              </p>
-            `
-            : `
-              <p class="muted">
-                Awaiting support response.
-              </p>
-            `
+      if (!fileError && fileData?.signedUrl) {
+        if (item.attachment_type?.startsWith("image/")) {
+          const preview = document.createElement("img");
+          preview.src = fileData.signedUrl;
+          preview.alt = item.attachment_name || "Support attachment";
+          preview.style.display = "block";
+          preview.style.maxWidth = "100%";
+          preview.style.maxHeight = "220px";
+          preview.style.objectFit = "contain";
+          preview.style.borderRadius = "10px";
+          preview.style.marginTop = "10px";
+          card.appendChild(preview);
         }
 
-      `;
-
-
-      list.appendChild(card);
-
+        const link = document.createElement("a");
+        link.href = fileData.signedUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent =
+          "📎 " + (item.attachment_name || "Open attachment");
+        link.style.display = "block";
+        link.style.marginTop = "10px";
+        link.style.color = "#35c98b";
+        card.appendChild(link);
+      } else {
+        const unavailable = document.createElement("p");
+        unavailable.textContent = "Attachment unavailable.";
+        card.appendChild(unavailable);
+      }
     }
-  );
 
+    if (item.admin_reply) {
+      const replyLabel = document.createElement("div");
+      replyLabel.className = "label";
+      replyLabel.style.marginTop = "12px";
+      replyLabel.textContent = "ADMIN REPLY";
+      card.appendChild(replyLabel);
+
+      const reply = document.createElement("p");
+      reply.textContent = item.admin_reply;
+      card.appendChild(reply);
+    } else {
+      const waiting = document.createElement("p");
+      waiting.className = "muted";
+      waiting.textContent = "Awaiting support response.";
+      card.appendChild(waiting);
+    }
+
+    list.appendChild(card);
+  }
 }
+
+
+
+
 $("refreshMySupportBtn")?.addEventListener(
   "click",
   async () => {
