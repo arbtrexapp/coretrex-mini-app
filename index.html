@@ -12735,9 +12735,64 @@ async function loadPromoOffer() {
     $("promoTrackingStatus").textContent =
       "Investment status: " + investment.status;
 
+    $("promoPrincipal").textContent =
+      Number(investment.principal).toFixed(2) + " USDT";
+
+    $("promoExpectedProfit").textContent =
+      Number(investment.expected_profit).toFixed(2) + " USDT";
+
+    $("promoTotalExpected").textContent =
+      Number(investment.total_expected).toFixed(2) + " USDT";
+
+    $("promoStartDate").textContent =
+      new Date(investment.started_at).toLocaleString();
+
     $("promoMaturityDate").textContent =
-      "Maturity: " +
       new Date(investment.maturity_at).toLocaleString();
+
+    function updatePromoCountdown() {
+
+      const remaining =
+        new Date(investment.maturity_at).getTime() -
+        Date.now();
+
+      if (remaining <= 0) {
+        $("promoCountdown").textContent =
+          "Maturity reached";
+        return;
+      }
+
+      const days = Math.floor(
+        remaining / 86400000
+      );
+
+      const hours = Math.floor(
+        (remaining % 86400000) / 3600000
+      );
+
+      const minutes = Math.floor(
+        (remaining % 3600000) / 60000
+      );
+
+      const seconds = Math.floor(
+        (remaining % 60000) / 1000
+      );
+
+      $("promoCountdown").textContent =
+        days + "d " +
+        hours + "h " +
+        minutes + "m " +
+        seconds + "s";
+    }
+
+    updatePromoCountdown();
+
+    if (window.promoCountdownTimer) {
+      clearInterval(window.promoCountdownTimer);
+    }
+
+    window.promoCountdownTimer =
+      setInterval(updatePromoCountdown, 1000);
 
     if (investment.status === "matured") {
       $("requestPromoPayoutBtn").classList.remove("hidden");
