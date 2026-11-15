@@ -1752,7 +1752,33 @@ Only official Coretrex communication channels should be trusted
           required
         ></textarea>
       </div>
+      
 
+      
+      <div style="margin:14px 0">
+        <input
+          type="file"
+          id="contactFile"
+          accept="image/*,.pdf,.doc,.docx,.txt"
+          hidden
+        >
+
+        <button
+          type="button"
+          id="contactAttachBtn"
+          class="btn secondary"
+          style="width:auto;padding:11px 14px"
+        >
+          📎 Attach File
+        </button>
+
+        <div
+          id="contactFileName"
+          class="muted"
+          style="font-size:12px;margin-top:8px"
+        ></div>
+      </div>
+      
       <button
         type="submit"
         class="btn contact-send-button"
