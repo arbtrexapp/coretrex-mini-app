@@ -1471,6 +1471,186 @@ button.history-item:last-child {
   font-weight:800;
 }
 
+/* CORETREX PREMIUM ACCOUNT DASHBOARD */
+#accountScreen {
+  padding-bottom: 30px;
+}
+
+#accountScreen > h2 {
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: -.6px;
+  color: #effff5;
+  margin-bottom: 6px;
+}
+
+#accountScreen > .muted {
+  color: #91ad9d;
+  line-height: 1.7;
+}
+
+#accountScreen .account-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 23px 20px;
+  margin: 20px 0 16px;
+  border: 1px solid #24734e;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(22,184,121,.23),transparent 48%),
+    linear-gradient(145deg,#142e21,#07150e);
+  box-shadow: 0 12px 30px rgba(0,0,0,.25);
+}
+
+#accountScreen .account-hero::after {
+  content: "";
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  right: -65px;
+  bottom: -90px;
+  border: 1px solid rgba(52,211,139,.2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 18px rgba(52,211,139,.035),
+              0 0 0 36px rgba(52,211,139,.025);
+  pointer-events: none;
+}
+
+#accountScreen .account-avatar {
+  width: 62px;
+  height: 62px;
+  min-width: 62px;
+  border: 2px solid #35d98b;
+  background: linear-gradient(145deg,#19b978,#075b3e);
+  color: #fff;
+  font-size: 27px;
+  box-shadow: 0 0 22px rgba(22,184,121,.25);
+}
+
+#accountScreen .account-hero-top {
+  position: relative;
+  z-index: 1;
+  gap: 14px;
+}
+
+#accountScreen .account-status {
+  margin-left: auto;
+  white-space: nowrap;
+  background: rgba(22,184,121,.13);
+  border-color: #24734e;
+  color: #72e6ac;
+}
+
+#accountScreen .account-info-row {
+  position: relative;
+  z-index: 1;
+  border-color: rgba(93,145,112,.2);
+}
+
+#accountScreen .account-section {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  margin-top: 15px;
+  border: 1px solid #244638;
+  border-radius: 20px;
+  background:
+    linear-gradient(155deg,#12251b,#09150f);
+  box-shadow: 0 9px 25px rgba(0,0,0,.17);
+}
+
+#accountScreen .account-section-heading {
+  gap: 12px;
+  margin-bottom: 17px;
+}
+
+#accountScreen .account-section-heading b {
+  color: #edfff4;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+#accountScreen .account-section-heading .muted {
+  color: #91ad9d;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+#accountScreen .account-section-icon {
+  width: 43px;
+  height: 43px;
+  min-width: 43px;
+  border-radius: 14px;
+  background: linear-gradient(145deg,#126d49,#0b3524);
+  border: 1px solid #24885a;
+  color: #74e8ae;
+  font-size: 21px;
+  box-shadow: 0 5px 14px rgba(0,0,0,.2);
+}
+
+#accountScreen .account-action {
+  min-height: 48px;
+  padding: 13px 14px;
+  border: 1px solid #294c39;
+  border-radius: 13px;
+  background: linear-gradient(110deg,#10271b,#0b1911);
+  color: #dff7e8;
+  font-size: 13px;
+  font-weight: 700;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+#accountScreen .account-action:active {
+  border-color: #35d98b;
+  background: #123d29;
+}
+
+#accountScreen .account-referral-value {
+  border: 1px solid #28543c;
+  border-radius: 13px;
+  background: #081810;
+  color: #b9f5d0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+#accountScreen #referralBalance {
+  color: #65e9a7 !important;
+  font-size: 25px !important;
+  letter-spacing: -.5px;
+}
+
+#accountScreen #openKycButton {
+  min-height: 48px;
+  border-radius: 13px;
+  background: linear-gradient(135deg,#18b978,#087348);
+  color: #fff;
+  font-weight: 800;
+}
+
+#accountScreen #logoutBtn {
+  min-height: 47px;
+  border-radius: 13px;
+  font-weight: 800;
+}
+
+#accountScreen #kycAccountStatus {
+  border-radius: 12px;
+  padding: 11px 13px;
+}
+
+@media (max-width: 380px) {
+  #accountScreen .account-hero,
+  #accountScreen .account-section {
+    padding: 17px;
+  }
+
+  #accountScreen .account-status {
+    font-size: 9px;
+    padding: 5px 8px;
+  }
+}
+
 
   </style>
 </head>
